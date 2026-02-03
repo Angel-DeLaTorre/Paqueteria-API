@@ -1,0 +1,7 @@
+﻿services:
+  paqueteria.core:
+    image: paqueteria.core
+    build:
+      context: .
+      dockerfile: Paqueteria.Core/Dockerfile
+
