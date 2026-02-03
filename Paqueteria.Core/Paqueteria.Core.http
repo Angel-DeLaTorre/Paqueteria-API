@@ -1,6 +1,0 @@
-@Paqueteria.Core_HostAddress = http://localhost:5100
-
-GET {{Paqueteria.Core_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
