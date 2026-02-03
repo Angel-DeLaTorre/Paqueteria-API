@@ -13,21 +13,39 @@ public class Sucursal
 
     [Required]
     [MaxLength(100)]
+    [Column("nombre")]
     public string Nombre { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(50)]
+    [Column("codigo")]
     public string Codigo { get; set; } = string.Empty;
 
     [Column("es_matriz")]
     public bool EsMatriz { get; set; } = false;
 
-    [Column("id_municipio")]
-    public Guid IdMunicipio { get; set; }
+    [Column("calle")]
+    [MaxLength(100)]
+    public string Calle { get; set; } = string.Empty;
 
-    [Column("direccion")]
+    [Column("colonia")]
+    [MaxLength(100)]
+    public string Colonia { get; set; } = string.Empty;
+
+    [Column("numero_exterior")]
+    [MaxLength(10)]
+    public string NumeroExterior { get; set; }  = string.Empty;
+
+    [Column("numero_interior")]
+    [MaxLength(10)]
+    public string? NumeroInterior { get; set; }
+
+    [Column("localidad")]
     [MaxLength(250)]
-    public string? Direccion { get; set; }
+    public string? Localidad { get; set; }
+
+    [Column("id_municipio")]
+    public Guid? IdMunicipio { get; set; }
 
     [Column("telefono")]
     [MaxLength(20)]
@@ -42,7 +60,7 @@ public class Sucursal
 
     // llaves
     [ForeignKey("IdMunicipio")]
-    public virtual Municipio Municipio { get; set; } = null!;
+    public virtual Municipio? Municipio { get; set; }
 
     // colleciones
     [InverseProperty("SucursalOrigen")]

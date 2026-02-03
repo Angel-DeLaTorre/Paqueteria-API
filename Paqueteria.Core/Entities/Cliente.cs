@@ -13,15 +13,18 @@ public class Cliente
 
     [Required]
     [MaxLength(100)]
+    [Column("nombre")]
     public string Nombre { get; set; } = string.Empty;
 
     [Column("estatus")]
     public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;
 
     [MaxLength(20)]
+    [Column("rfc")]
     public string? Rfc { get; set; }
 
     [MaxLength(255)]
+    [Column("direccion")]
     public string? Direccion { get; set; }
 
     [MaxLength(255)]
@@ -32,16 +35,23 @@ public class Cliente
     [Column("codigo_postal")]
     public string? CodigoPostal { get; set; }
 
-    [MaxLength(100)]
-    public string? Ciudad { get; set; }
+    [Column("id_municipio")]
+    public Guid? IdMunicipio { get; set; }
 
     [MaxLength(20)]
+    [Column("telefono")]
     public string? Telefono { get; set; }
 
+    [MaxLength(20)]
+    [Column("telefono_2")]
+    public string? Telefono2 { get; set; }
+
     [MaxLength(100)]
+    [Column("correo")]
     public string? Correo { get; set; }
 
     [MaxLength(100)]
+    [Column("contacto")]
     public string? Contacto { get; set; }
 
     [MaxLength(50)]
@@ -59,6 +69,9 @@ public class Cliente
     public DateTime FechaAlta { get; set; } = DateTime.UtcNow;
 
     // llaves
+    [ForeignKey("IdMunicipio")]
+    public virtual Municipio? Municipio { get; set; }
+
     [ForeignKey("IdSucursal")]
     public virtual Sucursal? Sucursal { get; set; }
 

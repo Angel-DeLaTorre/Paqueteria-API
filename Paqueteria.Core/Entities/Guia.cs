@@ -8,11 +8,12 @@ namespace Paqueteria.Core.Entities;
 public class Guia
 {
     [Key]
-    [Column("id_guias")]
+    [Column("id_guia")]
     public Guid IdGuia { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(20)]
+    [Column("clave")]
     public string Clave { get; set; } = string.Empty;
 
     [Column("forma_pago")]
@@ -80,6 +81,7 @@ public class Guia
     public string? ImporteTexto { get; set; }
 
     [MaxLength(500)]
+    [Column("observaciones")]
     public string? Observaciones { get; set; }
 
     [MaxLength(50)]
@@ -89,6 +91,9 @@ public class Guia
     // llaves
     [ForeignKey("IdClienteOrigen")]
     public virtual Cliente ClienteOrigen { get; set; } = null!;
+
+    [ForeignKey("IdClienteDestino")]
+    public virtual Cliente ClienteDestino { get; set; } = null!;
 
     [ForeignKey("IdDireccionOrigen")]
     public virtual DireccionGuiaSnapshot DireccionOrigen { get; set; } = null!;

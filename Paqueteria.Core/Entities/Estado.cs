@@ -13,11 +13,13 @@ public class Estado
 
     [Required]
     [MaxLength(100)]
+    [Column("nombre")]
     public string Nombre { get; set; } = string.Empty;
 
     [MaxLength(3)]
     [Column("acronimo_3")]
     public string? Acronimo3 { get; set; }
 
+    // colecciones
     public virtual ICollection<Municipio> Municipios { get; set; } = new List<Municipio>();
 }

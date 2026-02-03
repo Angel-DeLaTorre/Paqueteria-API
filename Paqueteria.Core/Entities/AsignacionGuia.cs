@@ -17,7 +17,7 @@ namespace Paqueteria.Core.Entities
         [Column("id_guia")]
         public Guid IdGuia { get; set; }
 
-        //Llaves
+        // llaves
         [ForeignKey("IdAsignacion")]
         public virtual Asignacion Asignacion { get; set; } = null!;
 

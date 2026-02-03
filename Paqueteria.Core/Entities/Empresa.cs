@@ -11,7 +11,8 @@ public class Empresa
     public Guid IdEmpresa { get; set; } = Guid.NewGuid();
 
     [Required]
-    [MaxLength(100)]
+    [MaxLength(150)]
+    [Column("nombre")]
     public string Nombre { get; set; } = string.Empty;
 
     [MaxLength(50)]
@@ -20,21 +21,24 @@ public class Empresa
 
     [Required]
     [MaxLength(20)]
+    [Column("rfc")]
     public string Rfc { get; set; } = string.Empty;
 
     [MaxLength(200)]
+    [Column("calle")]
     public string? Calle { get; set; }
 
     [MaxLength(6)]
     [Column("codigo_postal")]
     public string? CodigoPostal { get; set; }
 
-    [MaxLength(100)]
-    public string? Ciudad { get; set; }
-
-    [MaxLength(100)]
-    public string? Estado { get; set; }
+    [Column("id_municipio")]
+    public Guid? IdMunicipio { get; set; }
 
     [Column("fecha_alta")]
     public DateTime FechaAlta { get; set; } = DateTime.UtcNow;
+
+    // llaves
+    [ForeignKey("IdMunicipio")]
+    public virtual Municipio? Municipio { get; set; }
 }

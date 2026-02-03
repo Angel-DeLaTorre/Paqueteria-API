@@ -17,6 +17,7 @@ public class Ruta
     public Guid IdSucursalDestino { get; set; }
 
     [MaxLength(200)]
+    [Column("descripcion")]
     public string? Descripcion { get; set; }
 
     [Column("num_camion")]

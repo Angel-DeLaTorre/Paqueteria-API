@@ -10,22 +10,22 @@ public class ArticuloGuia
     [Column("id_articulos_guia")]
     public Guid IdArticuloGuia { get; set; } = Guid.NewGuid();
 
-    [Column("id_remision")]
-    public Guid IdGuiaCatalogo { get; set; }
+    [Column("id_guia")]
+    public Guid IdGuia { get; set; }
 
     [Column("id_articulo")]
-    public Guid IdArticuloCatalogo { get; set; }
+    public Guid IdArticulo { get; set; }
 
+    [Column("cantidad")]
     public int Cantidad { get; set; }
 
-    [Column(TypeName = "decimal(10,2)")]
+    [Column("peso", TypeName = "decimal(10,2)")]
     public decimal Peso { get; set; }
 
-    //Llaves
-
+    // llaves
     [ForeignKey("IdGuia")]
     public virtual Guia Guia { get; set; } = null!;
 
-    [ForeignKey("IdArticuloCatalogo")]
+    [ForeignKey("IdArticulo")]
     public virtual Articulo Articulo { get; set; } = null!;
 }

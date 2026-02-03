@@ -13,6 +13,7 @@ public class BitacoraAcceso
     [Column("id_usuario")]
     public Guid? IdUsuario { get; set; }
 
+    [Column("exito")]
     public bool Exito { get; set; }
 
     [MaxLength(50)]
@@ -26,8 +27,7 @@ public class BitacoraAcceso
     [Column("fecha_acceso")]
     public DateTime FechaAcceso { get; set; } = DateTime.UtcNow;
 
-    //Llaves
-
+    // llaves
     [ForeignKey("IdUsuario")]
     public virtual Usuario? Usuario { get; set; }
 }

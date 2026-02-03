@@ -4,7 +4,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Core.Entities;
 
-[Table("articulo")]
+[Table("articulos")]
 public class Articulo
 {
     [Key]
@@ -13,10 +13,12 @@ public class Articulo
 
     [Required]
     [MaxLength(50)]
+    [Column("clave")]
     public string Clave { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(100)]
+    [Column("descripcion")]
     public string Descripcion { get; set; } = string.Empty;
 
     [Column("estatus")]

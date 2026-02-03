@@ -13,15 +13,18 @@ public class Usuario
 
     [Required]
     [MaxLength(100)]
+    [Column("nombre")]
     public string Nombre { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(50)]
+    [Column("usarname")]
     public string Username { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(100)]
-    public string Contrasena { get; set; } = string.Empty;
+    [Column("password")]
+    public string Password { get; set; } = string.Empty;
 
     [Column("rol")]
     public RolUsuario Rol { get; set; } = RolUsuario.Reportes;

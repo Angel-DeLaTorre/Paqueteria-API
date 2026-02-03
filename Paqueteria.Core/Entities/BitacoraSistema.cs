@@ -14,8 +14,6 @@ public class BitacoraSistema
     [Column("id_sucursal")]
     public Guid IdSucursal { get; set; }
 
-    public virtual Sucursal Sucursal { get; set; } = null!;
-
     [Column("id_usuario")]
     public Guid? IdUsuario { get; set; }
 
@@ -51,4 +49,7 @@ public class BitacoraSistema
 
     [ForeignKey("IdUsuario")]
     public virtual Usuario? Usuario { get; set; }
+
+    [ForeignKey("IdSucursal")]
+    public virtual Sucursal? Sucursal { get; set; } = null!;
 }

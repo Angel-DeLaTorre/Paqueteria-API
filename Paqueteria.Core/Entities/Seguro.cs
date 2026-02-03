@@ -12,5 +12,6 @@ public class Seguro
 
     [Required]
     [MaxLength(100)]
+    [Column("nombre")]
     public string Nombre { get; set; } = string.Empty;
 }

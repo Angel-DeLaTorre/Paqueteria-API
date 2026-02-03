@@ -11,6 +11,7 @@ public class DireccionGuiaSnapshot
     public Guid IdDireccion { get; set; } = Guid.NewGuid();
 
     [MaxLength(200)]
+    [Column("calle")]
     public string? Calle { get; set; }
 
     [MaxLength(20)]
@@ -22,6 +23,7 @@ public class DireccionGuiaSnapshot
     public string? NumeroInterior { get; set; }
 
     [MaxLength(100)]
+    [Column("colonia")]
     public string? Colonia { get; set; }
 
     [MaxLength(6)]
@@ -29,6 +31,7 @@ public class DireccionGuiaSnapshot
     public string? CodigoPostal { get; set; }
 
     [MaxLength(100)]
+    [Column("localidad")]
     public string? Localidad { get; set; }
 
     [Column("id_municipio")]
