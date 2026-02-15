@@ -18,7 +18,7 @@ public class Usuario
 
     [Required]
     [MaxLength(50)]
-    [Column("usarname")]
+    [Column("usuario")]
     public string Username { get; set; } = string.Empty;
 
     [Required]

@@ -22,8 +22,8 @@ public class Municipio
 
     // llaves
     [ForeignKey("IdEstado")]
-    public virtual Estado Estado { get; set; } = null!;
+    public Estado Estado { get; set; } = null!;
 
     // colleciones
-    public virtual ICollection<Sucursal> Sucursales { get; set; } = new List<Sucursal>();
+    public ICollection<Sucursal> Sucursales { get; set; } = new List<Sucursal>();
 }

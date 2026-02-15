@@ -45,7 +45,7 @@ public class Sucursal
     public string? Localidad { get; set; }
 
     [Column("id_municipio")]
-    public Guid? IdMunicipio { get; set; }
+    public Guid IdMunicipio { get; private set; }
 
     [Column("telefono")]
     [MaxLength(20)]
@@ -60,7 +60,7 @@ public class Sucursal
 
     // llaves
     [ForeignKey("IdMunicipio")]
-    public virtual Municipio? Municipio { get; set; }
+    public virtual Municipio Municipio { get; private set; } = null!;
 
     // colleciones
     [InverseProperty("SucursalOrigen")]
@@ -68,4 +68,30 @@ public class Sucursal
 
     [InverseProperty("SucursalDestino")]
     public virtual ICollection<Ruta> RutasDestino { get; set; } = new List<Ruta>();
+
+    public Sucursal() {}
+
+    public Sucursal(
+        string nombre,
+        string codigo,
+        bool esMatriz,
+        string calle,
+        string colonia,
+        string numeroExterior,
+        string? numeroInterior,
+        string? localidad,
+        Guid municipioId,
+        string telefono)
+    {
+        Nombre = nombre;
+        Codigo = codigo;
+        EsMatriz = esMatriz;
+        Calle = calle;
+        Colonia = colonia;
+        NumeroExterior = numeroExterior;
+        NumeroInterior = numeroInterior;
+        Localidad = localidad;
+        IdMunicipio = municipioId;
+        Telefono = telefono;
+    }
 }

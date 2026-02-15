@@ -7,14 +7,19 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.2" />
+      <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.15.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Paqueteria.Application\Paqueteria.Application.csproj" />
       <ProjectReference Include="..\Paqueteria.Core\Paqueteria.Core.csproj" />
     </ItemGroup>
 
