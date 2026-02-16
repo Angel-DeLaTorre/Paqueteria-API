@@ -7,11 +7,11 @@ namespace Paqueteria.Core.Entities
     public class Asignacion
     {
         [Key]
-        [Column("id_asignacion")]
-        public Guid IdAsignacion { get; set; } = Guid.NewGuid();
+        [Column("id")]
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        [Column("id_chofer")]
-        public Guid IdChofer { get; set; }
+        [Column("chofer_id")]
+        public Guid ChoferId { get; set; }
 
         [Column("fecha_asignacion")]
         public DateTime FechaAsignacion { get; set; } = DateTime.UtcNow;

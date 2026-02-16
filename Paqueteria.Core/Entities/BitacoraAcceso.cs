@@ -7,27 +7,26 @@ namespace Paqueteria.Core.Entities;
 public class BitacoraAcceso
 {
     [Key]
-    [Column("id_acceso")]
-    public Guid IdAcceso { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
-    [Column("id_usuario")]
-    public Guid? IdUsuario { get; set; }
+    [Required]
+    [Column("usuario_id")]
+    public Guid UsiarioId { get; set; }
 
+    [Required]
     [Column("exito")]
     public bool Exito { get; set; }
 
     [MaxLength(50)]
-    [Column("ip_cliente")]
-    public string? IpCliente { get; set; }
+    [Column("cliente_ip")]
+    public string? ClienteIp { get; set; }
 
-    [MaxLength(200)]
-    [Column("user_agent")]
-    public string? UserAgent { get; set; }
-
-    [Column("fecha_acceso")]
-    public DateTime FechaAcceso { get; set; } = DateTime.UtcNow;
+    [Required]
+    [Column("fecha")]
+    public DateTime Fecha { get; set; } = DateTime.UtcNow;
 
     // llaves
-    [ForeignKey("IdUsuario")]
-    public virtual Usuario? Usuario { get; set; }
+    [ForeignKey("UsuarioId")]
+    public virtual Usuario Usuario { get; set; } = null!;
 }

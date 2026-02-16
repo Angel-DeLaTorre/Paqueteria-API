@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 
-namespace Paqueteria.Application.Interfaces;
+namespace Paqueteria.Application.Interfaces.Repositories;
 
-public interface IGenericRepository<T> where T : class
+public interface IEntityRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(Guid id);
     Task<IReadOnlyList<T>> GetAllAsync();

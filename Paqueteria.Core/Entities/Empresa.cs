@@ -7,8 +7,8 @@ namespace Paqueteria.Core.Entities;
 public class Empresa
 {
     [Key]
-    [Column("id_empresa")]
-    public Guid IdEmpresa { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(150)]
@@ -26,19 +26,19 @@ public class Empresa
 
     [MaxLength(200)]
     [Column("calle")]
-    public string? Calle { get; set; }
+    public string Calle { get; set; } = string.Empty;
 
     [MaxLength(6)]
     [Column("codigo_postal")]
-    public string? CodigoPostal { get; set; }
+    public string CodigoPostal { get; set; } = string.Empty;
 
-    [Column("id_municipio")]
-    public Guid? IdMunicipio { get; set; }
+    [Column("municipio_id")]
+    public Guid MunicipioId { get; set; }
 
     [Column("fecha_alta")]
     public DateTime FechaAlta { get; set; } = DateTime.UtcNow;
 
     // llaves
-    [ForeignKey("IdMunicipio")]
-    public virtual Municipio? Municipio { get; set; }
+    [ForeignKey("MunicipioId")]
+    public virtual Municipio Municipio { get; set; } = null!;
 }

@@ -1,9 +1,8 @@
 using Paqueteria.Application.DTOs;
 
-namespace Paqueteria.Application.Interfaces;
+namespace Paqueteria.Application.Interfaces.Services;
 
 public interface IAuthService
 {
-    Task<AuthResponse?> LoginAsync(LoginRequest request);
-    string HashPassword(string password);
+    Task<SesionResponseDto?> LoginAsync(LoginRequestDto request);
 }

@@ -7,8 +7,8 @@ namespace Paqueteria.Core.Entities;
 public class Seguro
 {
     [Key]
-    [Column("id_seguro")]
-    public Guid IdSeguro { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(100)]

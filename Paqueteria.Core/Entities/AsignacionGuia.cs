@@ -8,20 +8,20 @@ namespace Paqueteria.Core.Entities
     public class AsignacionGuia
     {
         [Key]
-        [Column("id_asignacion_guia")]
+        [Column("id")]
         public Guid IdAsignacionGuia { get; set; } = Guid.NewGuid();
 
-        [Column("id_asignacion")]
-        public Guid IdAsignacion { get; set; }
+        [Column("asignacion_id")]
+        public Guid AsignacionId { get; set; }
 
-        [Column("id_guia")]
-        public Guid IdGuia { get; set; }
+        [Column("guia_id")]
+        public Guid GuiaId { get; set; }
 
         // llaves
-        [ForeignKey("IdAsignacion")]
+        [ForeignKey("AsignacionId")]
         public virtual Asignacion Asignacion { get; set; } = null!;
 
-        [ForeignKey("IdGuia")]
+        [ForeignKey("GuiaId")]
         public virtual Guia Guia { get; set; } = null!;
     }
 }

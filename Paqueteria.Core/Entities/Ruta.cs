@@ -7,14 +7,14 @@ namespace Paqueteria.Core.Entities;
 public class Ruta
 {
     [Key]
-    [Column("id_ruta")]
-    public Guid IdRuta { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
-    [Column("sucursal_origen")]
-    public Guid IdSucursalOrigen { get; set; }
+    [Column("sucursal_origen_id")]
+    public Guid SucursalOrigenId { get; set; }
 
-    [Column("sucursal_destino")]
-    public Guid IdSucursalDestino { get; set; }
+    [Column("sucursal_destino_id")]
+    public Guid SucursalDestinoId { get; set; }
 
     [MaxLength(200)]
     [Column("descripcion")]
@@ -30,9 +30,9 @@ public class Ruta
     public int? NumContenedor2 { get; set; }
 
     // llaves
-    [ForeignKey("IdSucursalOrigen")]
+    [ForeignKey("SucursalOrigenId")]
     public virtual Sucursal SucursalOrigen { get; set; } = null!;
 
-    [ForeignKey("IdSucursalDestino")]
+    [ForeignKey("SucursalDestinoId")]
     public virtual Sucursal SucursalDestino { get; set; } = null!;
 }

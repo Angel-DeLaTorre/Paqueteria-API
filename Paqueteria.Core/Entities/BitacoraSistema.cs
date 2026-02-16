@@ -8,48 +8,47 @@ namespace Paqueteria.Core.Entities;
 public class BitacoraSistema
 {
     [Key]
-    [Column("id_bitacora")]
-    public Guid IdBitacora { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
-    [Column("id_sucursal")]
-    public Guid IdSucursal { get; set; }
+    [Required]
+    [Column("sucursal_id")]
+    public Guid SucursalId { get; set; }
 
-    [Column("id_usuario")]
-    public Guid? IdUsuario { get; set; }
+    [Required]
+    [Column("usuario_id")]
+    public Guid UsuarioId { get; set; }
 
+    [Required]
     [Column("accion")]
     public AccionBitacora Accion { get; set; }
 
     [Required]
     [MaxLength(50)]
-    [Column("tabla_afectada")]
-    public string TablaAfectada { get; set; } = string.Empty;
+    [Column("tabla")]
+    public string Tabla { get; set; } = string.Empty;
 
-    [Column("id_registro_afectado")]
-    public Guid IdRegistroAfectado { get; set; }
+    [Column("registro_id")]
+    public Guid RegistroId { get; set; }
 
-    [Column("valores_anteriores", TypeName = "jsonb")]
-    public string? ValoresAnteriores { get; set; }
+    [Column("valor_anterior", TypeName = "jsonb")]
+    public string? ValorAnterior { get; set; }
 
-    [Column("valores_nuevos", TypeName = "jsonb")]
-    public string? ValoresNuevos { get; set; }
+    [Column("valor_nuevo", TypeName = "jsonb")]
+    public string? ValorNuevo { get; set; }
 
     [MaxLength(50)]
-    [Column("ip_cliente")]
-    public string? IpCliente { get; set; }
+    [Column("cliente_ip")]
+    public string? ClienteIp { get; set; }
 
-    [MaxLength(200)]
-    [Column("user_agent")]
-    public string? UserAgent { get; set; }
-
-    [Column("fecha_evento")]
-    public DateTime FechaEvento { get; set; } = DateTime.UtcNow;
+    [Column("fecha")]
+    public DateTime Fecha { get; set; } = DateTime.UtcNow;
 
     //Llaves
 
-    [ForeignKey("IdUsuario")]
-    public virtual Usuario? Usuario { get; set; }
+    [ForeignKey("UsuarioId")]
+    public virtual Usuario Usuario { get; set; } = null!;
 
-    [ForeignKey("IdSucursal")]
-    public virtual Sucursal? Sucursal { get; set; } = null!;
+    [ForeignKey("SucursalId")]
+    public virtual Sucursal Sucursal { get; set; } = null!;
 }

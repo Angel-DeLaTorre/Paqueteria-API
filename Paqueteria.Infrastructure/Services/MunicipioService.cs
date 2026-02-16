@@ -11,9 +11,9 @@ public sealed class MunicipioService(MunicipioRepository repository) : IMunicipi
         var obj = await repository.ObtenerMunicipioAsync(id);
         if (obj != null)
             return new MunicipioDto(
-                obj.IdMunicipio,
+                obj.Id,
                 obj.Nombre,
-                obj.IdEstado
+                obj.EstadoId
             );
         return null;
     }
@@ -24,9 +24,9 @@ public sealed class MunicipioService(MunicipioRepository repository) : IMunicipi
 
         return municipios.Select(m => new MunicipioDto
         (
-            m.IdMunicipio,
+            m.Id,
             m.Nombre,
-            m.IdEstado
+            m.EstadoId
         ));
     }
 }

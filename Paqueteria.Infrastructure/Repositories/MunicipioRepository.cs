@@ -11,14 +11,14 @@ public class MunicipioRepository(AppDbContext context) : IMunicipioRepository
     {
         return await context.Municipios
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.IdMunicipio == id);
+            .FirstOrDefaultAsync(m => m.Id == id);
     }
 
     public async Task<IEnumerable<Municipio>> ObtenerMunicipiosPorEstadoAsync(string estadoId)
     {
         return await context.Municipios
             .AsNoTracking()
-            .Where(m => m.IdEstado == estadoId)
+            .Where(m => m.EstadoId == estadoId)
             .OrderBy(m => m.Nombre)
             .ToListAsync();
     }

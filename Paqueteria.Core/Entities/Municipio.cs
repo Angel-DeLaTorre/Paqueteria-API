@@ -7,8 +7,8 @@ namespace Paqueteria.Core.Entities;
 public class Municipio
 {
     [Key]
-    [Column("id_municipio")]
-    public Guid IdMunicipio { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(100)]
@@ -18,10 +18,10 @@ public class Municipio
     [Required]
     [MaxLength(2)]
     [Column("estado")]
-    public string IdEstado { get; set; } = string.Empty;
+    public string EstadoId { get; set; } = string.Empty;
 
     // llaves
-    [ForeignKey("IdEstado")]
+    [ForeignKey("EstadoId")]
     public Estado Estado { get; set; } = null!;
 
     // colleciones

@@ -8,8 +8,8 @@ namespace Paqueteria.Core.Entities;
 public class Guia
 {
     [Key]
-    [Column("id_guia")]
-    public Guid IdGuia { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(20)]
@@ -29,32 +29,32 @@ public class Guia
     public DateTime? FechaPago { get; set; }
 
     // Origen
-    [Column("cliente_origen")]
-    public Guid IdClienteOrigen { get; set; }
+    [Column("cliente_origen_id")]
+    public Guid ClienteOrigenId { get; set; }
 
-    [Column("direccion_origen")]
-    public Guid IdDireccionOrigen { get; set; }
+    [Column("direccion_origen_id")]
+    public Guid DireccionOrigenId { get; set; }
 
     // Destino
-    [Column("cliente_destino")]
-    public Guid IdClienteDestino { get; set; }
+    [Column("cliente_destino_id")]
+    public Guid ClienteDestinoId { get; set; }
 
-    [Column("direccion_destino")]
-    public Guid IdDireccionDestino { get; set; }
+    [Column("direccion_destino_id")]
+    public Guid DireccionDestinoId { get; set; }
 
     // Sucursales involucradas
-    [Column("sucursal_origen")]
-    public Guid IdSucursalOrigen { get; set; }
+    [Column("sucursal_origen_id")]
+    public Guid SucursalOrigenId { get; set; }
 
-    [Column("sucursal_destino")]
-    public Guid IdSucursalDestino { get; set; }
+    [Column("sucursal_destino_id")]
+    public Guid SucursalDestinoId { get; set; }
 
     // Usuarios responsables
-    [Column("usuario_alta")]
-    public Guid? IdUsuarioAlta { get; set; }
+    [Column("usuario_alta_id")]
+    public Guid UsuarioAltaId { get; set; }
 
-    [Column("usuario_cobro")]
-    public Guid? IdUsuarioCobro { get; set; }
+    [Column("usuario_cobro_id")]
+    public Guid? UsuarioCobroId { get; set; }
 
     // Datos Financieros
     [Column("costo_flete", TypeName = "decimal(15,2)")]
@@ -89,28 +89,28 @@ public class Guia
     public string? PolizaSeguro { get; set; }
 
     // llaves
-    [ForeignKey("IdClienteOrigen")]
+    [ForeignKey("ClienteOrigenId")]
     public virtual Cliente ClienteOrigen { get; set; } = null!;
 
-    [ForeignKey("IdClienteDestino")]
+    [ForeignKey("ClienteDestinoId")]
     public virtual Cliente ClienteDestino { get; set; } = null!;
 
-    [ForeignKey("IdDireccionOrigen")]
+    [ForeignKey("DireccionOrigenId")]
     public virtual DireccionGuiaSnapshot DireccionOrigen { get; set; } = null!;
 
-    [ForeignKey("IdUsuarioAlta")]
-    public virtual Usuario? UsuarioAlta { get; set; }
+    [ForeignKey("UsuarioAltaId")]
+    public virtual Usuario UsuarioAlta { get; set; } = null!;
 
-    [ForeignKey("IdUsuarioCobro")]
+    [ForeignKey("UsuarioCobroId")]
     public virtual Usuario? UsuarioCobro { get; set; }
 
-    [ForeignKey("IdDireccionDestino")]
+    [ForeignKey("DireccionDestinoId")]
     public virtual DireccionGuiaSnapshot DireccionDestino { get; set; } = null!;
 
-    [ForeignKey("IdSucursalOrigen")]
+    [ForeignKey("SucursalOrigenId")]
     public virtual Sucursal SucursalOrigen { get; set; } = null!;
 
-    [ForeignKey("IdSucursalDestino")]
+    [ForeignKey("SucursalDestinoId")]
     public virtual Sucursal SucursalDestino { get; set; } = null!;
 
     // colleciones

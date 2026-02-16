@@ -1,9 +1,10 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Core.Entities;
 
 namespace Paqueteria.Application.Interfaces.Services;
 
 public interface IClienteService
 {
-    Task<ClienteResponseDto> CrearClienteAsync(ClienteCreateDto dto, Guid usuarioId, Guid sucursalId);
-    Task<IEnumerable<ClienteResponseDto>> ObtenerTodosAsync();
+    Task<IReadOnlyList<Cliente>> ObtenerTodosAsync();
+    Task<ClienteResponseDto> CreateAsync(ClienteCreateDto dto, Guid usuarioId, Guid sucursalId);
 }

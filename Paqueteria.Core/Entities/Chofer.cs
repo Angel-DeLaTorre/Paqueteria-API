@@ -8,8 +8,8 @@ namespace Paqueteria.Core.Entities
     public class Chofer
     {
         [Key]
-        [Column("id_chofere")]
-        public Guid IdChofer { get; set; } = Guid.NewGuid();
+        [Column("chofer_id")]
+        public Guid ChoferId { get; init; } = Guid.NewGuid();
 
         [Required]
         [MaxLength(100)]
@@ -25,12 +25,31 @@ namespace Paqueteria.Core.Entities
         [Column("apellido_materno")]
         public string? ApellidoMaterno { get; set; }
 
-        [Column("estatus_generico")]
+        [Column("estatus")]
         public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;
 
-        [MaxLength(200)]
-        [Column("direccion")]
-        public string? Direccion { get; set; }
+        [Column("calle")]
+        [MaxLength(100)]
+        public string? Calle { get; set; } = string.Empty;
+
+        [Column("colonia")]
+        [MaxLength(100)]
+        public string? Colonia { get; set; } = string.Empty;
+
+        [Column("numero_exterior")]
+        [MaxLength(10)]
+        public string? NumeroExterior { get; set; }  = string.Empty;
+
+        [Column("numero_interior")]
+        [MaxLength(10)]
+        public string? NumeroInterior { get; set; }
+
+        [Column("localidad")]
+        [MaxLength(250)]
+        public string? Localidad { get; set; }
+
+        [Column("id_municipio")]
+        public Guid IdMunicipio { get; private set; }
 
         [MaxLength(20)]
         [Column("telefono")]
@@ -46,10 +65,14 @@ namespace Paqueteria.Core.Entities
         public int NumContenedor2 { get; set; }
 
         [Column("fecha_alta")]
-        public DateTime FechaAlta { get; set; } = DateTime.UtcNow;
+        public DateTime FechaAlta { get; init; } = DateTime.UtcNow;
 
         [Column("fecha_baja")]
         public DateTime? FechaBaja { get; set; }
+
+        // llaves
+        [ForeignKey("IdMunicipio")]
+        public virtual Municipio Municipio { get; private set; } = null!;
 
         // Navegacion
         public virtual ICollection<Asignacion> Asignaciones { get; set; } = new List<Asignacion>();

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Paqueteria.Application.Interfaces;
+using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Settings;
 using Paqueteria.Infrastructure.Data;
@@ -25,8 +26,7 @@ public static class InfrastructureServiceRegistration
                 // Configuramos el ensamblado de migraciones
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IClienteService, ClienteService>();

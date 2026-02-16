@@ -8,8 +8,8 @@ namespace Paqueteria.Core.Entities;
 public class Cliente
 {
     [Key]
-    [Column("id_cliente")]
-    public Guid IdCliente { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; init; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(100)]
@@ -35,8 +35,8 @@ public class Cliente
     [Column("codigo_postal")]
     public string? CodigoPostal { get; set; }
 
-    [Column("id_municipio")]
-    public Guid? IdMunicipio { get; set; }
+    [Column("municipio_id")]
+    public Guid? MunicipioId { get; set; }
 
     [MaxLength(20)]
     [Column("telefono")]
@@ -62,18 +62,18 @@ public class Cliente
     [Column("poliza_seguro")]
     public string? PolizaSeguro { get; set; }
 
-    [Column("id_sucursal")]
-    public Guid? IdSucursal { get; set; }
+    [Column("sucursal_id")]
+    public Guid? SucursalId { get; set; }
 
     [Column("fecha_alta")]
     public DateTime FechaAlta { get; set; } = DateTime.UtcNow;
 
     // llaves
-    [ForeignKey("IdMunicipio")]
-    public virtual Municipio? Municipio { get; set; }
+    [ForeignKey("MunicipioId")]
+    public virtual Municipio Municipio { get; set; } = null!;
 
-    [ForeignKey("IdSucursal")]
-    public virtual Sucursal? Sucursal { get; set; }
+    [ForeignKey("SucursalId")]
+    public virtual Sucursal Sucursal { get; set; } = null!;
 
     // collecions
     [InverseProperty("ClienteOrigen")]

@@ -7,25 +7,25 @@ namespace Paqueteria.Core.Entities;
 public class ArticuloGuia
 {
     [Key]
-    [Column("id_articulos_guia")]
-    public Guid IdArticuloGuia { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; init; } = Guid.NewGuid();
 
-    [Column("id_guia")]
-    public Guid IdGuia { get; set; }
+    [Column("guia_id")]
+    public Guid GuiaId { get; private set; }
 
-    [Column("id_articulo")]
-    public Guid IdArticulo { get; set; }
+    [Column("articulo_id")]
+    public Guid ArticuloId { get; private set; }
 
     [Column("cantidad")]
-    public int Cantidad { get; set; }
+    public int Cantidad { get; private set; }
 
     [Column("peso", TypeName = "decimal(10,2)")]
-    public decimal Peso { get; set; }
+    public decimal Peso { get; private set; }
 
     // llaves
-    [ForeignKey("IdGuia")]
-    public virtual Guia Guia { get; set; } = null!;
+    [ForeignKey("GuiaId")]
+    public virtual Guia Guia { get; private set; } = null!;
 
-    [ForeignKey("IdArticulo")]
-    public virtual Articulo Articulo { get; set; } = null!;
+    [ForeignKey("ArticuloId")]
+    public virtual Articulo Articulo { get; private set; } = null!;
 }

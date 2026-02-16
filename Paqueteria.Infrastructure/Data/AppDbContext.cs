@@ -46,8 +46,8 @@ public class AppDbContext : DbContext
         // Configuración de JSONB
         modelBuilder.Entity<BitacoraSistema>(entity =>
         {
-            entity.Property(b => b.ValoresAnteriores).HasColumnType("jsonb");
-            entity.Property(b => b.ValoresNuevos).HasColumnType("jsonb");
+            entity.Property(b => b.ValorAnterior).HasColumnType("jsonb");
+            entity.Property(b => b.ValorNuevo).HasColumnType("jsonb");
         });
 
         // Conversión de Enums a String

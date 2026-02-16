@@ -8,8 +8,8 @@ namespace Paqueteria.Core.Entities;
 public class Sucursal
 {
     [Key]
-    [Column("id_sucursal")]
-    public Guid IdSucursal { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(100)]
@@ -44,8 +44,8 @@ public class Sucursal
     [MaxLength(250)]
     public string? Localidad { get; set; }
 
-    [Column("id_municipio")]
-    public Guid IdMunicipio { get; private set; }
+    [Column("municipio_id")]
+    public Guid MunicipioId { get; private set; }
 
     [Column("telefono")]
     [MaxLength(20)]
@@ -54,12 +54,12 @@ public class Sucursal
     [Column("estatus")]
     public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;
 
-    [Column("ip_servidor_local")]
+    [Column("servidor_ip")]
     [MaxLength(50)]
-    public string? IpServidorLocal { get; set; }
+    public string? ServidorIp { get; set; }
 
     // llaves
-    [ForeignKey("IdMunicipio")]
+    [ForeignKey("MunicipioId")]
     public virtual Municipio Municipio { get; private set; } = null!;
 
     // colleciones
@@ -91,7 +91,7 @@ public class Sucursal
         NumeroExterior = numeroExterior;
         NumeroInterior = numeroInterior;
         Localidad = localidad;
-        IdMunicipio = municipioId;
+        MunicipioId = municipioId;
         Telefono = telefono;
     }
 }

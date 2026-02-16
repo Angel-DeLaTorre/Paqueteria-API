@@ -4,36 +4,32 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Paqueteria.Application.DTOs;
-using Paqueteria.Application.Interfaces;
+using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Entities;
 using Paqueteria.Core.Enums;
 using Paqueteria.Core.Settings;
+using Paqueteria.Infrastructure.Repositories;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class AuthService(IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtOptions) : IAuthService
+public class AuthService(UsuarioRepository repoUsuario, IOptions<JwtSettings> jwtOptions) : IAuthService
 {
-    public async Task<AuthResponse?> LoginAsync(LoginRequest request)
+    public async Task<SesionResponseDto?> LoginAsync(LoginRequestDto request)
     {
-        var usuarios = await unitOfWork.Repository<Usuario>()
-            .GetAsync(u => u.Username == request.Username && u.Estatus == EstatusGenerico.Activo);
-
-        var usuario = usuarios.FirstOrDefault();
+        var usuario = await repoUsuario.GetByUsernameAsync(request.Username);
 
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.Password))
         {
             return null;
         }
 
+        if (usuario.Estatus != EstatusGenerico.Activo)
+            return null;
+
         return GenerateAuthResponse(usuario);
     }
 
-    public string HashPassword(string password)
-    {
-        return BCrypt.Net.BCrypt.HashPassword(password);
-    }
-
-    private AuthResponse GenerateAuthResponse(Usuario usuario)
+    private SesionResponseDto GenerateAuthResponse(Usuario usuario)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(jwtOptions.Value.Key);
@@ -41,7 +37,7 @@ public class AuthService(IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtOption
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity([
-                new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.Username),
                 new Claim(ClaimTypes.Role, usuario.Rol.ToString())
             ]),
@@ -55,8 +51,8 @@ public class AuthService(IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtOption
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
-        return new AuthResponse(
-            usuario.IdUsuario,
+        return new SesionResponseDto(
+            usuario.Id,
             usuario.Username,
             usuario.Nombre,
             usuario.Rol.ToString(),

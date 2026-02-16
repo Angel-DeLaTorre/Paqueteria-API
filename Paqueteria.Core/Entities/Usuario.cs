@@ -8,8 +8,8 @@ namespace Paqueteria.Core.Entities;
 public class Usuario
 {
     [Key]
-    [Column("id_usuario")]
-    public Guid IdUsuario { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(100)]

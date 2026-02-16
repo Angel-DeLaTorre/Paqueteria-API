@@ -8,8 +8,8 @@ namespace Paqueteria.Core.Entities;
 public class Articulo
 {
     [Key]
-    [Column("id_articulo")]
-    public Guid IdArticulo { get; set; } = Guid.NewGuid();
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(50)]

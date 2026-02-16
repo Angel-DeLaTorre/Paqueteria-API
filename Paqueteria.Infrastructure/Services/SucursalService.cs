@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
@@ -6,16 +5,16 @@ using Paqueteria.Core.Entities;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public abstract class SucursalService(ISucursalRepository repository) : ISucursalService
+public abstract class SucursalService(ISucursalRepository repoSucursal) : ISucursalService
 {
     public async Task<SucursalResponseDto?> ObtenerSucursalByIdAsync(Guid sucursalId)
     {
         try
         {
-            var sucursal = (await repository.ObtenerSucursalPorIdAsync(sucursalId));
+            var sucursal = (await repoSucursal.GetByIdAsync(sucursalId));
             if (sucursal != null)
                 return new SucursalResponseDto(
-                    sucursal.IdSucursal,
+                    sucursal.Id,
                     sucursal.Codigo,
                     sucursal.Calle,
                     sucursal.Colonia,
@@ -40,9 +39,9 @@ public abstract class SucursalService(ISucursalRepository repository) : ISucursa
     {
         try
         {
-            return (await repository.ObtenerSucursalesAsync())
+            return (await repoSucursal.GetAllAsync())
                 .Select( s => new SucursalResponseDto(
-                    s.IdSucursal,
+                    s.Id,
                     s.Codigo,
                     s.Calle,
                     s.Colonia,
@@ -66,7 +65,7 @@ public abstract class SucursalService(ISucursalRepository repository) : ISucursa
     {
         try
         {
-            var x = await repository.InsertarSucursalAsync(
+            var x = await repoSucursal.AddAsync(
                 new Sucursal(
                     dto.Nombre,
                     dto.Codigo,
@@ -82,7 +81,7 @@ public abstract class SucursalService(ISucursalRepository repository) : ISucursa
             );
 
             return new SucursalResponseDto(
-                x.IdSucursal,
+                x.Id,
                 x.Codigo,
                 x.Calle,
                 x.Colonia,
@@ -105,11 +104,11 @@ public abstract class SucursalService(ISucursalRepository repository) : ISucursa
     {
         try
         {
-            var sucursalExistente = await repository.ObtenerSucursalPorIdAsync(idSucursal);
+            var sucursalExistente = await repoSucursal.GetByIdAsync(idSucursal);
 
             if (sucursalExistente == null) return false;
 
-            await repository.EditarSucursalAsync(new Sucursal(
+            repoSucursal.Update(new Sucursal(
                     dto.Nombre,
                     dto.Codigo,
                     dto.EsMatriz,
@@ -135,11 +134,11 @@ public abstract class SucursalService(ISucursalRepository repository) : ISucursa
     {
         try
         {
-            var sucursalExistente = await repository.ObtenerSucursalPorIdAsync(idSucursal);
+            var sucursalExistente = await repoSucursal.GetByIdAsync(idSucursal);
 
             if (sucursalExistente == null) return false;
 
-            await repository.DesactivarSucursalAsync(idSucursal);
+            repoSucursal.Delete(sucursalExistente);
             return true;
         }
         catch (Exception e)

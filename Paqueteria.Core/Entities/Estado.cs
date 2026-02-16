@@ -7,18 +7,18 @@ namespace Paqueteria.Core.Entities;
 public class Estado
 {
     [Key]
-    [MaxLength(2)]
-    [Column("id_estado")]
-    public string IdEstado { get; set; } = string.Empty;
+    [MaxLength(3)]
+    [Column("id")]
+    public string Id { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(100)]
     [Column("nombre")]
     public string Nombre { get; set; } = string.Empty;
 
-    [MaxLength(3)]
-    [Column("acronimo_3")]
-    public string? Acronimo3 { get; set; }
+    [MaxLength(2)]
+    [Column("acronimo_2")]
+    public string? Acronimo2 { get; set; }
 
     // colecciones
     public virtual ICollection<Municipio> Municipios { get; set; } = new List<Municipio>();

@@ -1,12 +1,12 @@
 // Paqueteria.Infrastructure/Repositories/GenericRepository.cs
 using Microsoft.EntityFrameworkCore;
-using Paqueteria.Application.Interfaces;
 using Paqueteria.Infrastructure.Data;
 using System.Linq.Expressions;
+using Paqueteria.Application.Interfaces.Repositories;
 
 namespace Paqueteria.Infrastructure.Repositories;
 
-public class GenericRepository<T>(AppDbContext context) : IGenericRepository<T>
+public class EntityRepository<T>(AppDbContext context) : IEntityRepository<T>
     where T : class
 {
     public async Task<T?> GetByIdAsync(Guid id) => await context.Set<T>().FindAsync(id);
