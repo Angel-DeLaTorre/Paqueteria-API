@@ -14,27 +14,27 @@ public class Sucursal
     [Required]
     [MaxLength(100)]
     [Column("nombre")]
-    public string Nombre { get; set; } = string.Empty;
+    public string Nombre { get; set; }
 
     [Required]
     [MaxLength(50)]
     [Column("codigo")]
-    public string Codigo { get; set; } = string.Empty;
+    public string Codigo { get; set; }
 
     [Column("es_matriz")]
     public bool EsMatriz { get; set; } = false;
 
     [Column("calle")]
     [MaxLength(100)]
-    public string Calle { get; set; } = string.Empty;
+    public string Calle { get; set; }
 
     [Column("colonia")]
     [MaxLength(100)]
-    public string Colonia { get; set; } = string.Empty;
+    public string Colonia { get; set; }
 
     [Column("numero_exterior")]
     [MaxLength(10)]
-    public string NumeroExterior { get; set; }  = string.Empty;
+    public string NumeroExterior { get; set; }
 
     [Column("numero_interior")]
     [MaxLength(10)]
@@ -45,7 +45,7 @@ public class Sucursal
     public string? Localidad { get; set; }
 
     [Column("municipio_id")]
-    public Guid MunicipioId { get; private set; }
+    public Guid MunicipioId { get; set; }
 
     [Column("telefono")]
     [MaxLength(20)]
@@ -62,15 +62,6 @@ public class Sucursal
     [ForeignKey("MunicipioId")]
     public virtual Municipio Municipio { get; private set; } = null!;
 
-    // colleciones
-    [InverseProperty("SucursalOrigen")]
-    public virtual ICollection<Ruta> RutasOrigen { get; set; } = new List<Ruta>();
-
-    [InverseProperty("SucursalDestino")]
-    public virtual ICollection<Ruta> RutasDestino { get; set; } = new List<Ruta>();
-
-    public Sucursal() {}
-
     public Sucursal(
         string nombre,
         string codigo,
@@ -83,6 +74,32 @@ public class Sucursal
         Guid municipioId,
         string telefono)
     {
+        Nombre = nombre;
+        Codigo = codigo;
+        EsMatriz = esMatriz;
+        Calle = calle;
+        Colonia = colonia;
+        NumeroExterior = numeroExterior;
+        NumeroInterior = numeroInterior;
+        Localidad = localidad;
+        MunicipioId = municipioId;
+        Telefono = telefono;
+    }
+
+    public Sucursal(
+        Guid id,
+        string nombre,
+        string codigo,
+        bool esMatriz,
+        string calle,
+        string colonia,
+        string numeroExterior,
+        string? numeroInterior,
+        string? localidad,
+        Guid municipioId,
+        string telefono)
+    {
+        Id = id;
         Nombre = nombre;
         Codigo = codigo;
         EsMatriz = esMatriz;

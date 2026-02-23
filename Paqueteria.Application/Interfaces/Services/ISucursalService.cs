@@ -1,12 +1,13 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Core.Common;
 
 namespace Paqueteria.Application.Interfaces.Services;
 
 public interface ISucursalService
 {
-    Task<SucursalResponseDto?> ObtenerSucursalByIdAsync(Guid sucursalId);
-    Task<ICollection<SucursalResponseDto>> ObtenerSucursalesAsync();
-    Task<SucursalResponseDto> InsertarSucursalAsync(SucursalCreateDto dto);
-    Task<bool> ActualizarSucursalAsync(Guid idSucursal, SucursaUpdateDto dto);
-    Task<bool> DesactivarSucursalAsync(Guid sucursalId);
+    Task<Result<SucursalResponseDto>> ObtenerSucursalByIdAsync(Guid sucursalId);
+    Task<Result<ICollection<SucursalResponseDto>>> ObtenerSucursalesAsync();
+    Task<Result<SucursalResponseDto>> InsertarSucursalAsync(SucursalCreateDto dto);
+    Task<Result> ActualizarSucursalAsync(Guid idSucursal, SucursaUpdateDto dto);
+    Task<Result> DesactivarSucursalAsync(Guid sucursalId);
 }

@@ -4,12 +4,8 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
-
     // Core: Seguridad
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<BitacoraSistema> BitacorasSistema { get; set; }

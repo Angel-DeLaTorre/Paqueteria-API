@@ -9,7 +9,7 @@ public class Articulo
 {
     [Key]
     [Column("id")]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; init; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(50)]
@@ -23,4 +23,18 @@ public class Articulo
 
     [Column("estatus")]
     public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;
+
+    public Articulo (){}
+
+    public Articulo(string clave, string descripcion)
+    {
+        Clave = clave;
+        Descripcion = descripcion;
+    }
+    public Articulo(string clave, string descripcion,  EstatusGenerico estatus)
+    {
+        Clave = clave;
+        Descripcion = descripcion;
+        Estatus = estatus;
+    }
 }

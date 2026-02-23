@@ -1,19 +1,35 @@
 using Paqueteria.Application.DTOs;
-using Paqueteria.Application.Interfaces;
+using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
+using Paqueteria.Core.Common;
 using Paqueteria.Core.Entities;
 using Paqueteria.Core.Enums;
-using Paqueteria.Infrastructure.Repositories;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class ClienteService(ClienteRepository clienteRepo) : IClienteService
+public class ClienteService(IClienteRepository clienteRepo) : IClienteService
 {
-    public async Task<IReadOnlyList<Cliente>> ObtenerTodosAsync()
+    public async Task<Result<IReadOnlyList<ClienteResponseDto>>> GetAllAsync()
     {
-        return await clienteRepo.GetAllAsync();
+        var clientes = await clienteRepo.GetAllAsync();
+
+        if (clientes.Any())
+            return Result<IReadOnlyList<ClienteResponseDto>>.Failure(CodigoRespuesta.NotFound, "Sin datos");
+
+        return Result<IReadOnlyList<ClienteResponseDto>>.Success(EntityToResponseDto(clientes));
     }
-    public async Task<ClienteResponseDto> CreateAsync(ClienteCreateDto dto, Guid usuarioId,  Guid sucursalId)
+
+    public async Task<Result<ClienteResponseDto>> GetByIdAsync(Guid id)
+    {
+        var cliente = await clienteRepo.GetByIdAsync(id);
+
+        if (cliente == null)
+            return Result<ClienteResponseDto>.Failure(CodigoRespuesta.NotFound, "Cliente no encontrado");
+
+        return Result<ClienteResponseDto>.Success(EntityToResponseDto(cliente));
+    }
+
+    public async Task<Result<ClienteResponseDto>> CreateAsync(ClienteCreateDto dto, Guid usuarioId,  Guid sucursalId)
     {
         var cliente = new Cliente
         {
@@ -33,13 +49,27 @@ public class ClienteService(ClienteRepository clienteRepo) : IClienteService
             SucursalId = Guid.Parse(dto.IdSucursal)
         };
 
-        await clienteRepo.AddAsync(cliente);
+        var clienteCreado = await clienteRepo.AddAsync(cliente);
 
-        return new ClienteResponseDto(
-            cliente.Id,
-            cliente.Nombre
-        );
+        return Result<ClienteResponseDto>.Success(ClienteResponseDto.FromEntity(clienteCreado));
     }
 
+    public async Task<Result<bool>> UpdateAsync(ClienteUpdateDto dto)
+    {
+        var cliente = await clienteRepo.AddAsync(new Cliente());
+        return Result<bool>.Success(true);
+    }
+
+    private ClienteResponseDto EntityToResponseDto(Cliente cliente)
+    {
+        return new ClienteResponseDto(
+            cliente.Id,
+            cliente.Nombre);
+    }
+
+    private List<ClienteResponseDto> EntityToResponseDto(IReadOnlyList<Cliente> clientes)
+    {
+        return clientes.Select(EntityToResponseDto).ToList();
+    }
 
 }

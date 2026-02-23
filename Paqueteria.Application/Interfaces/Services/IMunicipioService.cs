@@ -1,9 +1,10 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Core.Common;
 
 namespace Paqueteria.Application.Interfaces.Services;
 
 public interface IMunicipioService
 {
-    Task<MunicipioDto?> ObtenerMunicipioAsync(Guid id);
-    Task<IEnumerable<MunicipioDto>> ObtenerMunicipiosPorEstadoAsync(string estado);
+    Task<Result<MunicipioDto>> ObtenerMunicipioAsync(Guid id);
+    Task<Result<IEnumerable<MunicipioDto>>> ObtenerMunicipiosPorEstadoAsync(string estado);
 }

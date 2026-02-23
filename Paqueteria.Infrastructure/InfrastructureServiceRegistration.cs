@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Paqueteria.Application.Interfaces;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Settings;
@@ -15,8 +14,13 @@ public static class InfrastructureServiceRegistration
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Obtenemos la cadena de conexión del appsettings.json
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("La cadena de conexión 'DefaultConnection' no fue encontrada.");
+        }
+
 
         // 1. Mapear configuraciones de JWT desde Variables de Entorno o AppSettings
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
@@ -27,9 +31,15 @@ public static class InfrastructureServiceRegistration
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
         services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
+        services.AddScoped<IClienteRepository, ClienteRepository>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+        services.AddScoped<ISucursalRepository, SucursalRepository>();
+        services.AddScoped<IMunicipioRepository, MunicipioRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IClienteService, ClienteService>();
+        services.AddScoped<ISucursalService, SucursalService>();
+        services.AddScoped<IMunicipioService, MunicipioService>();
 
         return services;
     }

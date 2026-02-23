@@ -1,32 +1,32 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
-using Paqueteria.Infrastructure.Repositories;
+using Paqueteria.Core.Common;
+using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public sealed class MunicipioService(MunicipioRepository repository) : IMunicipioService
+public sealed class MunicipioService(IMunicipioRepository repository) : IMunicipioService
 {
-    public async Task<MunicipioDto?> ObtenerMunicipioAsync(Guid id)
+    public async Task<Result<MunicipioDto>> ObtenerMunicipioAsync(Guid id)
     {
-        var obj = await repository.ObtenerMunicipioAsync(id);
-        if (obj != null)
-            return new MunicipioDto(
-                obj.Id,
-                obj.Nombre,
-                obj.EstadoId
-            );
-        return null;
+        var municipio = await repository.ObtenerMunicipioAsync(id);
+
+        if (municipio == null)
+            return Result<MunicipioDto>.Failure(CodigoRespuesta.NotFound, "Municipio no encontrado");
+
+
+
+        return Result<MunicipioDto>.Success( MunicipioDto.FromEntity(municipio) );
     }
 
-    public async Task<IEnumerable<MunicipioDto>> ObtenerMunicipiosPorEstadoAsync(string estadoId)
+    public async Task<Result<IEnumerable<MunicipioDto>>> ObtenerMunicipiosPorEstadoAsync(string estadoId)
     {
-        var municipios = await repository.ObtenerMunicipiosPorEstadoAsync(estadoId);
+        var municipios = (await repository.ObtenerMunicipiosPorEstadoAsync(estadoId)).Select(MunicipioDto.FromEntity).ToList();
 
-        return municipios.Select(m => new MunicipioDto
-        (
-            m.Id,
-            m.Nombre,
-            m.EstadoId
-        ));
+        if (municipios.Count == 0)
+            return Result<IEnumerable<MunicipioDto>>.Failure(CodigoRespuesta.NotFound, "No existe ningun municipio");
+
+        return Result<IEnumerable<MunicipioDto>>.Success( municipios);
     }
 }

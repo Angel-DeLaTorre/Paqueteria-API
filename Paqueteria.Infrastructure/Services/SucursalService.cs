@@ -1,31 +1,23 @@
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
-using Paqueteria.Core.Entities;
+using Paqueteria.Core.Common;
+using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public abstract class SucursalService(ISucursalRepository repoSucursal) : ISucursalService
+public class SucursalService(ISucursalRepository repoSucursal) : ISucursalService
 {
-    public async Task<SucursalResponseDto?> ObtenerSucursalByIdAsync(Guid sucursalId)
+    public async Task<Result<SucursalResponseDto>> ObtenerSucursalByIdAsync(Guid sucursalId)
     {
         try
         {
             var sucursal = (await repoSucursal.GetByIdAsync(sucursalId));
-            if (sucursal != null)
-                return new SucursalResponseDto(
-                    sucursal.Id,
-                    sucursal.Codigo,
-                    sucursal.Calle,
-                    sucursal.Colonia,
-                    sucursal.NumeroExterior,
-                    sucursal.NumeroInterior,
-                    sucursal.Localidad,
-                    sucursal.Municipio.Nombre,
-                    sucursal.Telefono,
-                    sucursal.Estatus
-                );
-            return null;
+
+            if (sucursal == null)
+                return Result<SucursalResponseDto>.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
+
+            return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
         }
         catch (Exception e)
         {
@@ -35,23 +27,14 @@ public abstract class SucursalService(ISucursalRepository repoSucursal) : ISucur
 
     }
 
-    public async Task<ICollection<SucursalResponseDto>> ObtenerSucursalesAsync()
+    public async Task<Result<ICollection<SucursalResponseDto>>> ObtenerSucursalesAsync()
     {
         try
         {
-            return (await repoSucursal.GetAllAsync())
-                .Select( s => new SucursalResponseDto(
-                    s.Id,
-                    s.Codigo,
-                    s.Calle,
-                    s.Colonia,
-                    s.NumeroExterior,
-                    s.NumeroInterior,
-                    s.Localidad,
-                    s.Municipio.Nombre,
-                    s.Telefono,
-                    s.Estatus
-                )).ToList();
+            var sucursales =  ( await repoSucursal.GetAllAsync() )
+                .Select( SucursalResponseDto.FromEntity ).ToList();
+
+            return Result<ICollection<SucursalResponseDto>>.Success(sucursales);
         }
         catch (Exception e)
         {
@@ -61,37 +44,13 @@ public abstract class SucursalService(ISucursalRepository repoSucursal) : ISucur
 
     }
 
-    public async Task<SucursalResponseDto> InsertarSucursalAsync(SucursalCreateDto dto)
+    public async Task<Result<SucursalResponseDto>> InsertarSucursalAsync(SucursalCreateDto dto)
     {
         try
         {
-            var x = await repoSucursal.AddAsync(
-                new Sucursal(
-                    dto.Nombre,
-                    dto.Codigo,
-                    dto.EsMatriz,
-                    dto.Calle,
-                    dto.Colonia,
-                    dto.NumeroExterior,
-                    dto.NumeroInterior,
-                    dto.Localidad,
-                    dto.MunicipioId,
-                    dto.Telefono
-                )
-            );
+            var sucursal = await repoSucursal.AddAsync( dto.ToEntity() );
 
-            return new SucursalResponseDto(
-                x.Id,
-                x.Codigo,
-                x.Calle,
-                x.Colonia,
-                x.NumeroExterior,
-                x.NumeroInterior,
-                x.Localidad,
-                x.Municipio.Nombre,
-                x.Telefono,
-                x.Estatus
-            );
+            return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
         }
         catch (Exception e)
         {
@@ -100,28 +59,18 @@ public abstract class SucursalService(ISucursalRepository repoSucursal) : ISucur
         }
     }
 
-    public async Task<bool> ActualizarSucursalAsync(Guid idSucursal, SucursaUpdateDto dto)
+    public async Task<Result> ActualizarSucursalAsync(Guid idSucursal, SucursaUpdateDto dto)
     {
         try
         {
-            var sucursalExistente = await repoSucursal.GetByIdAsync(idSucursal);
+            var sucursal = await repoSucursal.GetByIdAsync(idSucursal);
 
-            if (sucursalExistente == null) return false;
+            if (sucursal == null) return Result.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
 
-            repoSucursal.Update(new Sucursal(
-                    dto.Nombre,
-                    dto.Codigo,
-                    dto.EsMatriz,
-                    dto.Calle,
-                    dto.Colonia,
-                    dto.NumeroExterior,
-                    dto.NumeroInterior,
-                    dto.Localidad,
-                    dto.MunicipioId,
-                    dto.Telefono
-                )
-            );
-            return true;
+            dto.UpdateEntity(sucursal);
+            repoSucursal.Update( sucursal );
+
+            return Result.Success();
         }
         catch (Exception e)
         {
@@ -130,16 +79,17 @@ public abstract class SucursalService(ISucursalRepository repoSucursal) : ISucur
         }
     }
 
-    public async Task<bool> DesactivarSucursalAsync(Guid idSucursal)
+    public async Task<Result> DesactivarSucursalAsync(Guid idSucursal)
     {
         try
         {
-            var sucursalExistente = await repoSucursal.GetByIdAsync(idSucursal);
+            var sucursal = await repoSucursal.GetByIdAsync(idSucursal);
 
-            if (sucursalExistente == null) return false;
+            if (sucursal == null) return Result.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
 
-            repoSucursal.Delete(sucursalExistente);
-            return true;
+            repoSucursal.Delete(sucursal);
+
+            return Result.Success();
         }
         catch (Exception e)
         {

@@ -8,13 +8,13 @@ namespace Paqueteria.API.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class SucursalController(SucursalService service) : ControllerBase
+public class SucursalController(SucursalService service) : PaqueteriaControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<ICollection<SucursalResponseDto>>> Get()
     {
-        var sucursales = await service.ObtenerSucursalesAsync();
-        return Ok(sucursales);
+        var result = await service.ObtenerSucursalesAsync();
+        return ProcessResult(result);
     }
 
     [HttpGet("{id:guid}")]
@@ -23,12 +23,18 @@ public class SucursalController(SucursalService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<SucursalResponseDto>> Get(Guid id)
     {
-        var sucursal = await service.ObtenerSucursalByIdAsync(id);
+        var result = await service.ObtenerSucursalByIdAsync(id);
+        return ProcessResult(result);
+    }
 
-        if (sucursal == null)
-            return NotFound(new { mensaje = $"La sucursal con ID {id} no existe." });
 
-        return Ok(sucursal);
+    [HttpPost("create")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<SucursalResponseDto>> Create(SucursalCreateDto dto)
+    {
+        var result = await service.InsertarSucursalAsync(dto);
+        return ProcessResult(result);
     }
 
     [Authorize]
@@ -39,13 +45,7 @@ public class SucursalController(SucursalService service) : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] SucursaUpdateDto dto)
     {
         var result = await service.ActualizarSucursalAsync(id, dto);
-
-        if (!result)
-        {
-            return NotFound(new { mensaje = $"No se pudo encontrar la sucursal con ID {id} para actualizar." });
-        }
-
-        return NoContent();
+        return ProcessResult(result);
     }
 
     [Authorize]
@@ -56,12 +56,6 @@ public class SucursalController(SucursalService service) : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await service.DesactivarSucursalAsync(id);
-
-        if (!result)
-        {
-            return NotFound(new { mensaje = $"No se pudo encontrar la sucursal con ID {id} para desactivar." });
-        }
-
-        return NoContent();
+        return ProcessResult(result);
     }
 }

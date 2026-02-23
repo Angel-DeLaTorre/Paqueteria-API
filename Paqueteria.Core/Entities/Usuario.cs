@@ -9,25 +9,25 @@ public class Usuario
 {
     [Key]
     [Column("id")]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; init; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(100)]
     [Column("nombre")]
-    public string Nombre { get; set; } = string.Empty;
+    public string Nombre { get; set; }
 
     [Required]
     [MaxLength(50)]
     [Column("usuario")]
-    public string Username { get; set; } = string.Empty;
+    public string Username { get; set; }
 
     [Required]
     [MaxLength(100)]
     [Column("password")]
-    public string Password { get; set; } = string.Empty;
+    public string Password { get; set; }
 
     [Column("rol")]
-    public RolUsuario Rol { get; set; } = RolUsuario.Reportes;
+    public RolUsuario Rol { get; set; }
 
     [Column("estatus")]
     public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;
@@ -38,7 +38,12 @@ public class Usuario
     [Column("fecha_ultimo_acceso")]
     public DateTime? FechaUltimoAcceso { get; set; }
 
-    // colecciones
-    public virtual ICollection<BitacoraSistema> BitacorasSistema { get; set; } = new List<BitacoraSistema>();
-    public virtual ICollection<BitacoraAcceso> Accesos { get; set; } = new List<BitacoraAcceso>();
+    public Usuario(string nombre, string username, string password, RolUsuario rol)
+    {
+        Nombre = nombre;
+        Username = username;
+        Password = password;
+        Rol = rol;
+    }
+
 }
