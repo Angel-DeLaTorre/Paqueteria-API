@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Settings;
 using Paqueteria.Infrastructure.Data;
+using Paqueteria.Infrastructure.Persistence;
 using Paqueteria.Infrastructure.Repositories;
 using Paqueteria.Infrastructure.Services;
 
@@ -38,8 +40,11 @@ public static class InfrastructureServiceRegistration
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IClienteService, ClienteService>();
+        services.AddScoped<IUsuarioService, UsuarioService>();
         services.AddScoped<ISucursalService, SucursalService>();
         services.AddScoped<IMunicipioService, MunicipioService>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

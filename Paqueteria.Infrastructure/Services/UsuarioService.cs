@@ -1,4 +1,5 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
@@ -6,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class UsuarioService(IUsuarioRepository usuarioRepository) : IUsuarioService
+public class UsuarioService(IUsuarioRepository usuarioRepository, IUnitOfWork unitOfWork) : IUsuarioService
 {
     public async Task<Result<List<UsuarioResponseDto>>> GetAll()
     {
@@ -20,7 +21,7 @@ public class UsuarioService(IUsuarioRepository usuarioRepository) : IUsuarioServ
         var usuario = await usuarioRepository.GetByUsernameAsync(username);
 
         if (usuario == null)
-            return Result<UsuarioResponseDto>.Failure(CodigoRespuesta.NotFound, "Usuario no encontrado");
+            return Result<UsuarioResponseDto>.Failure(CodigoRespuesta.Failure, "Usuario no encontrado");
 
         return Result<UsuarioResponseDto>.Success(UsuarioResponseDto.FromEntity(usuario));
     }
@@ -29,8 +30,10 @@ public class UsuarioService(IUsuarioRepository usuarioRepository) : IUsuarioServ
     {
         var usuario = await usuarioRepository.AddAsync(dto.ToEntity());
 
-        if (usuario == null)
-            return Result<UsuarioResponseDto>.Failure(CodigoRespuesta.Failure, "Error al insertar");
+        var result = await unitOfWork.CompleteAsync();
+
+        if (result <= 0)
+            return Result<UsuarioResponseDto>.Failure(CodigoRespuesta.NotFound, "Usuario no creado");
 
         return Result<UsuarioResponseDto>.Success(UsuarioResponseDto.FromEntity(usuario));
     }
@@ -44,9 +47,11 @@ public class UsuarioService(IUsuarioRepository usuarioRepository) : IUsuarioServ
 
         dto.UpdateEntity(usuario);
         usuarioRepository.Update(usuario);
+        var result = await unitOfWork.CompleteAsync();
+        if (result <= 0)
+            return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 
         return Result.Success();
-
     }
 
     public async Task<Result> Delete(Guid id)
@@ -57,6 +62,10 @@ public class UsuarioService(IUsuarioRepository usuarioRepository) : IUsuarioServ
             return Result.Failure(CodigoRespuesta.NotFound, "Usuario no encontrado");
 
         usuarioRepository.Delete(usuario);
+
+        var result = await unitOfWork.CompleteAsync();
+        if (result <= 0)
+            return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 
         return Result.Success();
     }

@@ -1,4 +1,3 @@
-// Paqueteria.Infrastructure/Repositories/GenericRepository.cs
 using Microsoft.EntityFrameworkCore;
 using Paqueteria.Infrastructure.Data;
 using System.Linq.Expressions;
