@@ -1,5 +1,8 @@
-bin/
-obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
+# Ignora cualquier carpeta bin u obj en cualquier profundidad
+**/[Bb]in/
+**/[Oo]bj/
+# Ignora archivos temporales de Rider y macOS
+**/.DS_Store
+**/.idea/
+**/*.user
+**/[Tt]est[Rr]esults/
