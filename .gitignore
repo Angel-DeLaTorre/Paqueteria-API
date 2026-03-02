@@ -1,6 +1,15 @@
-# Ignora cualquier carpeta bin u obj en cualquier profundidad
+# Ignorar carpetas bin y obj de forma absoluta y recursiva
 **/[Bb]in/
 **/[Oo]bj/
+**/[Bb]in/**
+**/[Oo]bj/**
+
+# Patrones específicos para los archivos rebeldes que vemos en tu terminal
+**/*.deps.json
+**/*.runtimeconfig.json
+**/*.exe.config
+**/BuildHost-*/**
+
 # Ignora archivos temporales de Rider y macOS
 **/.DS_Store
 **/.idea/
@@ -8,3 +17,6 @@
 **/[Tt]est[Rr]esults/
 /Paqueteria.API/bin\Debug
 /Paqueteria.Infrastructure/bin\Debug
+*.dll
+*.exe
+Paqueteria.sln.DotSettings.user
