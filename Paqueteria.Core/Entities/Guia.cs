@@ -9,7 +9,7 @@ public class Guia
 {
     [Key]
     [Column("id")]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; init; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(20)]

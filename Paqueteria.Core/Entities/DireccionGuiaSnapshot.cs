@@ -6,38 +6,45 @@ namespace Paqueteria.Core.Entities;
 [Table("direcciones_guia_snapshot")]
 public class DireccionGuiaSnapshot
 {
-    [Key]
-    [Column("id")]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    #region Campos
 
-    [MaxLength(200)]
-    [Column("calle")]
-    public string Calle { get; set; }  = string.Empty;
+        [Key]
+        [Column("id")]
+        public Guid Id { get; init; } = Guid.NewGuid();
 
-    [MaxLength(20)]
-    [Column("numero_exterior")]
-    public string NumeroExterior { get; set; }  = string.Empty;
+        [MaxLength(200)]
+        [Column("calle")]
+        public string Calle { get; set; }  = string.Empty;
 
-    [MaxLength(20)]
-    [Column("numero_interior")]
-    public string? NumeroInterior { get; set; }
+        [MaxLength(20)]
+        [Column("numero_exterior")]
+        public string NumeroExterior { get; set; }  = string.Empty;
 
-    [MaxLength(100)]
-    [Column("colonia")]
-    public string Colonia { get; set; } = string.Empty;
+        [MaxLength(20)]
+        [Column("numero_interior")]
+        public string? NumeroInterior { get; set; }
 
-    [MaxLength(6)]
-    [Column("codigo_postal")]
-    public string CodigoPostal { get; set; }  = string.Empty;
+        [MaxLength(100)]
+        [Column("colonia")]
+        public string Colonia { get; set; } = string.Empty;
 
-    [MaxLength(100)]
-    [Column("localidad")]
-    public string? Localidad { get; set; }
+        [MaxLength(6)]
+        [Column("codigo_postal")]
+        public string CodigoPostal { get; set; }  = string.Empty;
 
-    [Column("municipio_id")]
-    public Guid MunicipioId { get; set; }
+        [MaxLength(100)]
+        [Column("localidad")]
+        public string? Localidad { get; set; }
 
-    // llaves
-    [ForeignKey("IdMunicipio")]
-    public virtual Municipio Municipio { get; set; } = null!;
+        [Column("municipio_id")]
+        public Guid MunicipioId { get; set; }
+
+    #endregion
+
+    #region Llaves
+
+        [ForeignKey("IdMunicipio")]
+        public virtual Municipio Municipio { get; set; } = null!;
+
+    #endregion
 }
