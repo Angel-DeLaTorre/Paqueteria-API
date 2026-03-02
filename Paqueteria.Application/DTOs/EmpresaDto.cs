@@ -54,7 +54,7 @@ public record EmpresaResponseDto(
     DateTime FechaAlta
 )
 {
-    public EmpresaResponseDto FromEntity(Empresa empresa) =>
+    public static EmpresaResponseDto FromEntity(Empresa empresa) =>
         new
         (
             empresa.Id,

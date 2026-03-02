@@ -1,34 +1,113 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class EmpresaService(IEmpresaRepository empresaRepository) : IEmpresaService
+public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork unitOfWork) : IEmpresaService
 {
-    public Task<Result<IReadOnlyList<EmpresaResponseDto>>> GetAllAsync()
+    public async Task<Result<IReadOnlyList<EmpresaResponseDto>>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        try
+        {
+            var empresas =  ( await empresaRepository.GetAllAsync() )
+                .Select( EmpresaResponseDto.FromEntity ).ToList();
+
+            return Result<IReadOnlyList<EmpresaResponseDto>>.Success(empresas);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result<EmpresaResponseDto>> GetByIdAsync(Guid id)
+    public async Task<Result<EmpresaResponseDto>> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var empresa = (await empresaRepository.GetByIdAsync(id));
+
+            if (empresa is null)
+                return Result<EmpresaResponseDto>.Failure(CodigoRespuesta.NotFound, "Empresa not found");
+
+            return Result<EmpresaResponseDto>.Success(EmpresaResponseDto.FromEntity(empresa));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result<EmpresaResponseDto>> CreateAsync(EmpresaCreateDto dto)
+    public async Task<Result<EmpresaResponseDto>> CreateAsync(EmpresaCreateDto dto)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var empresa = await empresaRepository.AddAsync(dto.ToEntity());
+
+            var result = await unitOfWork.CompleteAsync();
+
+            if (result <= 0)
+                return Result<EmpresaResponseDto>.Failure(CodigoRespuesta.NotFound, "Empresa no creado");
+
+            return Result<EmpresaResponseDto>.Success(EmpresaResponseDto.FromEntity(empresa));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result> UpdateAsync(EmpresaCreateDto dto)
+    public async Task<Result> UpdateAsync(EmpresaUpdateDto dto)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var empresa = (await empresaRepository.GetByIdAsync(dto.EmpresaId));
+
+            if (empresa == null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Empresa no encontrada");
+
+            dto.UpdateEntity(empresa);
+            empresaRepository.Update(empresa);
+            var result = await unitOfWork.CompleteAsync();
+            if (result <= 0)
+                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result> DeleteAsync(Guid empresaId)
+    public async Task<Result> DeleteAsync(Guid empresaId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var empresa = (await empresaRepository.GetByIdAsync(empresaId));
+
+            if ( empresa is null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Empresa no encontrada");
+
+            empresaRepository.Delete(empresa);
+
+            var result = await unitOfWork.CompleteAsync();
+            if (result <= 0)
+                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }
