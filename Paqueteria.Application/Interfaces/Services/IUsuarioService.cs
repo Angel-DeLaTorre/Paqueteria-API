@@ -5,9 +5,10 @@ namespace Paqueteria.Application.Interfaces.Services;
 
 public interface IUsuarioService
 {
-    Task<Result<List<UsuarioResponseDto>>> GetAll();
-    Task<Result<UsuarioResponseDto>> GetById(string username);
-    Task<Result<UsuarioResponseDto>> Create(UsuarioCreateDto dto);
-    Task<Result> Update(UsuarioUpdateDto dto);
-    Task<Result> Delete(Guid id);
+    Task<Result<IReadOnlyList<UsuarioResponseDto>>> GetAllAsync();
+    Task<Result<UsuarioResponseDto>> GetByIdAsync(Guid usuarioId);
+    Task<Result<UsuarioResponseDto>> GetByUsername(string username);
+    Task<Result<UsuarioResponseDto>> CreateAsync(UsuarioCreateDto dto, UserContext currentUser);
+    Task<Result> UpdateAsync(UsuarioUpdateDto dto, UserContext currentUser);
+    Task<Result> DeleteAsync(Guid usuarioId, UserContext currentUser);
 }

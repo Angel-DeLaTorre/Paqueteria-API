@@ -43,7 +43,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork un
         }
     }
 
-    public async Task<Result<EmpresaResponseDto>> CreateAsync(EmpresaCreateDto dto)
+    public async Task<Result<EmpresaResponseDto>> CreateAsync(EmpresaCreateDto dto, UserContext currentUser)
     {
         try
         {
@@ -63,7 +63,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork un
         }
     }
 
-    public async Task<Result> UpdateAsync(EmpresaUpdateDto dto)
+    public async Task<Result> UpdateAsync(EmpresaUpdateDto dto, UserContext currentUser)
     {
         try
         {
@@ -87,7 +87,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork un
         }
     }
 
-    public async Task<Result> DeleteAsync(Guid empresaId)
+    public async Task<Result> DeleteAsync(Guid empresaId, UserContext currentUser)
     {
         try
         {

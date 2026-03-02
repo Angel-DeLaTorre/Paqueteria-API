@@ -26,7 +26,7 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
         return Result<ArticuloResponseDto>.Success(ArticuloResponseDto.FromEntity(articulo));
     }
 
-    public async Task<Result<ArticuloResponseDto>> CreateAsync(ArticuloCreateDto dto)
+    public async Task<Result<ArticuloResponseDto>> CreateAsync(ArticuloCreateDto dto, UserContext currentUser)
     {
         var articulo = await articuloRepository.AddAsync(dto.ToEntity());
 
@@ -38,7 +38,7 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
         return Result<ArticuloResponseDto>.Success(ArticuloResponseDto.FromEntity(articulo));
     }
 
-    public async Task<Result> UpdateAsync(ArticuloUpdateDto dto)
+    public async Task<Result> UpdateAsync(ArticuloUpdateDto dto, UserContext currentUser)
     {
         var articulo = await articuloRepository.GetByIdAsync(dto.ArticuloId);
 
@@ -53,5 +53,10 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
             return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
 
         return Result.Success();
+    }
+
+    public Task<Result> DeleteAsync(Guid articuloId, UserContext currentUser)
+    {
+        throw new NotImplementedException();
     }
 }

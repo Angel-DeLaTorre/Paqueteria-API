@@ -11,9 +11,9 @@ namespace Paqueteria.API.Controllers.v1;
 public class SucursalController(SucursalService service) : PaqueteriaControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<ICollection<SucursalResponseDto>>> Get()
+    public async Task<ActionResult<IReadOnlyList<SucursalResponseDto>>> Get()
     {
-        var result = await service.ObtenerSucursalesAsync();
+        var result = await service.GetAllAsync();
         return ProcessResult(result);
     }
 
@@ -23,7 +23,7 @@ public class SucursalController(SucursalService service) : PaqueteriaControllerB
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<SucursalResponseDto>> Get(Guid id)
     {
-        var result = await service.ObtenerSucursalByIdAsync(id);
+        var result = await service.GetByIdAsync(id);
         return ProcessResult(result);
     }
 
@@ -33,29 +33,29 @@ public class SucursalController(SucursalService service) : PaqueteriaControllerB
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<SucursalResponseDto>> Create(SucursalCreateDto dto)
     {
-        var result = await service.InsertarSucursalAsync(dto);
+        var result = await service.CreateAsync(dto, CurrentUser);
         return ProcessResult(result);
     }
 
     [Authorize]
-    [HttpPut("{id:guid}")]
+    [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, [FromBody] SucursaUpdateDto dto)
+    public async Task<IActionResult> Update([FromBody] SucursaUpdateDto dto)
     {
-        var result = await service.ActualizarSucursalAsync(id, dto);
+        var result = await service.UpdateAsync(dto, CurrentUser);
         return ProcessResult(result);
     }
 
     [Authorize]
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{sucursalId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid sucursalId)
     {
-        var result = await service.DesactivarSucursalAsync(id);
+        var result = await service.DeleteAsync(sucursalId, CurrentUser);
         return ProcessResult(result);
     }
 }

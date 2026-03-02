@@ -7,7 +7,8 @@ namespace Paqueteria.Application.Interfaces.Services;
 public interface IClienteService
 {
     Task<Result<IReadOnlyList<ClienteResponseDto>>> GetAllAsync();
-    Task<Result<ClienteResponseDto>> GetByIdAsync(Guid id);
-    Task<Result<ClienteResponseDto>> CreateAsync(ClienteCreateDto dto, Guid usuarioId, Guid sucursalId);
-    Task<Result<bool>> UpdateAsync(ClienteUpdateDto dto);
+    Task<Result<ClienteResponseDto>> GetByIdAsync(Guid clienteId);
+    Task<Result<ClienteResponseDto>> CreateAsync(ClienteCreateDto dto, UserContext currentUser);
+    Task<Result> UpdateAsync(ClienteUpdateDto dto, UserContext currentUser);
+    Task<Result> DeleteAsync(Guid clienteId, UserContext currentUser);
 }

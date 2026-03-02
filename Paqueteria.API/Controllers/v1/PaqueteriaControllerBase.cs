@@ -10,11 +10,12 @@ namespace Paqueteria.API.Controllers.v1;
 [Route("api/v1/[controller]")]
 public abstract class PaqueteriaControllerBase : ControllerBase
 {
-    protected Guid UsuarioId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
-                                           ?? throw new UnauthorizedAccessException("Usuario no identificado"));
-
-    protected Guid SucursalId => Guid.Parse(User.FindFirst("sucursalId")?.Value
-                                            ?? ""); //throw new UnauthorizedAccessException("Sucursal no identificada"));
+    protected UserContext CurrentUser => new UserContext(
+        UserId: Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty),
+        Username: User.FindFirstValue(ClaimTypes.Name),
+        Sucursal: Guid.Parse(User.FindFirstValue(ClaimTypes.Sid) ?? string.Empty),
+        IpAddress: HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
+    );
 
     protected ActionResult<T> ProcessResult<T>(Result<T> result)
     {

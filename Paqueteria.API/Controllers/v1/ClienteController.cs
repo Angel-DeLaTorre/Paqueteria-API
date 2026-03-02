@@ -28,7 +28,7 @@ public class ClienteController(IClienteService clienteService) : PaqueteriaContr
     [HttpPost]
     public async Task<ActionResult<ClienteResponseDto>> Create(ClienteCreateDto dto)
     {
-        var result = await clienteService.CreateAsync(dto, UsuarioId, SucursalId);
+        var result = await clienteService.CreateAsync(dto, CurrentUser);
         return Ok(result);
     }
 }

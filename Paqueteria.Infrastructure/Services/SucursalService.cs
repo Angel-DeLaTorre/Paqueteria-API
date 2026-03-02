@@ -8,7 +8,23 @@ namespace Paqueteria.Infrastructure.Services;
 
 public class SucursalService(ISucursalRepository repoSucursal) : ISucursalService
 {
-    public async Task<Result<SucursalResponseDto>> ObtenerSucursalByIdAsync(Guid sucursalId)
+    public async Task<Result<IReadOnlyList<SucursalResponseDto>>> GetAllAsync()
+    {
+        try
+        {
+            var sucursales =  ( await repoSucursal.GetAllAsync() )
+                .Select( SucursalResponseDto.FromEntity ).ToList();
+
+            return Result<IReadOnlyList<SucursalResponseDto>>.Success(sucursales);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task<Result<SucursalResponseDto>> GetByIdAsync(Guid sucursalId)
     {
         try
         {
@@ -27,24 +43,7 @@ public class SucursalService(ISucursalRepository repoSucursal) : ISucursalServic
 
     }
 
-    public async Task<Result<ICollection<SucursalResponseDto>>> ObtenerSucursalesAsync()
-    {
-        try
-        {
-            var sucursales =  ( await repoSucursal.GetAllAsync() )
-                .Select( SucursalResponseDto.FromEntity ).ToList();
-
-            return Result<ICollection<SucursalResponseDto>>.Success(sucursales);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-
-    }
-
-    public async Task<Result<SucursalResponseDto>> InsertarSucursalAsync(SucursalCreateDto dto)
+    public async Task<Result<SucursalResponseDto>> CreateAsync(SucursalCreateDto dto, UserContext currentUser)
     {
         try
         {
@@ -59,11 +58,11 @@ public class SucursalService(ISucursalRepository repoSucursal) : ISucursalServic
         }
     }
 
-    public async Task<Result> ActualizarSucursalAsync(Guid idSucursal, SucursaUpdateDto dto)
+    public async Task<Result> UpdateAsync(SucursaUpdateDto dto, UserContext currentUser)
     {
         try
         {
-            var sucursal = await repoSucursal.GetByIdAsync(idSucursal);
+            var sucursal = await repoSucursal.GetByIdAsync(dto.SucursalId);
 
             if (sucursal == null) return Result.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
 
@@ -79,7 +78,7 @@ public class SucursalService(ISucursalRepository repoSucursal) : ISucursalServic
         }
     }
 
-    public async Task<Result> DesactivarSucursalAsync(Guid idSucursal)
+    public async Task<Result> DeleteAsync(Guid idSucursal,  UserContext currentUser)
     {
         try
         {
