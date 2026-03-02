@@ -6,12 +6,10 @@ public record SeguroCreateDto(
     string Nombre
 )
 {
-    public Seguro ToEntity()
-    {
-        return new Seguro(
+    public Seguro ToEntity() =>
+        new(
             Nombre
         );
-    }
 };
 
 public record SeguroUpdateDto(
@@ -21,8 +19,7 @@ public record SeguroUpdateDto(
 {
     public void UpdateEntity(Seguro entity)
     {
-        if (entity.Nombre != Nombre)
-            entity.Nombre = Nombre.Trim();
+        entity.Nombre = Nombre;
     }
 };
 
@@ -31,11 +28,9 @@ public record SeguroResponseDto(
     string Nombre
 )
 {
-    private static SeguroResponseDto FromEntity(Seguro entity)
-    {
-        return new SeguroResponseDto(
+    private static SeguroResponseDto FromEntity(Seguro entity) =>
+        new (
             entity.Id,
             entity.Nombre
         );
-    }
 };

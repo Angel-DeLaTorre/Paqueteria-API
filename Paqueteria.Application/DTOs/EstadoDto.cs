@@ -2,18 +2,17 @@ using Paqueteria.Core.Entities;
 
 namespace Paqueteria.Application.DTOs;
 
-public record EstadoDto(
+public record EstadoResponseDto(
     string Id,
     string Nombre,
     string Acronimo2
 )
 {
-    public static EstadoDto FromEntity(Estado entity)
-    {
-        return new EstadoDto(
+    public static EstadoResponseDto FromEntity(Estado entity) =>
+        new
+        (
             entity.Id,
             entity.Nombre,
             entity.Acronimo2
         );
-    }
 };

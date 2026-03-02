@@ -33,16 +33,45 @@ public static class InfrastructureServiceRegistration
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
         services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
+
+        services.AddScoped<IArticuloRepository, ArticuloRepository>();
+        services.AddScoped<IArticuloService, ArticuloService>();
+
+        services.AddScoped<IAsignacionRepository, AsignacionRepository>();
+        services.AddScoped<IAsignacionSerivce, AsignacionService>();
+
+        services.AddScoped<IBitacoraAccesoRepository, BitacoraAccesoRepository>();
+
+        services.AddScoped<IChoferRepository, ChoferRepository>();
+        services.AddScoped<IChoferService, ChoferService>();
+
         services.AddScoped<IClienteRepository, ClienteRepository>();
-        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-        services.AddScoped<ISucursalRepository, SucursalRepository>();
+        services.AddScoped<IClienteService, ClienteService>();
+
+        services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+        services.AddScoped<IEmpresaService, EmpresaService>();
+
+        services.AddScoped<IEstadoRepository, EstadoRepository>();
+        services.AddScoped<IEstadoService, EstadoService>();
+
+        services.AddScoped<IGuiaRepository, GuiaRepository>();
+        services.AddScoped<IGuiaService, GuiaService>();
+
         services.AddScoped<IMunicipioRepository, MunicipioRepository>();
+        services.AddScoped<IMunicipioService, MunicipioService>();
+
+        services.AddScoped<IRutaRepository, RutaRepository>();
+        services.AddScoped<IRutaService, RutaService>();
+
+        services.AddScoped<ISeguroRepository, SeguroRepository>();
+        services.AddScoped<ISeguroService, SeguroService>();
+
+        services.AddScoped<ISucursalRepository, SucursalRepository>();
+        services.AddScoped<ISucursalService, SucursalService>();
 
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IClienteService, ClienteService>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IUsuarioService, UsuarioService>();
-        services.AddScoped<ISucursalService, SucursalService>();
-        services.AddScoped<IMunicipioService, MunicipioService>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

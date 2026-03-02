@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
 
-namespace Paqueteria.API.Controllers;
+namespace Paqueteria.API.Controllers.v1;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 public abstract class PaqueteriaControllerBase : ControllerBase
 {
     protected Guid UsuarioId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)

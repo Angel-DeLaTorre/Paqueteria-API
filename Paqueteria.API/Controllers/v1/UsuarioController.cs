@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
 
-namespace Paqueteria.API.Controllers;
+namespace Paqueteria.API.Controllers.v1;
 
 [ApiController]
 [Route("api/v1/[controller]")]
@@ -42,6 +42,4 @@ public class UsuarioController(IUsuarioService service) : PaqueteriaControllerBa
         var result = await service.Delete(usuarioId);
         return ProcessResult(result);
     }
-
-
 }

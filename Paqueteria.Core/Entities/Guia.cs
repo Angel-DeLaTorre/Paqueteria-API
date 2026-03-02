@@ -88,33 +88,33 @@ public class Guia
     [Column("poliza_seguro")]
     public string? PolizaSeguro { get; set; }
 
-    // llaves
-    [ForeignKey("ClienteOrigenId")]
-    public virtual Cliente ClienteOrigen { get; set; } = null!;
+    #region Llaves foraneas
 
-    [ForeignKey("ClienteDestinoId")]
-    public virtual Cliente ClienteDestino { get; set; } = null!;
+        [ForeignKey("ClienteOrigenId")]
+        public virtual Cliente ClienteOrigen { get; set; } = null!;
 
-    [ForeignKey("DireccionOrigenId")]
-    public virtual DireccionGuiaSnapshot DireccionOrigen { get; set; } = null!;
+        [ForeignKey("ClienteDestinoId")]
+        public virtual Cliente ClienteDestino { get; set; } = null!;
 
-    [ForeignKey("UsuarioAltaId")]
-    public virtual Usuario UsuarioAlta { get; set; } = null!;
+        [ForeignKey("DireccionOrigenId")]
+        public virtual DireccionGuiaSnapshot DireccionOrigen { get; set; } = null!;
 
-    [ForeignKey("UsuarioCobroId")]
-    public virtual Usuario? UsuarioCobro { get; set; }
+        [ForeignKey("UsuarioAltaId")]
+        public virtual Usuario UsuarioAlta { get; set; } = null!;
 
-    [ForeignKey("DireccionDestinoId")]
-    public virtual DireccionGuiaSnapshot DireccionDestino { get; set; } = null!;
+        [ForeignKey("UsuarioCobroId")]
+        public virtual Usuario? UsuarioCobro { get; set; }
 
-    [ForeignKey("SucursalOrigenId")]
-    public virtual Sucursal SucursalOrigen { get; set; } = null!;
+        [ForeignKey("DireccionDestinoId")]
+        public virtual DireccionGuiaSnapshot DireccionDestino { get; set; } = null!;
 
-    [ForeignKey("SucursalDestinoId")]
-    public virtual Sucursal SucursalDestino { get; set; } = null!;
+        [ForeignKey("SucursalOrigenId")]
+        public virtual Sucursal SucursalOrigen { get; set; } = null!;
 
-    // colleciones
-    public virtual ICollection<ArticuloGuia> Articulos { get; set; } = new List<ArticuloGuia>();
+        [ForeignKey("SucursalDestinoId")]
+        public virtual Sucursal SucursalDestino { get; set; } = null!;
 
-    public virtual ICollection<AsignacionGuia> Asignaciones { get; set; } = new List<AsignacionGuia>();
+    #endregion
+
+
 }

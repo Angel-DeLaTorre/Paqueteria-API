@@ -14,13 +14,20 @@ public record ArticuloCreateDto(
 };
 
 public record ArticuloUpdateDto(
-    Guid IdArticulo,
+    Guid ArticuloId,
     string Clave,
     string Descripcion
-);
+)
+{
+    public void UpdateEntity(Articulo entity)
+    {
+        entity.Clave = Clave;
+        entity.Descripcion = Descripcion;
+    }
+};
 
 public record ArticuloResponseDto(
-    Guid IdArticulo,
+    Guid ArticuloId,
     string Clave,
     string Descripcion
 )

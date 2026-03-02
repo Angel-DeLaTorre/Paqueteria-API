@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
 
-namespace Paqueteria.API.Controllers;
+namespace Paqueteria.API.Controllers.v1;
 
 [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 public class ClienteController(IClienteService clienteService) : PaqueteriaControllerBase
 {
     [HttpGet]

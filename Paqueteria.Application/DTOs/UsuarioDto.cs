@@ -10,25 +10,19 @@ public record UsuarioCreateDto(
     RolUsuario Rol
 )
 {
-    public Usuario ToEntity() => new Usuario(Nombre, Username, Password, Rol);
+    public Usuario ToEntity() => new (Nombre, Username, Password, Rol);
 };
 
 public record UsuarioUpdateDto(
     Guid UsuarioId,
-    string? Nombre,
-    RolUsuario? Rol
+    string Nombre,
+    RolUsuario Rol
 )
 {
     public void UpdateEntity(Usuario entity)
     {
-        if (!string.IsNullOrWhiteSpace(Nombre) && Nombre != entity.Nombre)
-        {
-            entity.Nombre = Nombre.Trim();
-        }
-        if (Rol.HasValue && Rol.Value != entity.Rol)
-        {
-            entity.Rol = Rol.Value;
-        }
+        entity.Nombre = Nombre;
+        entity.Rol = Rol;
     }
 };
 
@@ -40,14 +34,12 @@ public record UsuarioResponseDto(
     DateTime? FechaUltimoAcesso
 )
 {
-    public static UsuarioResponseDto FromEntity(Usuario entity)
-    {
-        return new UsuarioResponseDto(
+    public static UsuarioResponseDto FromEntity(Usuario entity) =>
+        new (
             entity.Id,
             entity.Nombre,
             entity.Username,
             entity.Rol,
             entity.FechaUltimoAcceso
         );
-    }
 };

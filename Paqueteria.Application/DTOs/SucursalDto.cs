@@ -16,8 +16,20 @@ public abstract record SucursalCreateDto(
     string Telefono
 )
 {
-    public Sucursal ToEntity() => new Sucursal(Nombre, Codigo, EsMatriz, Calle, Colonia, NumeroExterior, NumeroInterior,
-        Localidad, MunicipioId, Telefono);
+    public Sucursal ToEntity() =>
+        new Sucursal
+        {
+            Nombre = Nombre,
+            Codigo = Codigo,
+            EsMatriz = EsMatriz,
+            Calle = Calle,
+            Colonia = Colonia,
+            NumeroExterior = NumeroExterior,
+            NumeroInterior = NumeroInterior,
+            Localidad = Localidad,
+            MunicipioId = MunicipioId,
+            Telefono = Telefono
+        };
 };
 
 public record SucursaUpdateDto(
@@ -36,26 +48,16 @@ public record SucursaUpdateDto(
 {
     public void UpdateEntity(Sucursal entity)
     {
-        if (Nombre != entity.Nombre)
-            entity.Nombre = Nombre.Trim();
-        if (Codigo != entity.Codigo)
-            entity.Codigo = Codigo.Trim();
-        if (EsMatriz != entity.EsMatriz)
-            entity.EsMatriz = EsMatriz;
-        if (Calle != entity.Calle)
-            entity.Calle = Calle.Trim();
-        if (Colonia != entity.Colonia)
-            entity.Colonia = Colonia;
-        if (NumeroExterior != entity.NumeroExterior)
-            entity.NumeroExterior = NumeroExterior.Trim();
-        if (NumeroInterior != entity.NumeroInterior)
-            entity.NumeroInterior = NumeroInterior.Trim();
-        if (Localidad != entity.Localidad)
-            entity.Localidad = Localidad.Trim();
-        if (MunicipioId != entity.MunicipioId)
-            entity.MunicipioId =  MunicipioId;
-        if (Telefono != entity.Telefono)
-            entity.Telefono = Telefono.Trim();
+        entity.Nombre = Nombre;
+        entity.Codigo = Codigo;
+        entity.EsMatriz = EsMatriz;
+        entity.Calle = Calle;
+        entity.Colonia = Colonia;
+        entity.NumeroExterior = NumeroExterior;
+        entity.NumeroInterior = NumeroInterior;
+        entity.Localidad = Localidad;
+        entity.MunicipioId =  MunicipioId;
+        entity.Telefono = Telefono;
     }
 };
 
@@ -68,15 +70,15 @@ public record SucursalResponseDto(
     string NumeroExterior,
     string? NumeroInterior,
     string? Localidad,
-    string Municipio,
     Guid MunicipioId,
+    string MunicipioNombre,
     string? Telefono,
     EstatusGenerico Estatus
 )
 {
-    public static SucursalResponseDto FromEntity(Sucursal entity)
-    {
-        return new SucursalResponseDto(
+    public static SucursalResponseDto FromEntity(Sucursal entity) =>
+        new
+        (
             entity.Id,
             entity.Nombre,
             entity.Codigo,
@@ -85,10 +87,9 @@ public record SucursalResponseDto(
             entity.NumeroExterior,
             entity.NumeroInterior,
             entity.Localidad,
-            entity.Municipio.Nombre,
-            entity.Municipio.Id,
+            entity.MunicipioId,
+            entity.Municipio?.Nombre ?? "",
             entity.Telefono,
             entity.Estatus
         );
-    }
 };

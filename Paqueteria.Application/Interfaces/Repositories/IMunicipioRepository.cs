@@ -2,8 +2,7 @@ using Paqueteria.Core.Entities;
 
 namespace Paqueteria.Application.Interfaces.Repositories;
 
-public interface IMunicipioRepository
+public interface IMunicipioRepository : IEntityRepository<Municipio>
 {
-    Task<Municipio?> ObtenerMunicipioAsync(Guid id);
     Task<IEnumerable<Municipio>> ObtenerMunicipiosPorEstadoAsync(string estadoId);
 }

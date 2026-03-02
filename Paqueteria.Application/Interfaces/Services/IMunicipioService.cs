@@ -5,6 +5,6 @@ namespace Paqueteria.Application.Interfaces.Services;
 
 public interface IMunicipioService
 {
-    Task<Result<MunicipioDto>> ObtenerMunicipioAsync(Guid id);
-    Task<Result<IEnumerable<MunicipioDto>>> ObtenerMunicipiosPorEstadoAsync(string estado);
+    Task<Result<MunicipioResponseDto>> ObtenerMunicipioAsync(Guid id);
+    Task<Result<IEnumerable<MunicipioResponseDto>>> ObtenerMunicipiosPorEstadoAsync(string estado);
 }

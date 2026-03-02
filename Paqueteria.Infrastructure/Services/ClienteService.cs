@@ -31,23 +31,7 @@ public class ClienteService(IClienteRepository clienteRepo) : IClienteService
 
     public async Task<Result<ClienteResponseDto>> CreateAsync(ClienteCreateDto dto, Guid usuarioId,  Guid sucursalId)
     {
-        var cliente = new Cliente
-        {
-            Nombre = dto.Nombre,
-            Estatus = EstatusGenerico.Activo,
-            Rfc = dto.Rfc,
-            Direccion = dto.Direccion,
-            DireccionComplemento = dto.DireccionComplemento,
-            CodigoPostal  = dto.CodigoPostal,
-            MunicipioId = Guid.Parse(dto.IdMunicipio),
-            Telefono = dto.Telefono,
-            Telefono2  = dto.Telefono2,
-            Correo  = dto.Correo,
-            Contacto  = dto.Contacto,
-            NumConvenio  = dto.NumConvenio,
-            PolizaSeguro  = dto.PolizaSeguro,
-            SucursalId = Guid.Parse(dto.IdSucursal)
-        };
+        var cliente = dto.ToEntity();
 
         var clienteCreado = await clienteRepo.AddAsync(cliente);
 

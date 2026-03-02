@@ -2,16 +2,16 @@ using Paqueteria.Core.Entities;
 
 namespace Paqueteria.Application.DTOs;
 
-public record MunicipioDto(
-    Guid IdMunicipio,
+public record MunicipioResponseDto(
+    Guid MunicipioId,
     string Nombre,
     string EstadoId,
-    string Estado
+    string EstadoNombre
 )
 {
-    public static MunicipioDto FromEntity(Municipio entity)
+    public static MunicipioResponseDto FromEntity(Municipio entity)
     {
-        return new MunicipioDto(
+        return new MunicipioResponseDto(
             entity.Id,
             entity.Nombre,
             entity.EstadoId,

@@ -14,14 +14,12 @@ public record SesionResponseDto(
     DateTime? Expiracion
 )
 {
-    public static SesionResponseDto FromEntity(Usuario entity, SecurityToken token, DateTime? expiracion)
-    {
-        return new SesionResponseDto(
+    public static SesionResponseDto FromEntity(Usuario entity, SecurityToken token, DateTime? expiracion) =>
+        new(
             entity.Username,
             entity.Nombre,
             entity.Rol,
             token,
             expiracion
         );
-    }
 };
