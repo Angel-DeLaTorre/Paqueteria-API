@@ -6,3 +6,5 @@
 **/.idea/
 **/*.user
 **/[Tt]est[Rr]esults/
+/Paqueteria.API/bin\Debug
+/Paqueteria.Infrastructure/bin\Debug
