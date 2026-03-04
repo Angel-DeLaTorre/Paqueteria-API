@@ -28,7 +28,7 @@ public record SeguroResponseDto(
     string Nombre
 )
 {
-    private static SeguroResponseDto FromEntity(Seguro entity) =>
+    public static SeguroResponseDto FromEntity(Seguro entity) =>
         new (
             entity.Id,
             entity.Nombre

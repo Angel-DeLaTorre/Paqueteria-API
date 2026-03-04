@@ -69,7 +69,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork un
         {
             var empresa = (await empresaRepository.GetByIdAsync(dto.EmpresaId));
 
-            if (empresa == null)
+            if (empresa is null)
                 return Result.Failure(CodigoRespuesta.NotFound, "Empresa no encontrada");
 
             dto.UpdateEntity(empresa);

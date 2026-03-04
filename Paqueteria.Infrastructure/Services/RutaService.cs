@@ -2,33 +2,112 @@ using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Enums;
+using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class RutaService(IRutaRepository rutaRepository) : IRutaService
+public class RutaService(IRutaRepository rutaRepository, UnitOfWork unitOfWork) : IRutaService
 {
-    public Task<Result<IReadOnlyList<RutaResponseDto>>> GetAllAsync()
+    public async Task<Result<IReadOnlyList<RutaResponseDto>>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        try
+        {
+            var rutas = ( await rutaRepository.GetAllAsync() )
+                .Select( RutaResponseDto.FromEntity ).ToList();
+            return Result<IReadOnlyList<RutaResponseDto>>.Success(rutas);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result<RutaResponseDto>> GetByIdAsync(Guid rutaId)
+    public async Task<Result<RutaResponseDto>> GetByIdAsync(Guid rutaId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var ruta = await rutaRepository.GetByIdAsync(rutaId);
+
+            if (ruta is null)
+                return Result<RutaResponseDto>.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrada");
+
+            return Result<RutaResponseDto>.Success(RutaResponseDto.FromEntity(ruta));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result<RutaResponseDto>> CreateAsync(RutaCreateDto dto, UserContext currentUser)
+    public async Task<Result<RutaResponseDto>> CreateAsync(RutaCreateDto dto, UserContext currentUser)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var ruta = await rutaRepository.AddAsync(dto.ToEntity());
+
+            var result = unitOfWork.CompleteAsync();
+
+            if (result.IsCompletedSuccessfully)
+                return Result<RutaResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+
+            return Result<RutaResponseDto>.Success(RutaResponseDto.FromEntity(ruta));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result> UpdateAsync(RutaUpdateDto dto, UserContext currentUser)
+    public async Task<Result> UpdateAsync(RutaUpdateDto dto, UserContext currentUser)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var ruta = await rutaRepository.GetByIdAsync(dto.RutaId);
+
+            if (ruta is null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Chofer no encontrado");
+
+            dto.UpdateEntity(ruta);
+            rutaRepository.Update(ruta);
+            var result = await  unitOfWork.CompleteAsync();
+
+            if (result != 0)
+                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result> DeleteAsync(Guid rutaId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid rutaId, UserContext currentUser)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var ruta = (await rutaRepository.GetByIdAsync(rutaId));
+
+            if (ruta is null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Ruta no encontrada");
+
+            rutaRepository.Delete(ruta);
+
+            var result = await unitOfWork.CompleteAsync();
+            if (result <= 0)
+                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

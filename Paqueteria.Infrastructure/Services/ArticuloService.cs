@@ -55,8 +55,27 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
         return Result.Success();
     }
 
-    public Task<Result> DeleteAsync(Guid articuloId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid articuloId, UserContext currentUser)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var articulo = (await articuloRepository.GetByIdAsync(articuloId));
+
+            if (articulo == null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Articulo no encontrado");
+
+            articuloRepository.Delete(articulo);
+
+            var result = await unitOfWork.CompleteAsync();
+            if (result <= 0)
+                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

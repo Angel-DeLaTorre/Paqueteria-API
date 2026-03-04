@@ -2,22 +2,19 @@ using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Entities;
 using Paqueteria.Core.Enums;
+using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class ClienteService(IClienteRepository clienteRepo) : IClienteService
+public class ClienteService(IClienteRepository clienteRepo, UnitOfWork unitOfWork) : IClienteService
 {
     public async Task<Result<IReadOnlyList<ClienteResponseDto>>> GetAllAsync()
     {
         try
         {
-            var clientes = (await clienteRepo.GetAllAsync()).Select(ClienteResponseDto.FromEntity).ToList();
-
-            if (clientes.Any())
-                return Result<IReadOnlyList<ClienteResponseDto>>.Failure(CodigoRespuesta.NotFound, "Sin datos");
-
+            var clientes = ( await clienteRepo.GetAllAsync() )
+                .Select( ClienteResponseDto.FromEntity ).ToList();
             return Result<IReadOnlyList<ClienteResponseDto>>.Success(clientes);
         }
         catch (Exception e)
@@ -27,11 +24,11 @@ public class ClienteService(IClienteRepository clienteRepo) : IClienteService
         }
     }
 
-    public async Task<Result<ClienteResponseDto>> GetByIdAsync(Guid id)
+    public async Task<Result<ClienteResponseDto>> GetByIdAsync(Guid clienteId)
     {
         try
         {
-            var cliente = await clienteRepo.GetByIdAsync(id);
+            var cliente = await clienteRepo.GetByIdAsync(clienteId);
 
             if (cliente == null)
                 return Result<ClienteResponseDto>.Failure(CodigoRespuesta.NotFound, "Cliente no encontrado");
@@ -49,11 +46,14 @@ public class ClienteService(IClienteRepository clienteRepo) : IClienteService
     {
         try
         {
-            var cliente = dto.ToEntity();
+            var cliente = await clienteRepo.AddAsync(dto.ToEntity());
 
-            var clienteCreado = await clienteRepo.AddAsync(cliente);
+            var result = unitOfWork.CompleteAsync();
 
-            return Result<ClienteResponseDto>.Success(ClienteResponseDto.FromEntity(clienteCreado));
+            if (result.IsCompletedSuccessfully)
+                return Result<ClienteResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+
+            return Result<ClienteResponseDto>.Success(ClienteResponseDto.FromEntity(cliente));
         }
         catch (Exception e)
         {
@@ -66,7 +66,18 @@ public class ClienteService(IClienteRepository clienteRepo) : IClienteService
     {
         try
         {
-            var cliente = await clienteRepo.AddAsync(new Cliente());
+            var cliente = await clienteRepo.GetByIdAsync(dto.IdCliente);
+
+            if (cliente is null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Cliente no encontrado");
+
+            dto.UpdateEntity(cliente);
+            clienteRepo.Update(cliente);
+            var result = await  unitOfWork.CompleteAsync();
+
+            if (result != 0)
+                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+
             return Result.Success();
         }
         catch (Exception e)
@@ -76,11 +87,22 @@ public class ClienteService(IClienteRepository clienteRepo) : IClienteService
         }
     }
 
-    public Task<Result> DeleteAsync(Guid clienteId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid clienteId, UserContext currentUser)
     {
         try
         {
-            throw new NotImplementedException();
+            var cliente = (await clienteRepo.GetByIdAsync(clienteId));
+
+            if (cliente is null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Cliente no encontrado");
+
+            clienteRepo.Delete(cliente);
+
+            var result = await unitOfWork.CompleteAsync();
+            if (result <= 0)
+                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+
+            return Result.Success();
         }
         catch (Exception e)
         {

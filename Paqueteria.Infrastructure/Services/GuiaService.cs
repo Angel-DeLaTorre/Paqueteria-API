@@ -2,33 +2,112 @@ using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Enums;
+using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class GuiaService(IGuiaRepository guiaRepository) : IGuiaService
+public class GuiaService(IGuiaRepository guiaRepository, UnitOfWork unitOfWork) : IGuiaService
 {
-    public Task<Result<IReadOnlyList<GuiaResponseDto>>> GetAllAsync()
+    public async Task<Result<IReadOnlyList<GuiaResponseDto>>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        try
+        {
+            var guias = ( await guiaRepository.GetAllAsync() )
+                .Select( GuiaResponseDto.FromEntity ).ToList();
+            return Result<IReadOnlyList<GuiaResponseDto>>.Success(guias);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result<GuiaResponseDto>> GetByIdAsync(Guid guiaId)
+    public async Task<Result<GuiaResponseDto>> GetByIdAsync(Guid guiaId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var guia = await guiaRepository.GetByIdAsync(guiaId);
+
+            if (guia is null)
+                return Result<GuiaResponseDto>.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrada");
+
+            return Result<GuiaResponseDto>.Success(GuiaResponseDto.FromEntity(guia));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result<GuiaResponseDto>> CreateAsync(GuiaCreateDto dto, UserContext currentUser)
+    public async Task<Result<GuiaResponseDto>> CreateAsync(GuiaCreateDto dto, UserContext currentUser)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var guia = await guiaRepository.AddAsync(dto.ToEntity());
+
+            var result = unitOfWork.CompleteAsync();
+
+            if (result.IsCompletedSuccessfully)
+                return Result<GuiaResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+
+            return Result<GuiaResponseDto>.Success(GuiaResponseDto.FromEntity(guia));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result> UpdateAsync(GuiaCreateDto dto, UserContext currentUser)
+    public async Task<Result> UpdateAsync(GuiaUpdateDto dto, UserContext currentUser)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var guia = await guiaRepository.GetByIdAsync(dto.GuiaId);
+
+            if (guia is null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Guia no encontrado");
+
+            dto.UpdateEntity(guia);
+            guiaRepository.Update(guia);
+            var result = await  unitOfWork.CompleteAsync();
+
+            if (result != 0)
+                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<Result> DeleteAsync(Guid guiaId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid guiaId, UserContext currentUser)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var guia = (await guiaRepository.GetByIdAsync(guiaId));
+
+            if (guia is null)
+                return Result.Failure(CodigoRespuesta.NotFound, "Guia no encontrado");
+
+            guiaRepository.Delete(guia);
+
+            var result = await unitOfWork.CompleteAsync();
+            if (result <= 0)
+                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }
