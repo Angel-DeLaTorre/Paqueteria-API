@@ -98,6 +98,9 @@ public class Guia
         [Column("seguro_id")]
         public Guid? Seguro { get; init; }
         
+        [Column("asignacion_id")]
+        public Guid? AsignacionId { get; init; }
+        
         [Column("empresa_id")]
         public Guid EmpresaId { get; init; }
 
@@ -128,6 +131,9 @@ public class Guia
 
         [ForeignKey("SucursalDestinoId")]
         public virtual Sucursal SucursalDestino { get; set; } = null!;
+        
+        [ForeignKey("AsignacionId")]
+        public Asignacion? Asignacion { get; set; }
 
         [ForeignKey("SeguroId")]
         public Seguro Sucursal { get; set; } = null!;

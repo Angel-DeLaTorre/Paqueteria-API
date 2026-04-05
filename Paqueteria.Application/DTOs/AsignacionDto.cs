@@ -6,7 +6,7 @@ namespace Paqueteria.Application.DTOs;
 public record AsignacionCreateDto(
     Guid Id,
     Guid ChoferId,
-    DateTime FechaAsignacion,
+    DateTime? FechaPartida,
     string? St1,
     string? St2,
     string? St3,
@@ -16,25 +16,21 @@ public record AsignacionCreateDto(
     string? NumContenedor2
 )
 {
-    public Asignacion ToEntity() =>
-        new Asignacion
-        {
-            Id = Id,
-            ChoferId = ChoferId,
-            FechaAsignacion = FechaAsignacion,
-            St1 = St1,
-            St2 = St2,
-            St3 = St3,
-            St4 = St4,
-            Camion = Camion,
-            NumContenedor = NumContenedor,
-            NumContenedor2 = NumContenedor2
-        };
+    public Asignacion ToEntity() => Asignacion.Create(
+        ChoferId,
+        FechaPartida,
+        St1,
+        St2,
+        St3,
+        St4,
+        Camion,
+        NumContenedor,
+        NumContenedor2);
 };
 
 public record AsignacionUpdateDto(
     Guid Id,
-    DateTime FechaAsignacion,
+    DateTime FechaPartida,
     string? St1,
     string? St2,
     string? St3,
@@ -45,7 +41,7 @@ public record AsignacionUpdateDto(
 {
     public void UpdateEntity(Asignacion entity)
     {
-        entity.FechaAsignacion = FechaAsignacion;
+        entity.FechaPartida = FechaPartida;
         entity.St1 = St1;
         entity.St2 = St2;
         entity.St3 = St3;
@@ -59,7 +55,7 @@ public record AsignacionUpdateDto(
 public record AsignacionResponseDto(
     Guid Id,
     Guid ChoferId,
-    DateTime FechaAsignacion,
+    DateTime? FechaPartida,
     string? St1,
     string? St2,
     string? St3,
@@ -73,7 +69,7 @@ public record AsignacionResponseDto(
         => new(
             entity.Id,
             entity.ChoferId,
-            entity.FechaAsignacion,
+            entity.FechaPartida,
             entity.St1,
             entity.St2,
             entity.St3,

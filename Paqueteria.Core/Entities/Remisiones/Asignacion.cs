@@ -12,15 +12,15 @@ namespace Paqueteria.Core.Entities.Remisiones
             [Key]
             [Column("id")]
             public Guid Id { get; init; } = Guid.NewGuid();
-            
-            [Column("guia_id")]
-            public Guid GuiaId { get; init; }
 
             [Column("chofer_id")]
             public Guid ChoferId { get; init; }
 
-            [Column("fecha_asignacion")]
-            public DateTime FechaAsignacion { get; set; } = DateTime.UtcNow;
+            [Column("fecha_creacion")]
+            public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
+            
+            [Column("fecha_partida")]
+            public DateTime? FechaPartida { get; set; } = DateTime.UtcNow;
 
             [MaxLength(10)]
             [Column("st1")]
@@ -56,9 +56,45 @@ namespace Paqueteria.Core.Entities.Remisiones
             [ForeignKey("ChoferId")]
             public Chofer Chofer { get; init; } = null!;
 
-            [ForeignKey("GuiaId")] 
-            public Guia Guia { get; init; } = null!;
+        #endregion
 
-            #endregion
+        #region Constructos
+
+            private Asignacion() { }
+
+            public static Asignacion Create(
+                Guid choferId, 
+                DateTime? fechaPartida,
+                string? st1, 
+                string? st2, 
+                string? st3, 
+                string? st4, 
+                string camion,
+                string? numContenedor,
+                string? numContenedor2)
+            {
+                return new Asignacion()
+                {
+                    Id = Guid.NewGuid(),
+                    ChoferId = choferId,
+                    FechaCreacion = DateTime.UtcNow,
+                    FechaPartida = fechaPartida,
+                    St1 = st1,
+                    St2 = st2,
+                    St3 = st3,
+                    St4 = st4,
+                    Camion = camion,
+                    NumContenedor = numContenedor,
+                    NumContenedor2 = numContenedor2
+                };
+            }
+
+        #endregion
+            
+        #region Relations
+        
+            public ICollection<Guia> Guias { get; private set; } = new List<Guia>();
+            
+        #endregion
     }
 }
