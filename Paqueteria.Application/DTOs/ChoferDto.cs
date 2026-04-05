@@ -1,5 +1,7 @@
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
 using Paqueteria.Core.Enums;
+using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Application.DTOs;
 
@@ -7,34 +9,30 @@ public record ChoferCreateDto(
     string Nombre,
     string ApellidoPaterno,
     string ApellidoMaterno,
-    string Calle,
-    string Colonia,
-    string NumeroExterior,
-    string? NumeroInterior,
-    string? Localidad,
-    Guid MunicipioId,
+    DireccionDto Direccion,
     string Telefono,
-    int? NumCamion,
-    int? NumContenedor,
-    int? NumContenedor2
+    string? NumCamion,
+    string? NumContenedor,
+    string? NumContenedor2
 )
 {
-    public Chofer ToEntity() =>
-        new Chofer(
+    public Chofer ToEntity(Guid empresaId)
+    {
+        var direccion = Direccion.ToEntity();
+        
+        return Chofer.Create
+        (
             Nombre,
             ApellidoPaterno,
             ApellidoMaterno,
-            Calle,
-            Colonia,
-            NumeroExterior,
-            NumeroInterior,
-            Localidad,
-            MunicipioId,
+            direccion,
             Telefono,
             NumCamion,
             NumContenedor,
-            NumContenedor2
+            NumContenedor2,
+            empresaId
         );
+    }
 };
 
 public record ChoferUpdateDto(
@@ -42,16 +40,11 @@ public record ChoferUpdateDto(
     string Nombre,
     string ApellidoPaterno,
     string ApellidoMaterno,
-    string Calle,
-    string Colonia,
-    string NumeroExterior,
-    string? NumeroInterior,
-    string? Localidad,
-    Guid MunicipioId,
+    DireccionDto Direccion,
     string Telefono,
-    int? NumCamion,
-    int? NumContenedor,
-    int? NumContenedor2
+    string? NumCamion,
+    string? NumContenedor,
+    string? NumContenedor2
 )
 {
     public void UpdateEntity(Chofer chofer)
@@ -59,16 +52,11 @@ public record ChoferUpdateDto(
         chofer.Nombre = Nombre;
         chofer.ApellidoPaterno = ApellidoPaterno;
         chofer.ApellidoMaterno = ApellidoMaterno;
-        chofer.Calle = Calle;
-        chofer.Colonia = Colonia;
-        chofer.NumeroExterior = NumeroExterior;
-        chofer.NumeroInterior = NumeroInterior;
-        chofer.Localidad = Localidad;
-        chofer.MunicipioId = MunicipioId;
         chofer.Telefono = Telefono;
         chofer.NumCamion = NumCamion;
         chofer.NumContenedor = NumContenedor;
         chofer.NumContenedor2 = NumContenedor2;
+        chofer.Direccion = Direccion.ToEntity();
     }
 }
 
@@ -77,32 +65,20 @@ public record ChoferResponseDto(
     string Nombre,
     string ApellidoPaterno,
     string? ApellidoMaterno,
-    string? Calle,
-    string? Colonia,
-    string? NumeroExterior,
-    string? NumeroInterior,
-    string? Localidad,
-    Guid MunicipioId,
-    string MunicipioNombre,
+    DireccionResponseDto Direccion,
     string? Telefono,
-    int? NumCamion,
-    int? NumContenedor,
-    int? NumContenedor2
+    string? NumCamion,
+    string? NumContenedor,
+    string? NumContenedor2
 )
 {
     public static ChoferResponseDto FromEntity(Chofer chofer) =>
         new ChoferResponseDto(
-            chofer.ChoferId,
+            chofer.Id,
             chofer.Nombre,
             chofer.ApellidoPaterno,
             chofer.ApellidoMaterno,
-            chofer.Calle,
-            chofer.Colonia,
-            chofer.NumeroExterior,
-            chofer.NumeroInterior,
-            chofer.Localidad,
-            chofer.MunicipioId,
-            chofer.Municipio.Nombre,
+            DireccionResponseDto.FromEntity(chofer.Direccion, chofer.Municipio),
             chofer.Telefono,
             chofer.NumCamion,
             chofer.NumContenedor,

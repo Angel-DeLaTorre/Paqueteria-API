@@ -1,4 +1,5 @@
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Application.DTOs;
@@ -10,7 +11,7 @@ public record UsuarioCreateDto(
     RolUsuario Rol
 )
 {
-    public Usuario ToEntity() => new (Nombre, Username, Password, Rol);
+    public Usuario ToEntity(Guid empresaId) => Usuario.Create(Nombre, Username, Password, Rol, empresaId);
 };
 
 public record UsuarioUpdateDto(

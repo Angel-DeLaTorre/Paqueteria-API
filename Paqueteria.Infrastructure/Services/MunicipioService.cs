@@ -20,13 +20,13 @@ public sealed class MunicipioService(IMunicipioRepository repository) : IMunicip
         return Result<MunicipioResponseDto>.Success( MunicipioResponseDto.FromEntity(municipio) );
     }
 
-    public async Task<Result<IEnumerable<MunicipioResponseDto>>> ObtenerMunicipiosPorEstadoAsync(string estadoId)
+    public async Task<Result<IReadOnlyList<MunicipioResponseDto>>> ObtenerMunicipiosPorEstadoAsync(string estadoId)
     {
         var municipios = (await repository.ObtenerMunicipiosPorEstadoAsync(estadoId)).Select(MunicipioResponseDto.FromEntity).ToList();
 
         if (municipios.Count == 0)
-            return Result<IEnumerable<MunicipioResponseDto>>.Failure(CodigoRespuesta.NotFound, "No existe ningun municipio");
+            return Result<IReadOnlyList<MunicipioResponseDto>>.Failure(CodigoRespuesta.NotFound, "No existe ningun municipio");
 
-        return Result<IEnumerable<MunicipioResponseDto>>.Success( municipios);
+        return Result<IReadOnlyList<MunicipioResponseDto>>.Success( municipios);
     }
 }

@@ -2,8 +2,8 @@ namespace Paqueteria.Core.Enums;
 
 public enum RolUsuario
 {
-    Admin,
-    Gerente,
-    Reportes,
-    Operativo
+    Super = 1,
+    Admin = 2,
+    Reportes = 3,
+    Operativo = 4
 }

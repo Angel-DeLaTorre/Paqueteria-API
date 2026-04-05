@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
-using Paqueteria.Infrastructure.Services;
+using Paqueteria.Application.Interfaces.Services;
 
 namespace Paqueteria.API.Controllers.v1;
 
-[Authorize]
 [ApiController]
 [Route("api/v1/[controller]")]
-public class SucursalController(SucursalService service) : PaqueteriaControllerBase
+public class SucursalController(ISucursalService service) : PaqueteriaControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<SucursalResponseDto>>> Get()

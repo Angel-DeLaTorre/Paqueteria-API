@@ -1,13 +1,13 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
-using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class ChoferService(IChoferRepository choferRepository, UnitOfWork unitOfWork) : IChoferService
+public class ChoferService(IChoferRepository choferRepository, IUnitOfWork unitOfWork) : IChoferService
 {
     public async Task<Result<IReadOnlyList<ChoferResponseDto>>> GetAllAsync()
     {
@@ -46,7 +46,7 @@ public class ChoferService(IChoferRepository choferRepository, UnitOfWork unitOf
     {
         try
         {
-            var chofer = await choferRepository.AddAsync(dto.ToEntity());
+            var chofer = await choferRepository.AddAsync(dto.ToEntity(currentUser.EmpresaId));
 
             var result = unitOfWork.CompleteAsync();
 

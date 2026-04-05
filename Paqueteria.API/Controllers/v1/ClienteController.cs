@@ -8,27 +8,54 @@ namespace Paqueteria.API.Controllers.v1;
 [Authorize]
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ClienteController(IClienteService clienteService) : PaqueteriaControllerBase
+public class ClienteController(IClienteService service) : PaqueteriaControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ClienteResponseDto>>> GetAll()
+    public async Task<ActionResult<IReadOnlyList<ClienteResponseDto>>> Get()
     {
-        var result = await clienteService.GetAllAsync();
-        //ProcessResult<IEnumerable<ClienteResponseDto>>(result);
-        return Ok(await clienteService.GetAllAsync());
-
+        var result = await service.GetAllAsync();
+        return ProcessResult(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ClienteResponseDto>> GetById(System.Guid id)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ClienteResponseDto>> Get(Guid id)
     {
-        return  Ok(await clienteService.GetByIdAsync(id));
+        var result = await service.GetByIdAsync(id);
+        return ProcessResult(result);
     }
 
-    [HttpPost]
+
+    [HttpPost("create")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ClienteResponseDto>> Create(ClienteCreateDto dto)
     {
-        var result = await clienteService.CreateAsync(dto, CurrentUser);
-        return Ok(result);
+        var result = await service.CreateAsync(dto, CurrentUser);
+        return ProcessResult(result);
+    }
+
+    [Authorize]
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update([FromBody] ClienteUpdateDto dto)
+    {
+        var result = await service.UpdateAsync(dto, CurrentUser);
+        return ProcessResult(result);
+    }
+
+    [Authorize]
+    [HttpDelete("{sucursalId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid sucursalId)
+    {
+        var result = await service.DeleteAsync(sucursalId, CurrentUser);
+        return ProcessResult(result);
     }
 }

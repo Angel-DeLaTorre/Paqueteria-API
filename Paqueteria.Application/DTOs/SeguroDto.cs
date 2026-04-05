@@ -1,4 +1,5 @@
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
 
 namespace Paqueteria.Application.DTOs;
 
@@ -7,9 +8,7 @@ public record SeguroCreateDto(
 )
 {
     public Seguro ToEntity() =>
-        new(
-            Nombre
-        );
+        Seguro.Create(Nombre);
 };
 
 public record SeguroUpdateDto(

@@ -1,5 +1,5 @@
 using Paqueteria.Application.Interfaces.Repositories;
-using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Catalogos;
 using Paqueteria.Infrastructure.Data;
 
 namespace Paqueteria.Infrastructure.Repositories;

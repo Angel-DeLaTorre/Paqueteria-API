@@ -16,7 +16,7 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
         return Result<IReadOnlyList<ArticuloResponseDto>>.Success(articulos);
     }
 
-    public async Task<Result<ArticuloResponseDto>> GetByIdAsync(Guid id)
+    public async Task<Result<ArticuloResponseDto>> GetByIdAsync(string id)
     {
         var articulo = await articuloRepository.GetByIdAsync(id);
 

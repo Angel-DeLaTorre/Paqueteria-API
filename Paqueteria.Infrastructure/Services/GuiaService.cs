@@ -1,13 +1,13 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
-using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class GuiaService(IGuiaRepository guiaRepository, UnitOfWork unitOfWork) : IGuiaService
+public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWork unitOfWork) : IGuiaService
 {
     public async Task<Result<IReadOnlyList<GuiaResponseDto>>> GetAllAsync()
     {
@@ -46,7 +46,7 @@ public class GuiaService(IGuiaRepository guiaRepository, UnitOfWork unitOfWork) 
     {
         try
         {
-            var guia = await guiaRepository.AddAsync(dto.ToEntity());
+            var guia = await guiaRepository.AddAsync(dto.ToEntity(currentUser.UserId, currentUser.EmpresaId));
 
             var result = unitOfWork.CompleteAsync();
 

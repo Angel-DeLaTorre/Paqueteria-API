@@ -1,0 +1,11 @@
+namespace Paqueteria.Core.Common;
+
+public static class Constantes
+{
+    public static class Esquemas
+    {
+        public const string Sat = "sat";
+        public const string Catalogos = "catalogos";
+        public const string Remisiones = "remisiones";
+    }
+}

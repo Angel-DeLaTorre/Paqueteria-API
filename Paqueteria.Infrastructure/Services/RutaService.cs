@@ -1,13 +1,13 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
-using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class RutaService(IRutaRepository rutaRepository, UnitOfWork unitOfWork) : IRutaService
+public class RutaService(IRutaRepository rutaRepository, IUnitOfWork unitOfWork) : IRutaService
 {
     public async Task<Result<IReadOnlyList<RutaResponseDto>>> GetAllAsync()
     {
@@ -46,7 +46,7 @@ public class RutaService(IRutaRepository rutaRepository, UnitOfWork unitOfWork) 
     {
         try
         {
-            var ruta = await rutaRepository.AddAsync(dto.ToEntity());
+            var ruta = await rutaRepository.AddAsync(dto.ToEntity(currentUser.EmpresaId));
 
             var result = unitOfWork.CompleteAsync();
 

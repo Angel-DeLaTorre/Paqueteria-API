@@ -1,13 +1,13 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
-using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class SeguroService(ISeguroRepository seguroRepository, UnitOfWork unitOfWork) : ISeguroService
+public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWork unitOfWork) : ISeguroService
 {
     public async Task<Result<IReadOnlyList<SeguroResponseDto>>> GetAllAsync()
     {

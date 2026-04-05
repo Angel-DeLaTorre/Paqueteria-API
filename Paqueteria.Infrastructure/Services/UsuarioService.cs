@@ -51,7 +51,7 @@ public class UsuarioService(IUsuarioRepository usuarioRepository, IUnitOfWork un
     {
         try
         {
-            var usuario = await usuarioRepository.AddAsync(dto.ToEntity());
+            var usuario = await usuarioRepository.AddAsync(dto.ToEntity(currentUser.EmpresaId));
 
             var result = await unitOfWork.CompleteAsync();
 

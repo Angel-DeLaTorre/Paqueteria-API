@@ -33,6 +33,7 @@ public static class InfrastructureServiceRegistration
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
         services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IArticuloRepository, ArticuloRepository>();
         services.AddScoped<IArticuloService, ArticuloService>();
@@ -72,8 +73,6 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IUsuarioService, UsuarioService>();
-
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

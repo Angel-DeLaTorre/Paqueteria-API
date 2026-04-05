@@ -1,4 +1,5 @@
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Application.DTOs;
@@ -7,29 +8,23 @@ public abstract record SucursalCreateDto(
     string Nombre,
     string Codigo,
     bool EsMatriz,
-    string Calle,
-    string Colonia,
-    string NumeroExterior,
-    string? NumeroInterior,
-    string? Localidad,
-    Guid MunicipioId,
+    DireccionDto Direccion,
     string Telefono
 )
 {
-    public Sucursal ToEntity() =>
-        new Sucursal
-        {
-            Nombre = Nombre,
-            Codigo = Codigo,
-            EsMatriz = EsMatriz,
-            Calle = Calle,
-            Colonia = Colonia,
-            NumeroExterior = NumeroExterior,
-            NumeroInterior = NumeroInterior,
-            Localidad = Localidad,
-            MunicipioId = MunicipioId,
-            Telefono = Telefono
-        };
+    public Sucursal ToEntity(Guid empresaId)
+    {
+        var direccion = Direccion.ToEntity();
+        return Sucursal.Create
+        (
+            Nombre,
+            Codigo,
+            EsMatriz,
+            direccion,
+            Telefono,
+            empresaId
+        );
+    }
 };
 
 public record SucursaUpdateDto(
@@ -37,12 +32,7 @@ public record SucursaUpdateDto(
     string Nombre,
     string Codigo,
     bool EsMatriz,
-    string Calle,
-    string Colonia,
-    string NumeroExterior,
-    string NumeroInterior,
-    string Localidad,
-    Guid MunicipioId,
+    DireccionDto Direccion,
     string Telefono
 )
 {
@@ -51,13 +41,8 @@ public record SucursaUpdateDto(
         entity.Nombre = Nombre;
         entity.Codigo = Codigo;
         entity.EsMatriz = EsMatriz;
-        entity.Calle = Calle;
-        entity.Colonia = Colonia;
-        entity.NumeroExterior = NumeroExterior;
-        entity.NumeroInterior = NumeroInterior;
-        entity.Localidad = Localidad;
-        entity.MunicipioId =  MunicipioId;
         entity.Telefono = Telefono;
+        entity.Direccion = Direccion.ToEntity();
     }
 };
 
@@ -65,13 +50,7 @@ public record SucursalResponseDto(
     Guid SucursalId,
     string Nombre,
     string Codigo,
-    string Calle,
-    string Colonia,
-    string NumeroExterior,
-    string? NumeroInterior,
-    string? Localidad,
-    Guid MunicipioId,
-    string MunicipioNombre,
+    DireccionResponseDto Direccion,
     string? Telefono,
     EstatusGenerico Estatus
 )
@@ -82,13 +61,7 @@ public record SucursalResponseDto(
             entity.Id,
             entity.Nombre,
             entity.Codigo,
-            entity.Calle,
-            entity.Colonia,
-            entity.NumeroExterior,
-            entity.NumeroInterior,
-            entity.Localidad,
-            entity.MunicipioId,
-            entity.Municipio?.Nombre ?? "",
+            DireccionResponseDto.FromEntity(entity.Direccion, entity.Municipio),
             entity.Telefono,
             entity.Estatus
         );

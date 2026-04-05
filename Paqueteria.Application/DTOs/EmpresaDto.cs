@@ -1,25 +1,20 @@
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
 
 namespace Paqueteria.Application.DTOs;
 
 public record EmpresaCreateDto(
     string Nombre,
-    string? NombreCorto,
+    string NombreCorto,
     string Rfc,
-    string Calle,
-    string CodigoPostal,
-    Guid MunicipioId
+    DireccionDto Direccion
 )
 {
-    public Empresa ToEntity() => new Empresa
+    public Empresa ToEntity()
     {
-        Nombre = Nombre,
-        NombreCorto = NombreCorto,
-        Rfc = Rfc,
-        Calle = Calle,
-        CodigoPostal = CodigoPostal,
-        MunicipioId = MunicipioId,
-    };
+        var direccion = Direccion.ToEntity();
+        return Empresa.Create(Nombre, NombreCorto, Rfc, direccion);
+    }
 }
 
 public record EmpresaUpdateDto(
@@ -27,9 +22,7 @@ public record EmpresaUpdateDto(
     string Nombre,
     string? NombreCorto,
     string Rfc,
-    string Calle,
-    string CodigoPostal,
-    Guid MunicipioId
+    DireccionDto Direccion
 )
 {
     public void UpdateEntity(Empresa empresa)
@@ -37,9 +30,7 @@ public record EmpresaUpdateDto(
         empresa.Nombre = Nombre;
         empresa.NombreCorto = NombreCorto;
         empresa.Rfc = Rfc;
-        empresa.Calle = Calle;
-        empresa.CodigoPostal = CodigoPostal;
-        empresa.MunicipioId = MunicipioId;
+        empresa.Direccion = Direccion.ToEntity();
     }
 }
 
@@ -48,9 +39,7 @@ public record EmpresaResponseDto(
     string Nombre,
     string? NombreCorto,
     string Rfc,
-    string Calle,
-    string CodigoPostal,
-    Guid MunicipioId,
+    DireccionResponseDto Direccion,
     DateTime FechaAlta
 )
 {
@@ -61,9 +50,7 @@ public record EmpresaResponseDto(
             empresa.Nombre,
             empresa.NombreCorto,
             empresa.Rfc,
-            empresa.Calle,
-            empresa.CodigoPostal,
-            empresa.MunicipioId,
+            DireccionResponseDto.FromEntity(empresa.Direccion, empresa.Municipio),
             empresa.FechaAlta
         );
 }

@@ -1,10 +1,11 @@
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Application.DTOs;
 
 public record GuiaCreateDto(
-    string Clave,
+    string? Clave,
     FormaPago FormaPago,
     DateTime? FechaEnvio,
     DateTime? FechaPago,
@@ -22,41 +23,45 @@ public record GuiaCreateDto(
     decimal Subtotal,
     decimal Total,
     decimal CobroSeguro,
-    string? ImporteTexto,
+    string ImporteTexto,
     string? Observaciones,
-    string? PolizaSeguro
+    string? PolizaSeguro,
+    Guid? Seguro
 )
 {
-    public Guia ToEntity() =>
-        new ()
-        {
-            Clave = Clave,
-            FormaPago = FormaPago,
-            FechaEnvio = FechaEnvio,
-            FechaPago = FechaPago,
-            ClienteOrigenId = ClienteOrigenId,
-            DireccionOrigen = DireccionOrigen.ToEntity(),
-            ClienteDestinoId = ClienteDestinoId,
-            DireccionDestino = DireccionDestino.ToEntity(),
-            SucursalOrigenId = SucursalOrigenId,
-            SucursalDestinoId = SucursalDestinoId,
-            //UsuarioAltaId = UsuarioAltaId,
-            UsuarioCobroId = UsuarioCobroId,
-            CostoFlete = CostoFlete,
-            Iva = Iva,
-            IvaRetenido = IvaRetenido,
-            Subtotal = Subtotal,
-            Total = Total,
-            CobroSeguro = CobroSeguro,
-            ImporteTexto = ImporteTexto,
-            Observaciones = Observaciones,
-            PolizaSeguro = PolizaSeguro
-        };
+    public Guia ToEntity(Guid usuarioAltaId, Guid empresaId)
+    {
+        var direccionOrigen = DireccionOrigen.ToEntity();
+        var direccionDestino = DireccionDestino.ToEntity();
+        
+        return Guia.Create(
+            FormaPago,
+            FechaPago,
+            ClienteOrigenId,
+            direccionOrigen.Id,
+            ClienteDestinoId,
+            direccionDestino.Id,
+            SucursalOrigenId,
+            SucursalDestinoId,
+            usuarioAltaId,
+            UsuarioCobroId,
+            CostoFlete,
+            Iva,
+            IvaRetenido,
+            Subtotal,
+            Total,
+            CobroSeguro,
+            ImporteTexto,
+            Observaciones,
+            PolizaSeguro,
+            Seguro,
+            empresaId
+        );
+    }
 }
 
 public record GuiaUpdateDto(
     Guid GuiaId,
-    string Clave,
     FormaPago FormaPago,
     DateTime? FechaEnvio,
     DateTime? FechaPago,
@@ -80,7 +85,6 @@ public record GuiaUpdateDto(
 {
     public void UpdateEntity(Guia entity)
     {
-        entity.Clave = Clave;
         entity.FormaPago = FormaPago;
         entity.FechaEnvio = FechaEnvio;
         entity.FechaPago = FechaPago;

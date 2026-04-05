@@ -1,75 +1,41 @@
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Application.DTOs;
 
 public record DireccionGuiaSnapCreateDto(
-    string Calle,
-    string NumeroExterior,
-    string? NumeroInterior,
-    string Colonia,
-    string CodigoPostal,
-    string? Localidad,
-    Guid MunicipioId
+    DireccionDto Direccion
 )
 {
-    public DireccionGuiaSnapshot ToEntity() =>
-        new DireccionGuiaSnapshot
-        {
-            Calle = Calle,
-            NumeroExterior = NumeroExterior,
-            NumeroInterior = NumeroInterior,
-            Colonia =  Colonia,
-            CodigoPostal = CodigoPostal,
-            Localidad =  Localidad,
-            MunicipioId =  MunicipioId
-        };
+    public DireccionGuiaSnapshot ToEntity()
+    {
+        var direccion = Direccion.ToEntity();
+        return DireccionGuiaSnapshot.Create(direccion);
+    }
 };
 
 public record DireccionGuiaSnapUpdateDto(
     Guid DireccionGuiaId,
-    string Calle,
-    string NumeroExterior,
-    string? NumeroInterior,
-    string Colonia,
-    string CodigoPostal,
-    string? Localidad,
-    Guid MunicipioId
+    DireccionDto Direccion
 )
 {
     public void UpdateEntity(DireccionGuiaSnapshot entity)
     {
-        entity.Calle = Calle;
-        entity.NumeroExterior = NumeroExterior;
-        entity.NumeroInterior = NumeroInterior;
-        entity.Colonia = Colonia;
-        entity.CodigoPostal = CodigoPostal;
-        entity.Localidad = Localidad;
-        entity.MunicipioId = MunicipioId;
+        entity.Direccion = Direccion.ToEntity();
     }
 }
 
 public record DireccionGuiaSnapResponseDto(
     Guid DireccionGuiaId,
-    string Calle,
-    string NumeroExterior,
-    string? NumeroInterior,
-    string Colonia,
-    string CodigoPostal,
-    string? Localidad,
-    Guid MunicipioId,
+    DireccionResponseDto Direccion,
     string MunicipioNombre
 )
 {
     public static DireccionGuiaSnapResponseDto FromEntity(DireccionGuiaSnapshot entity) =>
         new (
             entity.Id,
-            entity.Calle,
-            entity.NumeroExterior,
-            entity.NumeroInterior,
-            entity.Colonia,
-            entity.CodigoPostal,
-            entity.Localidad,
-            entity.MunicipioId,
+            DireccionResponseDto.FromEntity(entity.Direccion, entity.Municipio),
             entity.Municipio.Nombre
         );
 }

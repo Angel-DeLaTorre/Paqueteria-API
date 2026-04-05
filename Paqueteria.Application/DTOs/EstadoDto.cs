@@ -1,4 +1,4 @@
-using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Catalogos;
 
 namespace Paqueteria.Application.DTOs;
 

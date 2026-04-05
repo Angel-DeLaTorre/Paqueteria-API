@@ -1,18 +1,23 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Paqueteria.Core.Common;
 
-namespace Paqueteria.Core.Entities
+namespace Paqueteria.Core.Entities.Remisiones
 {
-    [Table("asignaciones")]
+    [Table("asignaciones", Schema = Constantes.Esquemas.Remisiones)]
     public class Asignacion
     {
-        #region Campos
+        #region Columns
+        
             [Key]
             [Column("id")]
-            public Guid Id { get; set; } = Guid.NewGuid();
+            public Guid Id { get; init; } = Guid.NewGuid();
+            
+            [Column("guia_id")]
+            public Guid GuiaId { get; init; }
 
             [Column("chofer_id")]
-            public Guid ChoferId { get; set; }
+            public Guid ChoferId { get; init; }
 
             [Column("fecha_asignacion")]
             public DateTime FechaAsignacion { get; set; } = DateTime.UtcNow;
@@ -34,7 +39,7 @@ namespace Paqueteria.Core.Entities
             public string? St4 { get; set; }
 
             [Column("camion")]
-            public int Camion { get; set; }
+            public string Camion { get; set; } =  string.Empty;
 
             [MaxLength(50)]
             [Column("num_contenedor")]
@@ -43,13 +48,17 @@ namespace Paqueteria.Core.Entities
             [MaxLength(50)]
             [Column("num_contenedor2")]
             public string? NumContenedor2 { get; set; }
-        #endregion
-
-        #region Llaves foraneas
-
-        [ForeignKey("IdChofer")]
-        public virtual Chofer Chofer { get; set; } = null!;
 
         #endregion
+
+        #region ForeignKey
+
+            [ForeignKey("ChoferId")]
+            public Chofer Chofer { get; init; } = null!;
+
+            [ForeignKey("GuiaId")] 
+            public Guia Guia { get; init; } = null!;
+
+            #endregion
     }
 }

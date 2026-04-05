@@ -8,6 +8,7 @@ using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
 using Paqueteria.Core.Enums;
 using Paqueteria.Core.Settings;
 using Paqueteria.Infrastructure.Repositories;
@@ -41,7 +42,8 @@ public class AuthService(IUsuarioRepository repoUsuario, IOptions<JwtSettings> j
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.Username),
                 //new Claim("sucursalId", usuario.SucursalId.ToString()),
-                new Claim(ClaimTypes.Role, usuario.Rol.ToString())
+                new Claim(ClaimTypes.Role, usuario.Rol.ToString()),
+                new Claim(ClaimTypes.System , usuario.EmpresaId.ToString())
             ]),
             Expires = DateTime.UtcNow.AddMinutes(jwtOptions.Value.DurationInMinutes),
             Issuer = jwtOptions.Value.Issuer,

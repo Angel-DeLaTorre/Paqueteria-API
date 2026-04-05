@@ -14,7 +14,8 @@ public abstract class PaqueteriaControllerBase : ControllerBase
         UserId: Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty),
         Username: User.FindFirstValue(ClaimTypes.Name),
         Sucursal: Guid.Parse(User.FindFirstValue(ClaimTypes.Sid) ?? string.Empty),
-        IpAddress: HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
+        IpAddress: HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
+        EmpresaId: Guid.Parse(User.FindFirstValue(ClaimTypes.System) ?? string.Empty)
     );
 
     protected ActionResult<T> ProcessResult<T>(Result<T> result)

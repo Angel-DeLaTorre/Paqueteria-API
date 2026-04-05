@@ -2,9 +2,9 @@ namespace Paqueteria.Core.Enums;
 
 public enum FormaPago
 {
-    CreditoOrigen,
-    CreditoDestino,
-    Prepagado,
-    PorCobrarDestino,
-    Pagado
+    CreditoOrigen = 1,
+    CreditoDestino = 2,
+    Prepagado = 3,
+    PorCobrarDestino = 4,
+    Pagado = 5
 }

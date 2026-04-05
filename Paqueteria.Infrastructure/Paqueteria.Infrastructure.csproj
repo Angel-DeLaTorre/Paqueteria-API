@@ -27,4 +27,8 @@
       <ProjectReference Include="..\Paqueteria.Core\Paqueteria.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Data\Migrations\" />
+    </ItemGroup>
+
 </Project>

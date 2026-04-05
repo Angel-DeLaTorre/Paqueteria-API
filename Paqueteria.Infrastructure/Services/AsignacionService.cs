@@ -1,13 +1,13 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
-using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class AsignacionService (IAsignacionRepository asignacionRepository, UnitOfWork unitOfWork) : IAsignacionSerivce
+public class AsignacionService (IAsignacionRepository asignacionRepository, IUnitOfWork unitOfWork) : IAsignacionSerivce
 {
     public async Task<Result<IReadOnlyList<AsignacionResponseDto>>> GetAllAsync()
     {

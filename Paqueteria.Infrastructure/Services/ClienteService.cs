@@ -1,13 +1,13 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
-using Paqueteria.Infrastructure.Persistence;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class ClienteService(IClienteRepository clienteRepo, UnitOfWork unitOfWork) : IClienteService
+public class ClienteService(IClienteRepository clienteRepo, IUnitOfWork unitOfWork) : IClienteService
 {
     public async Task<Result<IReadOnlyList<ClienteResponseDto>>> GetAllAsync()
     {
@@ -46,7 +46,7 @@ public class ClienteService(IClienteRepository clienteRepo, UnitOfWork unitOfWor
     {
         try
         {
-            var cliente = await clienteRepo.AddAsync(dto.ToEntity());
+            var cliente = await clienteRepo.AddAsync(dto.ToEntity(currentUser.EmpresaId));
 
             var result = unitOfWork.CompleteAsync();
 

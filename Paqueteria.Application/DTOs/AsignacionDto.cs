@@ -1,4 +1,5 @@
 using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
 
 namespace Paqueteria.Application.DTOs;
 
@@ -10,7 +11,7 @@ public record AsignacionCreateDto(
     string? St2,
     string? St3,
     string? St4,
-    int Camion,
+    string Camion,
     string? NumContenedor,
     string? NumContenedor2
 )
@@ -38,7 +39,7 @@ public record AsignacionUpdateDto(
     string? St2,
     string? St3,
     string? St4,
-    int Camion,
+    string Camion,
     string? NumContenedor,
     string? NumContenedor2)
 {
@@ -63,7 +64,7 @@ public record AsignacionResponseDto(
     string? St2,
     string? St3,
     string? St4,
-    int Camion,
+    string Camion,
     string? NumContenedor,
     string? NumContenedor2
 )

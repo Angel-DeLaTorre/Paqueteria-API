@@ -1,43 +1,52 @@
-using Paqueteria.Core.Entities;
-using Paqueteria.Core.Enums;
+using Paqueteria.Core.Entities.Sat;
 
 namespace Paqueteria.Application.DTOs;
 
 public record ArticuloCreateDto(
-    string Clave,
-    string Descripcion
+    string ArticuloId,
+    string Texto,
+    string Similares,
+    string MaterialPeligroso,
+    DateTime VigenciaDesde,
+    DateTime VigenciaHasta
 )
 {
-    public Articulo ToEntity() => new Articulo(Clave, Descripcion);
-
-    public Articulo ToEntity(EstatusGenerico estatus) => new Articulo(Clave, Descripcion,  estatus);
+    public Articulo ToEntity() => Articulo.Create(ArticuloId, Texto, Similares, MaterialPeligroso, VigenciaDesde, VigenciaHasta);
 };
 
 public record ArticuloUpdateDto(
-    Guid ArticuloId,
-    string Clave,
-    string Descripcion
+    string ArticuloId,
+    string Texto,
+    string Similares,
+    string MaterialPeligroso,
+    DateTime VigenciaDesde,
+    DateTime VigenciaHasta
 )
 {
     public void UpdateEntity(Articulo entity)
     {
-        entity.Clave = Clave;
-        entity.Descripcion = Descripcion;
+        entity.Texto = Texto;
+        entity.Similares = Similares;
+        entity.MaterialPeligroso = MaterialPeligroso;
+        entity.VigenciaDesde = VigenciaDesde;
+        entity.VigenciaHasta = VigenciaHasta;
     }
 };
 
 public record ArticuloResponseDto(
-    Guid ArticuloId,
-    string Clave,
-    string Descripcion
+    string ArticuloId,
+    string Texto,
+    string Similares,
+    string MaterialPeligroso
 )
 {
     public static ArticuloResponseDto FromEntity(Articulo entity)
     {
         return new ArticuloResponseDto(
             entity.Id,
-            entity.Clave,
-            entity.Descripcion
+            entity.Texto,
+            entity.Similares,
+            entity.MaterialPeligroso
         );
     }
 };

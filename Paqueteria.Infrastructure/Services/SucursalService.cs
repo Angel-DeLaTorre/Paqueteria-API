@@ -1,4 +1,5 @@
 using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
@@ -6,13 +7,13 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class SucursalService(ISucursalRepository repoSucursal) : ISucursalService
+public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork unitOfWork) : ISucursalService
 {
     public async Task<Result<IReadOnlyList<SucursalResponseDto>>> GetAllAsync()
     {
         try
         {
-            var sucursales =  ( await repoSucursal.GetAllAsync() )
+            var sucursales =  ( await sucursalRepository.GetAllAsync() )
                 .Select( SucursalResponseDto.FromEntity ).ToList();
 
             return Result<IReadOnlyList<SucursalResponseDto>>.Success(sucursales);
@@ -28,7 +29,7 @@ public class SucursalService(ISucursalRepository repoSucursal) : ISucursalServic
     {
         try
         {
-            var sucursal = (await repoSucursal.GetByIdAsync(sucursalId));
+            var sucursal = (await sucursalRepository.GetByIdAsync(sucursalId));
 
             if (sucursal == null)
                 return Result<SucursalResponseDto>.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
@@ -47,7 +48,12 @@ public class SucursalService(ISucursalRepository repoSucursal) : ISucursalServic
     {
         try
         {
-            var sucursal = await repoSucursal.AddAsync( dto.ToEntity() );
+            var sucursal = await sucursalRepository.AddAsync( dto.ToEntity(currentUser.EmpresaId) );
+
+            var result = unitOfWork.CompleteAsync();
+
+            if (result.IsCompletedSuccessfully)
+                return Result<SucursalResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear sucursal");
 
             return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
         }
@@ -62,12 +68,16 @@ public class SucursalService(ISucursalRepository repoSucursal) : ISucursalServic
     {
         try
         {
-            var sucursal = await repoSucursal.GetByIdAsync(dto.SucursalId);
+            var sucursal = await sucursalRepository.GetByIdAsync(dto.SucursalId);
 
             if (sucursal == null) return Result.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
 
             dto.UpdateEntity(sucursal);
-            repoSucursal.Update( sucursal );
+            sucursalRepository.Update( sucursal );
+            var result = await  unitOfWork.CompleteAsync();
+
+            if (result != 0)
+                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
 
             return Result.Success();
         }
@@ -82,11 +92,15 @@ public class SucursalService(ISucursalRepository repoSucursal) : ISucursalServic
     {
         try
         {
-            var sucursal = await repoSucursal.GetByIdAsync(idSucursal);
+            var sucursal = await sucursalRepository.GetByIdAsync(idSucursal);
 
             if (sucursal == null) return Result.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
 
-            repoSucursal.Delete(sucursal);
+            sucursalRepository.Delete(sucursal);
+            var result = await  unitOfWork.CompleteAsync();
+
+            if (result != 0)
+                return Result.Failure(CodigoRespuesta.Failure, "Error al borrar");
 
             return Result.Success();
         }

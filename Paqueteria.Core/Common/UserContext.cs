@@ -4,5 +4,6 @@ public record UserContext(
     Guid UserId,
     string? Username,
     Guid Sucursal,
-    string IpAddress
+    string IpAddress,
+    Guid EmpresaId
 );

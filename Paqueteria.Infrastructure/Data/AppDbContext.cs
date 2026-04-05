@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Paqueteria.Core.Entities;
-using Paqueteria.Core.Enums;
+using Paqueteria.Core.Entities.Catalogos;
+using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Entities.Sat;
 
 namespace Paqueteria.Infrastructure.Data;
 
@@ -29,12 +31,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ArticuloGuia> ArticulosGuia { get; set; }
     public DbSet<DireccionGuiaSnapshot> DireccionesGuia { get; set; }
     public DbSet<Asignacion> Asignaciones { get; set; }
-    public DbSet<AsignacionGuia> AsignacionesGuias { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         // Habilitar extensión para generar UUIDs si la BD no la tiene
         modelBuilder.HasPostgresExtension("uuid-ossp");
@@ -75,5 +78,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             relationship.DeleteBehavior = DeleteBehavior.Restrict;
         }
+    }
+    
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Convierte todos los Enums a int automáticamente en toda la solución
+        configurationBuilder
+            .Properties<Enum>()
+            .HaveConversion<int>();
     }
 }
