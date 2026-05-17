@@ -7,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class RutaService(IRutaRepository rutaRepository, IUnitOfWork unitOfWork) : IRutaService
+public class RutaService(IRutaRepository rutaRepository, IUnitOfWorkBase unitOfWorkBase) : IRutaService
 {
     public async Task<Result<IReadOnlyList<RutaResponseDto>>> GetAllAsync()
     {
@@ -48,7 +48,7 @@ public class RutaService(IRutaRepository rutaRepository, IUnitOfWork unitOfWork)
         {
             var ruta = await rutaRepository.AddAsync(dto.ToEntity(currentUser.EmpresaId));
 
-            var result = unitOfWork.CompleteAsync();
+            var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
                 return Result<RutaResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
@@ -73,7 +73,7 @@ public class RutaService(IRutaRepository rutaRepository, IUnitOfWork unitOfWork)
 
             dto.UpdateEntity(ruta);
             rutaRepository.Update(ruta);
-            var result = await  unitOfWork.CompleteAsync();
+            var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
                 return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
@@ -98,7 +98,7 @@ public class RutaService(IRutaRepository rutaRepository, IUnitOfWork unitOfWork)
 
             rutaRepository.Delete(ruta);
 
-            var result = await unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
                 return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 

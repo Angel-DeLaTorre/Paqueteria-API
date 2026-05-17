@@ -13,12 +13,15 @@ public class ArticuloGuia
         [Key]
         [Column("id")]
         public Guid Id { get; init; } = Guid.NewGuid();
+        
+        [Column("descipcion")]
+        public string Descripcion { get; set; } = string.Empty;
 
         [Column("guia_id")]
-        public Guid GuiaId { get; set; }
+        public Guid GuiaId { get; init; }
 
         [Column("articulo_id")]
-        public string ArticuloId { get; set; } = string.Empty;
+        public string ArticuloId { get; init; } = string.Empty;
 
         [Column("cantidad")]
         public int Cantidad { get; set; }
@@ -45,19 +48,27 @@ public class ArticuloGuia
         
         private ArticuloGuia() {}
 
-        public static ArticuloGuia Create(Guid guiaId, string articuloId, int  cantidad, decimal pesoUnidad,  decimal valorUnidad)
+        public static ArticuloGuia Create
+        (
+            Guid guiaId,
+            string descripcion,
+            string articuloId,
+            int cantidad,
+            decimal pesoUnidad,
+            decimal valorUnidad
+        )
         {
             //TODO Validar campos
 
             return new ArticuloGuia()
             {
                 Id = Guid.NewGuid(),
+                Descripcion = descripcion,
                 GuiaId =  guiaId,
                 ArticuloId =  articuloId,
                 Cantidad =  cantidad,
                 PesoUnidad = pesoUnidad,
                 ValorUnidad = valorUnidad
-                
             };
         }
     

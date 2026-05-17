@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Entities.Catalogos;
 using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Core.Entities.Remisiones;
@@ -34,12 +33,6 @@ public class Empresa
         [Column("fecha_alta")]
         public DateTime FechaAlta { get; init; }
 
-    #endregion
-
-    #region ForeignKeys
-        
-        [ForeignKey("Direccion.MunicipioId")] public virtual Municipio Municipio { get; set; } = null!;
-        
     #endregion
     
     #region Constructors

@@ -13,7 +13,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ClienteResponseDto>>> Get()
     {
-        var result = await service.GetAllAsync();
+        var result = await service.GetAllAsync(CurrentUser);
         return ProcessResult(result);
     }
 
@@ -28,10 +28,10 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     }
 
 
-    [HttpPost("create")]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ClienteResponseDto>> Create(ClienteCreateDto dto)
+    public async Task<ActionResult<ClienteResponseDto>> Create([FromBody] ClienteCreateDto dto)
     {
         var result = await service.CreateAsync(dto, CurrentUser);
         return ProcessResult(result);

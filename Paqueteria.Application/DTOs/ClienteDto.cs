@@ -1,5 +1,5 @@
-using Paqueteria.Core.Entities;
 using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Application.DTOs;
 
@@ -11,10 +11,11 @@ public record ClienteCreateDto(
     string Correo,
     string Contacto,
     string? NumConvenio,
-    string? PolizaSeguro
+    string? PolizaSeguro,
+    DireccionDto? DireccionC
 )
 {
-    public Cliente ToEntity(Guid empresaId) => Cliente.Create
+    public Cliente ToClienteEntity(Guid empresaId) => Cliente.Create
     (
         Nombre,
         Rfc,
@@ -26,10 +27,28 @@ public record ClienteCreateDto(
         PolizaSeguro,
         empresaId
     );
+
+    public DireccionCliente ToDireccionEntity(Guid clienteId)
+    {
+        if (DireccionC == null) return null!;
+        
+        var d = Direccion.Create(
+            DireccionC.Calle,
+            DireccionC.NumeroExterior,
+            DireccionC.NumeroInterior,
+            DireccionC.Colonia,
+            DireccionC.CodigoPostal,
+            DireccionC.Localidad,
+            DireccionC.MunicipioId
+        );
+            
+        return DireccionCliente.Create(d,clienteId);
+
+    } 
 };
 
 public record ClienteUpdateDto(
-    Guid IdCliente,
+    Guid ClienteId,
     string Nombre,
     string Rfc,
     string Telefono,
@@ -54,7 +73,7 @@ public record ClienteUpdateDto(
 };
 
 public record ClienteResponseDto(
-    Guid IdCliente,
+    Guid ClienteId,
     string Nombre,
     string? Rfc,
     string? Telefono,
@@ -62,10 +81,12 @@ public record ClienteResponseDto(
     string? Correo,
     string? Contacto,
     string? NumConvenio,
-    string? PolizaSeguro
+    string? PolizaSeguro,
+    IEnumerable<ClienteDireccionResponseDto> Direcciones
 ){
-    public static ClienteResponseDto FromEntity(Cliente cliente) =>
-        new (
+    public static ClienteResponseDto FromEntity(Cliente cliente)
+    {
+        return new ClienteResponseDto(
             cliente.Id,
             cliente.Nombre,
             cliente.Rfc,
@@ -74,6 +95,26 @@ public record ClienteResponseDto(
             cliente.Correo,
             cliente.Contacto,
             cliente.NumConvenio,
-            cliente.PolizaSeguro
+            cliente.PolizaSeguro,
+            cliente.Direcciones?.Select(ClienteDireccionResponseDto.FromEntity).ToList() 
+            ?? []
         );
+    }
+        
 };
+
+public record ClienteDireccionResponseDto(
+    Guid IdDireccion,
+    DireccionResponseDto Direccion
+)
+{
+    public static ClienteDireccionResponseDto FromEntity(DireccionCliente entity)
+    {
+        var direccion = DireccionResponseDto.FromEntity(entity.Direccion);
+        return new ClienteDireccionResponseDto(
+            entity.Id,
+            direccion
+        );        
+    }
+}
+

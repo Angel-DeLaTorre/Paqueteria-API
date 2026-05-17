@@ -7,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork unitOfWork) : IArticuloService
+public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWorkBase unitOfWorkBase) : IArticuloService
 {
     public async Task<Result<IReadOnlyList<ArticuloResponseDto>>> GetAllAsync()
     {
@@ -30,7 +30,7 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
     {
         var articulo = await articuloRepository.AddAsync(dto.ToEntity());
 
-        var result = unitOfWork.CompleteAsync();
+        var result = unitOfWorkBase.CompleteAsync();
 
         if (result.IsCompletedSuccessfully)
             return Result<ArticuloResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
@@ -47,7 +47,7 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
 
         dto.UpdateEntity(articulo);
         articuloRepository.Update(articulo);
-        var result = await  unitOfWork.CompleteAsync();
+        var result = await  unitOfWorkBase.CompleteAsync();
 
         if (result != 0)
             return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
@@ -66,7 +66,7 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
 
             articuloRepository.Delete(articulo);
 
-            var result = await unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
                 return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 

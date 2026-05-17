@@ -7,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class AsignacionService (IAsignacionRepository asignacionRepository, IUnitOfWork unitOfWork) : IAsignacionSerivce
+public class AsignacionService (IAsignacionRepository asignacionRepository, IUnitOfWorkBase unitOfWorkBase) : IAsignacionSerivce
 {
     public async Task<Result<IReadOnlyList<AsignacionResponseDto>>> GetAllAsync()
     {
@@ -48,7 +48,7 @@ public class AsignacionService (IAsignacionRepository asignacionRepository, IUni
         {
             var asignacion = await asignacionRepository.AddAsync(dto.ToEntity());
 
-            var result = unitOfWork.CompleteAsync();
+            var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
                 return Result<AsignacionResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
@@ -73,7 +73,7 @@ public class AsignacionService (IAsignacionRepository asignacionRepository, IUni
 
             dto.UpdateEntity(asignacion);
             asignacionRepository.Update(asignacion);
-            var result = await  unitOfWork.CompleteAsync();
+            var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
                 return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
@@ -98,7 +98,7 @@ public class AsignacionService (IAsignacionRepository asignacionRepository, IUni
 
             asignacionRepository.Delete(asignacion);
 
-            var result = await unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
                 return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 

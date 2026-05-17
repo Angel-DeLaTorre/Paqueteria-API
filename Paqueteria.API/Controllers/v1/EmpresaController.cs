@@ -30,7 +30,7 @@ public class EmpresaController(IEmpresaService service) : PaqueteriaControllerBa
     [HttpPost("create")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<EmpresaResponseDto>> Create(EmpresaCreateDto dto)
+    public async Task<ActionResult<EmpresaResponseDto>> Create([FromBody] EmpresaCreateDto dto)
     {
         var result = await service.CreateAsync(dto, CurrentUser);
         return ProcessResult(result);

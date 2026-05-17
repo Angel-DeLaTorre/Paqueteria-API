@@ -27,10 +27,10 @@ public class GuiaController(IGuiaService service) : PaqueteriaControllerBase
     }
 
 
-    [HttpPost("create")]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<GuiaResponseDto>> Create(GuiaCreateDto dto)
+    public async Task<ActionResult<GuiaResponseDto>> Create([FromBody] GuiaCreateDto dto)
     {
         var result = await service.CreateAsync(dto, CurrentUser);
         return ProcessResult(result);

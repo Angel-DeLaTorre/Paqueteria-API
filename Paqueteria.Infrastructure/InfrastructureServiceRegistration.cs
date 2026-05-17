@@ -33,6 +33,7 @@ public static class InfrastructureServiceRegistration
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
         services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
+        services.AddScoped<IUnitOfWorkBase, UnitOfWorkBaseBase>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IArticuloRepository, ArticuloRepository>();
@@ -42,12 +43,14 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IAsignacionSerivce, AsignacionService>();
 
         services.AddScoped<IBitacoraAccesoRepository, BitacoraAccesoRepository>();
+        services.AddScoped<IBitacoraSistemaRepository, BitacoraSistemaRepository>();
 
         services.AddScoped<IChoferRepository, ChoferRepository>();
         services.AddScoped<IChoferService, ChoferService>();
 
         services.AddScoped<IClienteRepository, ClienteRepository>();
         services.AddScoped<IClienteService, ClienteService>();
+        
 
         services.AddScoped<IEmpresaRepository, EmpresaRepository>();
         services.AddScoped<IEmpresaService, EmpresaService>();
@@ -73,6 +76,12 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IUsuarioService, UsuarioService>();
+        
+        services.AddScoped<IRolRepository, RolRepository>();
+        services.AddScoped<IRolService, RolService>();
+        
+        services.AddScoped<IPermisoRepository, PermisoRepository>();
+        services.AddScoped<IPermisoService, PermisoService>();
 
         return services;
     }

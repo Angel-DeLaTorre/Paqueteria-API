@@ -6,4 +6,5 @@ namespace Paqueteria.Application.Interfaces.Services;
 public interface IAuthService
 {
     Task<Result<SesionResponseDto>> LoginAsync(LoginRequestDto request);
+    Task<Result> CambiarPasswordAsync(LoginRequestDto request);
 }

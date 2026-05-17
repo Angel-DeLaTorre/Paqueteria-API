@@ -50,7 +50,7 @@ public record EmpresaResponseDto(
             empresa.Nombre,
             empresa.NombreCorto,
             empresa.Rfc,
-            DireccionResponseDto.FromEntity(empresa.Direccion, empresa.Municipio),
+            DireccionResponseDto.FromEntity(empresa.Direccion),
             empresa.FechaAlta
         );
 }

@@ -16,20 +16,23 @@ public class DireccionCliente
         public Guid Id { get; init; } = Guid.NewGuid();
 
         public Direccion Direccion { get; set; } = null!;
+        
+        [Column("cliente_id")]
+        public Guid ClienteId { get; set; }
 
     #endregion
-
-    #region ForeignKey
-
-        [ForeignKey("Direccion.MunicipioId")] public virtual Municipio Municipio { get; set; } = null!;
-
+    
+    #region Foreign Keys
+    
+    [ForeignKey("ClienteId")] public virtual Cliente Cliente { get; set; } = null!;
+    
     #endregion
     
     #region Constructors
     
         private DireccionCliente () {}
 
-        public static DireccionCliente Create(Direccion direccion)
+        public static DireccionCliente Create(Direccion direccion, Guid clienteId)
         {
             //TODO Validar campos
 
@@ -37,6 +40,7 @@ public class DireccionCliente
             {
                 Id = Guid.NewGuid(),
                 Direccion = direccion,
+                ClienteId = clienteId
             };
         }
     

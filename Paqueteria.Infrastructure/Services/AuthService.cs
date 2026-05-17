@@ -7,11 +7,9 @@ using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Entities;
 using Paqueteria.Core.Entities.Remisiones;
 using Paqueteria.Core.Enums;
 using Paqueteria.Core.Settings;
-using Paqueteria.Infrastructure.Repositories;
 
 namespace Paqueteria.Infrastructure.Services;
 
@@ -19,7 +17,7 @@ public class AuthService(IUsuarioRepository repoUsuario, IOptions<JwtSettings> j
 {
     public async Task<Result<SesionResponseDto>> LoginAsync(LoginRequestDto request)
     {
-        var usuario = await repoUsuario.GetByUsernameAsync(request.Username);
+        var usuario = await repoUsuario.GetByUsernameAsync(request.Username, true);
 
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.Password))
             return Result<SesionResponseDto>.Failure(CodigoRespuesta.NotFound, $"Usuario o contraseña incorrectos.");
@@ -31,20 +29,45 @@ public class AuthService(IUsuarioRepository repoUsuario, IOptions<JwtSettings> j
         return Result<SesionResponseDto>.Success( GenerateAuthResponse(usuario) );
     }
 
+    public Task<Result> CambiarPasswordAsync(LoginRequestDto request)
+    {
+        throw new NotImplementedException();
+    }
+
     private SesionResponseDto GenerateAuthResponse(Usuario usuario)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(jwtOptions.Value.Key);
+        
+        var claims = new List<Claim>
+        {
+            new (ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new (ClaimTypes.Name, usuario.Username),
+            new ("empresa_id", usuario.EmpresaId.ToString())
+        };
+        
+        /*
+        var permisos = usuario.UsuarioRoles?
+            .Select(ur => ur.Rol)
+            .SelectMany(r => r.RolPermiso)
+            .Select(rp => rp.Permiso.Nombre)
+            .Distinct()
+            .ToList() ?? [];
+        */
+        var permisos = usuario.UsuarioRoles?
+            .Select(ur => ur.Rol)
+            .Where(r => r != null && r.RolPermiso != null)
+            .SelectMany(r => r.RolPermiso)
+            .Where(rp => rp.Permiso != null)
+            .Select(rp => rp.Permiso.Nombre) // 👈 Extrae "clientes.modificar", "clientes.consultar", etc.
+            .Distinct() // Evita duplicados si el usuario llega a tener dos roles con el mismo permiso
+            .ToList() ?? new List<string>();
+
+        claims.AddRange(permisos.Select(permiso => new Claim("permisos", permiso)));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity([
-                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                new Claim(ClaimTypes.Name, usuario.Username),
-                //new Claim("sucursalId", usuario.SucursalId.ToString()),
-                new Claim(ClaimTypes.Role, usuario.Rol.ToString()),
-                new Claim(ClaimTypes.System , usuario.EmpresaId.ToString())
-            ]),
+            Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddMinutes(jwtOptions.Value.DurationInMinutes),
             Issuer = jwtOptions.Value.Issuer,
             Audience = jwtOptions.Value.Audience,
@@ -52,9 +75,16 @@ public class AuthService(IUsuarioRepository repoUsuario, IOptions<JwtSettings> j
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
         };
+        
+        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+        
+        var jwtString = tokenHandler.WriteToken(securityToken);
+        
+        return SesionResponseDto.FromEntity(usuario, jwtString, tokenDescriptor.Expires);
+    }
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-
-        return SesionResponseDto.FromEntity(usuario, token, tokenDescriptor.Expires);
+    public static string HashPassword(string password)
+    {
+        return BCrypt.Net.BCrypt.HashPassword(password);
     }
 }

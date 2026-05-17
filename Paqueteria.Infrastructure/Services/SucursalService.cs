@@ -7,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork unitOfWork) : ISucursalService
+public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWorkBase unitOfWorkBase) : ISucursalService
 {
     public async Task<Result<IReadOnlyList<SucursalResponseDto>>> GetAllAsync()
     {
@@ -48,11 +48,12 @@ public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork
     {
         try
         {
-            var sucursal = await sucursalRepository.AddAsync( dto.ToEntity(currentUser.EmpresaId) );
+            var sucursalIn = dto.ToEntity(currentUser.EmpresaId);
+            var sucursal = await sucursalRepository.AddAsync( sucursalIn );
 
-            var result = unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
 
-            if (result.IsCompletedSuccessfully)
+            if (result <= 0)
                 return Result<SucursalResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear sucursal");
 
             return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
@@ -74,7 +75,7 @@ public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork
 
             dto.UpdateEntity(sucursal);
             sucursalRepository.Update( sucursal );
-            var result = await  unitOfWork.CompleteAsync();
+            var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
                 return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
@@ -97,7 +98,7 @@ public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork
             if (sucursal == null) return Result.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
 
             sucursalRepository.Delete(sucursal);
-            var result = await  unitOfWork.CompleteAsync();
+            var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
                 return Result.Failure(CodigoRespuesta.Failure, "Error al borrar");

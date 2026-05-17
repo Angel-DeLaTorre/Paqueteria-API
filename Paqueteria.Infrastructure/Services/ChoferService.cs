@@ -7,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class ChoferService(IChoferRepository choferRepository, IUnitOfWork unitOfWork) : IChoferService
+public class ChoferService(IChoferRepository choferRepository, IUnitOfWorkBase unitOfWorkBase) : IChoferService
 {
     public async Task<Result<IReadOnlyList<ChoferResponseDto>>> GetAllAsync()
     {
@@ -48,7 +48,7 @@ public class ChoferService(IChoferRepository choferRepository, IUnitOfWork unitO
         {
             var chofer = await choferRepository.AddAsync(dto.ToEntity(currentUser.EmpresaId));
 
-            var result = unitOfWork.CompleteAsync();
+            var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
                 return Result<ChoferResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
@@ -73,7 +73,7 @@ public class ChoferService(IChoferRepository choferRepository, IUnitOfWork unitO
 
             dto.UpdateEntity(chofer);
             choferRepository.Update(chofer);
-            var result = await  unitOfWork.CompleteAsync();
+            var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
                 return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
@@ -98,7 +98,7 @@ public class ChoferService(IChoferRepository choferRepository, IUnitOfWork unitO
 
             choferRepository.Delete(chofer);
 
-            var result = await unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
                 return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 

@@ -6,7 +6,7 @@ public record MunicipioResponseDto(
     Guid MunicipioId,
     string Nombre,
     string EstadoId,
-    string EstadoNombre
+    string? EstadoNombre
 )
 {
     public static MunicipioResponseDto FromEntity(Municipio entity)
@@ -15,7 +15,7 @@ public record MunicipioResponseDto(
             entity.Id,
             entity.Nombre,
             entity.EstadoId,
-            entity.Estado.Nombre
+            entity.Estado?.Nombre ?? "Sin Estado"
         );
     }
 };

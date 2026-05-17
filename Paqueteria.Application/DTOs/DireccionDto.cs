@@ -1,5 +1,3 @@
-using Paqueteria.Core.Entities;
-using Paqueteria.Core.Entities.Catalogos;
 using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Application.DTOs;
@@ -15,7 +13,7 @@ public record DireccionDto(
 )
 {
     public Direccion ToEntity() => 
-        new (
+        Direccion.Create(
             Calle,
             NumeroExterior,
             NumeroInterior,
@@ -34,10 +32,11 @@ public record DireccionResponseDto(
     string? CodigoPostal,
     string? Localidad,
     Guid? MunicipioId,
-    string? MunicipioNombre
+    string? MunicipioNombre,
+    string? Estado
 )
 {
-    public static DireccionResponseDto FromEntity(Direccion? direccion, Municipio? municipio) =>
+    public static DireccionResponseDto FromEntity(Direccion? direccion) =>
         new(
             direccion?.Calle,
             direccion?.NumeroExterior,
@@ -46,6 +45,7 @@ public record DireccionResponseDto(
             direccion?.CodigoPostal,
             direccion?.Localidad,
             direccion?.MunicipioId,
-            municipio?.Nombre
+            direccion?.Municipio?.Nombre,
+            direccion?.Municipio?.EstadoId
         );
 }

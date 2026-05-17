@@ -7,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWork unitOfWork) : ISeguroService
+public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWorkBase unitOfWorkBase) : ISeguroService
 {
     public async Task<Result<IReadOnlyList<SeguroResponseDto>>> GetAllAsync()
     {
@@ -48,7 +48,7 @@ public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWork unitO
         {
             var seguro = await seguroRepository.AddAsync(dto.ToEntity());
 
-            var result = unitOfWork.CompleteAsync();
+            var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
                 return Result<SeguroResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
@@ -73,7 +73,7 @@ public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWork unitO
 
             dto.UpdateEntity(seguro);
             seguroRepository.Update(seguro);
-            var result = await  unitOfWork.CompleteAsync();
+            var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
                 return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");

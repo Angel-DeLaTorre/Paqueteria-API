@@ -35,7 +35,7 @@ public record DireccionGuiaSnapResponseDto(
     public static DireccionGuiaSnapResponseDto FromEntity(DireccionGuiaSnapshot entity) =>
         new (
             entity.Id,
-            DireccionResponseDto.FromEntity(entity.Direccion, entity.Municipio),
-            entity.Municipio.Nombre
+            DireccionResponseDto.FromEntity(entity.Direccion),
+            entity.Direccion.Municipio.Nombre
         );
 }

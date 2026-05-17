@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Entities.Catalogos;
 using Paqueteria.Core.Enums;
 using Paqueteria.Core.ValueObjects;
 
@@ -60,8 +59,6 @@ namespace Paqueteria.Core.Entities.Remisiones
         #endregion
 
         #region ForeignKeys
-            [ForeignKey("Direccion.MunicipioId")] public virtual Municipio? Municipio { get; set; }
-            
             [ForeignKey("EmpresaId")] public Empresa Empresa { get; set; } = null!;
         #endregion
 

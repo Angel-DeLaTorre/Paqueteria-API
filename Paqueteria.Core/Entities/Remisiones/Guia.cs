@@ -96,7 +96,7 @@ public class Guia
         public string? PolizaSeguro { get; set; }
 
         [Column("seguro_id")]
-        public Guid? Seguro { get; init; }
+        public Guid? SeguroId { get; init; }
         
         [Column("asignacion_id")]
         public Guid? AsignacionId { get; init; }
@@ -136,9 +136,10 @@ public class Guia
         public Asignacion? Asignacion { get; set; }
 
         [ForeignKey("SeguroId")]
-        public Seguro Sucursal { get; set; } = null!;
+        public Seguro Seguro { get; set; } = null!;
         
-        [ForeignKey("EmpresaId")] public Empresa Empresa { get; set; } = null!;
+        [ForeignKey("EmpresaId")] 
+        public Empresa Empresa { get; init; } = null!;
 
     #endregion
     
@@ -166,7 +167,7 @@ public class Guia
             string importeTexto,
             string? observaciones,
             string? polizaSeguro,
-            Guid? seguro,
+            Guid? seguroId,
             Guid empresaId
             
         )
@@ -194,7 +195,7 @@ public class Guia
                 ImporteTexto = importeTexto,
                 Observaciones = observaciones,
                 PolizaSeguro = polizaSeguro,
-                Seguro = seguro,
+                SeguroId = seguroId,
                 EmpresaId = empresaId
             };
         }

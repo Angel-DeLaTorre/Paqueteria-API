@@ -60,7 +60,9 @@ public class Cliente
     
     #region ForeignKeys
 
-        [ForeignKey("EmpresaId")] public Empresa Empresa { get; set; } = null!;
+        [ForeignKey("EmpresaId")] public Empresa Empresa { get; init; } = null!;
+        
+        public virtual ICollection<DireccionCliente> Direcciones { get; set; } = new List<DireccionCliente>();
 
     #endregion
 

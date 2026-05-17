@@ -4,7 +4,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Application.DTOs;
 
-public abstract record SucursalCreateDto(
+public record SucursalCreateDto(
     string Nombre,
     string Codigo,
     bool EsMatriz,
@@ -55,14 +55,18 @@ public record SucursalResponseDto(
     EstatusGenerico Estatus
 )
 {
-    public static SucursalResponseDto FromEntity(Sucursal entity) =>
-        new
-        (
+    public static SucursalResponseDto FromEntity(Sucursal entity)
+    {
+        var dir = DireccionResponseDto.FromEntity(entity.Direccion);
+        
+        return new SucursalResponseDto(
             entity.Id,
             entity.Nombre,
             entity.Codigo,
-            DireccionResponseDto.FromEntity(entity.Direccion, entity.Municipio),
+            dir,
             entity.Telefono,
             entity.Estatus
         );
+    }
+        
 };

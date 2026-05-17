@@ -7,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWork unitOfWork) : IGuiaService
+public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWorkBase unitOfWorkBase) : IGuiaService
 {
     public async Task<Result<IReadOnlyList<GuiaResponseDto>>> GetAllAsync()
     {
@@ -48,7 +48,7 @@ public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWork unitOfWork)
         {
             var guia = await guiaRepository.AddAsync(dto.ToEntity(currentUser.UserId, currentUser.EmpresaId));
 
-            var result = unitOfWork.CompleteAsync();
+            var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
                 return Result<GuiaResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
@@ -73,7 +73,7 @@ public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWork unitOfWork)
 
             dto.UpdateEntity(guia);
             guiaRepository.Update(guia);
-            var result = await  unitOfWork.CompleteAsync();
+            var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
                 return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
@@ -98,7 +98,7 @@ public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWork unitOfWork)
 
             guiaRepository.Delete(guia);
 
-            var result = await unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
                 return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 

@@ -17,6 +17,7 @@ public record GuiaCreateDto(
     Guid SucursalDestinoId,
     //Guid UsuarioAltaId,
     Guid? UsuarioCobroId,
+    ArticuloGuiaCreateDto[] Articulos,
     decimal CostoFlete,
     decimal Iva,
     decimal IvaRetenido,
@@ -29,6 +30,20 @@ public record GuiaCreateDto(
     Guid? Seguro
 )
 {
+    public List<ArticuloGuia> ArticuloGuiaToEntity()
+    {
+        return Articulos.Select(
+            a => ArticuloGuia.Create
+            (
+                a.GuiaId,
+                a.Descripcion,
+                a.ArticuloId,
+                a.Cantidad,
+                a.PesoUnidad,
+                a.ValorUnidad
+            )
+        ).ToList();
+    }
     public Guia ToEntity(Guid usuarioAltaId, Guid empresaId)
     {
         var direccionOrigen = DireccionOrigen.ToEntity();

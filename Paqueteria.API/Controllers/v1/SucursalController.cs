@@ -27,7 +27,7 @@ public class SucursalController(ISucursalService service) : PaqueteriaController
     }
 
 
-    [HttpPost("create")]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<SucursalResponseDto>> Create(SucursalCreateDto dto)

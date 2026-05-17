@@ -1,19 +1,18 @@
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class UsuarioService(IUsuarioRepository usuarioRepository, IUnitOfWork unitOfWork) : IUsuarioService
+public class UsuarioService(IUnitOfWork unit) : IUsuarioService
 {
-    public async Task<Result<IReadOnlyList<UsuarioResponseDto>>> GetAllAsync()
+    public async Task<Result<IReadOnlyList<UsuarioResponseDto>>> GetAllAsync(UserContext currentUser)
     {
         try
         {
-            var usuarios = (await usuarioRepository.GetAllAsync())
+            var usuarios = (await unit.Usuarios.GetAllAsync(currentUser.EmpresaId))
                 .Select( UsuarioResponseDto.FromEntity ).ToList();
             return Result<IReadOnlyList<UsuarioResponseDto>>.Success(usuarios);
         }
@@ -24,7 +23,7 @@ public class UsuarioService(IUsuarioRepository usuarioRepository, IUnitOfWork un
         }
     }
 
-    public async Task<Result<UsuarioResponseDto>> GetByIdAsync(Guid usuarioId)
+    public Task<Result<UsuarioResponseDto>> GetByIdAsync(Guid usuarioId)
     {
         throw new NotImplementedException();
     }
@@ -33,7 +32,7 @@ public class UsuarioService(IUsuarioRepository usuarioRepository, IUnitOfWork un
     {
         try
         {
-            var usuario = await usuarioRepository.GetByUsernameAsync(username);
+            var usuario = await unit.Usuarios.GetByUsernameAsync(username);
 
             if (usuario == null)
                 return Result<UsuarioResponseDto>.Failure(CodigoRespuesta.Failure, "Usuario no encontrado");
@@ -51,17 +50,25 @@ public class UsuarioService(IUsuarioRepository usuarioRepository, IUnitOfWork un
     {
         try
         {
-            var usuario = await usuarioRepository.AddAsync(dto.ToEntity(currentUser.EmpresaId));
+            var usuario = dto.ToEntity(
+                AuthService.HashPassword(dto.Password),
+                currentUser.EmpresaId
+            );
+            
+            await unit.Usuarios.AddAsync(usuario);
 
-            var result = await unitOfWork.CompleteAsync();
-
-            if (result <= 0)
-                return Result<UsuarioResponseDto>.Failure(CodigoRespuesta.NotFound, "Usuario no creado");
+            foreach (var rolId in dto.Roles)
+            {
+                await unit.Usuarios.AddRoleToUserAsync(usuario.Id, rolId, currentUser.EmpresaId);
+            }
+            
+            await unit.CompleteAsync();
 
             return Result<UsuarioResponseDto>.Success(UsuarioResponseDto.FromEntity(usuario));
         }
         catch (Exception e)
         {
+            await unit.RollbackTransactionAsync();
             Console.WriteLine(e);
             throw;
         }
@@ -71,17 +78,14 @@ public class UsuarioService(IUsuarioRepository usuarioRepository, IUnitOfWork un
     {
         try
         {
-            var usuario = (await usuarioRepository.GetByIdAsync(dto.UsuarioId));
+            var usuario = (await unit.Usuarios.GetByIdAsync(dto.UsuarioId, currentUser.EmpresaId));
 
             if (usuario == null)
                 return Result.Failure(CodigoRespuesta.NotFound, "Usuario no encontrado");
 
             dto.UpdateEntity(usuario);
-            usuarioRepository.Update(usuario);
-            var result = await unitOfWork.CompleteAsync();
-            if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
-
+            await unit.CompleteAsync();
+            
             return Result.Success();
         }
         catch (Exception e)
@@ -95,16 +99,13 @@ public class UsuarioService(IUsuarioRepository usuarioRepository, IUnitOfWork un
     {
         try
         {
-            var usuario = (await usuarioRepository.GetByIdAsync(usuarioId));
+            var usuario = (await unit.Usuarios.GetByIdAsync(usuarioId, currentUser.EmpresaId));
 
             if (usuario == null)
                 return Result.Failure(CodigoRespuesta.NotFound, "Usuario no encontrado");
 
-            usuarioRepository.Delete(usuario);
-
-            var result = await unitOfWork.CompleteAsync();
-            if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+            unit.Usuarios.Delete(usuario);
+            await unit.CompleteAsync();
 
             return Result.Success();
         }

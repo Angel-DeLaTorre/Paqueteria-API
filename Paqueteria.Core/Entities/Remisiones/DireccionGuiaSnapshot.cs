@@ -18,12 +18,6 @@ public class DireccionGuiaSnapshot
         public Direccion Direccion { get; set; } = null!;
 
     #endregion
-
-    #region ForeignKeys
-
-        [ForeignKey("Direccion.MunicipioId")] public virtual Municipio Municipio { get; set; } = null!;
-
-    #endregion
     
     #region Constructors
     

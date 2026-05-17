@@ -30,9 +30,6 @@ public class Usuario
         [Column("password")]
         public string Password { get; set; }  = string.Empty;
 
-        [Column("rol")]
-        public RolUsuario Rol { get; set; } 
-
         [Required] [Column("estatus")] 
         public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;
 
@@ -42,8 +39,11 @@ public class Usuario
         [Column("fecha_ultimo_acceso")]
         public DateTime? FechaUltimoAcceso { get; set; }
         
+        [Required]
         [Column("empresa_id")]
         public Guid EmpresaId { get; init; }
+        
+        public ICollection<UsuarioRol> UsuarioRoles { get; private set; } = new List<UsuarioRol>();
         
     #endregion
     
@@ -57,7 +57,7 @@ public class Usuario
     
         private Usuario() {}
     
-        public static Usuario Create(string nombre, string username, string password, RolUsuario rol, Guid empresaId)
+        public static Usuario Create(string nombre, string username, string password, Guid empresaId)
         {
             //TODO Valida campos
             
@@ -66,7 +66,6 @@ public class Usuario
                 Nombre = nombre,
                 Username = username,
                 Password = password,
-                Rol = rol,
                 Estatus = EstatusGenerico.Activo,
                 FechaCreacion =  DateTime.UtcNow,
                 FechaUltimoAcceso = null,

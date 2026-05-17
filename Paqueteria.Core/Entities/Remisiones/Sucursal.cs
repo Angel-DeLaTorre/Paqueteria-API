@@ -48,8 +48,6 @@ public class Sucursal
     #endregion
 
     #region ForeignKey
-        [ForeignKey("Direccion.MunicipioId")] public virtual Municipio Municipio { get; init; } = null!;
-        
         [ForeignKey("EmpresaId")] public Empresa Empresa { get; init; } = null!;
     #endregion
 

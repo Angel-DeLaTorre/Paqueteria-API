@@ -7,7 +7,7 @@ using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork unitOfWork) : IEmpresaService
+public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWorkBase unitOfWorkBase) : IEmpresaService
 {
     public async Task<Result<IReadOnlyList<EmpresaResponseDto>>> GetAllAsync()
     {
@@ -49,7 +49,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork un
         {
             var empresa = await empresaRepository.AddAsync(dto.ToEntity());
 
-            var result = await unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
 
             if (result <= 0)
                 return Result<EmpresaResponseDto>.Failure(CodigoRespuesta.NotFound, "Empresa no creado");
@@ -74,7 +74,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork un
 
             dto.UpdateEntity(empresa);
             empresaRepository.Update(empresa);
-            var result = await unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
                 return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 
@@ -98,7 +98,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWork un
 
             empresaRepository.Delete(empresa);
 
-            var result = await unitOfWork.CompleteAsync();
+            var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
                 return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
 

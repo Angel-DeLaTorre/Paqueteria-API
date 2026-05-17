@@ -8,6 +8,16 @@ namespace Paqueteria.Infrastructure.Services;
 
 public sealed class MunicipioService(IMunicipioRepository repository) : IMunicipioService
 {
+    public async Task<Result<IReadOnlyList<MunicipioResponseDto>>> GetAll()
+    {
+        var municipiosEntityList = await repository.ObtenerMunicipiosAsync();
+        var municipios = municipiosEntityList.Select(MunicipioResponseDto.FromEntity).ToList();
+        
+        if (municipios.Count == 0)
+            return Result<IReadOnlyList<MunicipioResponseDto>>.Failure(CodigoRespuesta.NotFound, "No existe ningun municipio");
+
+        return Result<IReadOnlyList<MunicipioResponseDto>>.Success(municipios);
+    }
     public async Task<Result<MunicipioResponseDto>> ObtenerMunicipioAsync(Guid id)
     {
         var municipio = await repository.GetByIdAsync(id);
@@ -23,9 +33,6 @@ public sealed class MunicipioService(IMunicipioRepository repository) : IMunicip
     public async Task<Result<IReadOnlyList<MunicipioResponseDto>>> ObtenerMunicipiosPorEstadoAsync(string estadoId)
     {
         var municipios = (await repository.ObtenerMunicipiosPorEstadoAsync(estadoId)).Select(MunicipioResponseDto.FromEntity).ToList();
-
-        if (municipios.Count == 0)
-            return Result<IReadOnlyList<MunicipioResponseDto>>.Failure(CodigoRespuesta.NotFound, "No existe ningun municipio");
 
         return Result<IReadOnlyList<MunicipioResponseDto>>.Success( municipios);
     }

@@ -11,7 +11,7 @@ public class UsuarioController(IUsuarioService service) : PaqueteriaControllerBa
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<UsuarioResponseDto>>> GetAll()
     {
-        var result = await service.GetAllAsync();
+        var result = await service.GetAllAsync(CurrentUser);
         return ProcessResult(result);
     }
 
@@ -23,7 +23,7 @@ public class UsuarioController(IUsuarioService service) : PaqueteriaControllerBa
     }
 
     [HttpPost]
-    public async Task<ActionResult<UsuarioResponseDto>> Create(UsuarioCreateDto dto)
+    public async Task<ActionResult<UsuarioResponseDto>> Create([FromBody] UsuarioCreateDto dto)
     {
         var result = await service.CreateAsync(dto, CurrentUser);
         return ProcessResult(result);

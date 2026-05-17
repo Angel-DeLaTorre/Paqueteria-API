@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
@@ -9,8 +8,16 @@ namespace Paqueteria.API.Controllers.v1;
 [Route("api/v1/[controller]")]
 public class MunicipioController(IMunicipioService  service) : PaqueteriaControllerBase
 {
-    [HttpGet("estado/{estado}")]
-    public async Task<ActionResult<IReadOnlyList<MunicipioResponseDto>>> Get(string estado)
+    
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<MunicipioResponseDto>>> GetAll()
+    {
+        var result = await service.GetAll();
+        return ProcessResult(result);
+    }
+    
+    [HttpGet("{estado}")]
+    public async Task<ActionResult<IReadOnlyList<MunicipioResponseDto>>> GetByEstado(string estado)
     {
         var result = await service.ObtenerMunicipiosPorEstadoAsync(estado);
         return ProcessResult(result);
@@ -20,7 +27,7 @@ public class MunicipioController(IMunicipioService  service) : PaqueteriaControl
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<MunicipioResponseDto>> Get(Guid id)
+    public async Task<ActionResult<MunicipioResponseDto>> GetById(Guid id)
     {
         var result = await service.ObtenerMunicipioAsync(id);
         return ProcessResult(result);

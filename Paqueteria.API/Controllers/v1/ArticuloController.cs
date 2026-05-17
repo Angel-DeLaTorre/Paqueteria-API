@@ -16,7 +16,7 @@ public class ArticuloController(IArticuloService service) : PaqueteriaController
         return ProcessResult(result);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

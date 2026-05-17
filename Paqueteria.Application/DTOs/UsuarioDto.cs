@@ -1,6 +1,4 @@
-using Paqueteria.Core.Entities;
 using Paqueteria.Core.Entities.Remisiones;
-using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Application.DTOs;
 
@@ -8,22 +6,20 @@ public record UsuarioCreateDto(
     string Nombre,
     string Username,
     string Password,
-    RolUsuario Rol
+    List<Guid> Roles
 )
 {
-    public Usuario ToEntity(Guid empresaId) => Usuario.Create(Nombre, Username, Password, Rol, empresaId);
+    public Usuario ToEntity(string hashedPassword, Guid empresaId) => Usuario.Create(Nombre, Username, hashedPassword, empresaId);
 };
 
 public record UsuarioUpdateDto(
     Guid UsuarioId,
-    string Nombre,
-    RolUsuario Rol
+    string Nombre
 )
 {
     public void UpdateEntity(Usuario entity)
     {
         entity.Nombre = Nombre;
-        entity.Rol = Rol;
     }
 };
 
@@ -31,16 +27,22 @@ public record UsuarioResponseDto(
     Guid Id,
     string Nombre,
     string Username,
-    RolUsuario Rol,
+    List<RolResponseDto> Roles,
     DateTime? FechaUltimoAcesso
 )
 {
-    public static UsuarioResponseDto FromEntity(Usuario entity) =>
-        new (
+    public static UsuarioResponseDto FromEntity(Usuario entity)
+    {
+        var roles = entity.UsuarioRoles?
+            .Select(ur => RolResponseDto.FromEntity(ur.Rol))
+            .ToList() ?? [];
+        
+        return new UsuarioResponseDto(
             entity.Id,
             entity.Nombre,
             entity.Username,
-            entity.Rol,
+            roles,
             entity.FechaUltimoAcceso
         );
+    }
 };

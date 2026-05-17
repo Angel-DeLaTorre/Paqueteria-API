@@ -78,7 +78,7 @@ public record ChoferResponseDto(
             chofer.Nombre,
             chofer.ApellidoPaterno,
             chofer.ApellidoMaterno,
-            DireccionResponseDto.FromEntity(chofer.Direccion, chofer.Municipio),
+            DireccionResponseDto.FromEntity(chofer.Direccion),
             chofer.Telefono,
             chofer.NumCamion,
             chofer.NumContenedor,
