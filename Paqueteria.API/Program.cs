@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Paqueteria.API.Middlewares;
 using Paqueteria.Core.Settings;
 using Paqueteria.Infrastructure;
 
@@ -15,6 +16,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails(); 
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
@@ -44,8 +49,6 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -53,7 +56,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseExceptionHandler(); 
 app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");

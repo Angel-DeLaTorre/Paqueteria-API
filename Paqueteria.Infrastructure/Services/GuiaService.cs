@@ -31,7 +31,7 @@ public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWorkBase unitOfW
             var guia = await guiaRepository.GetByIdAsync(guiaId);
 
             if (guia is null)
-                return Result<GuiaResponseDto>.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrada");
+                return Result<GuiaResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<GuiaResponseDto>.Success(GuiaResponseDto.FromEntity(guia));
         }
@@ -51,7 +51,7 @@ public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWorkBase unitOfW
             var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
-                return Result<GuiaResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+                return Result<GuiaResponseDto>.Failure(Errors.Generic.NoCreado);
 
             return Result<GuiaResponseDto>.Success(GuiaResponseDto.FromEntity(guia));
         }
@@ -69,14 +69,14 @@ public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWorkBase unitOfW
             var guia = await guiaRepository.GetByIdAsync(dto.GuiaId);
 
             if (guia is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Guia no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(guia);
             guiaRepository.Update(guia);
             var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
-                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }
@@ -94,13 +94,13 @@ public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWorkBase unitOfW
             var guia = (await guiaRepository.GetByIdAsync(guiaId));
 
             if (guia is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Guia no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             guiaRepository.Delete(guia);
 
             var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+                return Result.Failure(Errors.Generic.NoEliminado);
 
             return Result.Success();
         }

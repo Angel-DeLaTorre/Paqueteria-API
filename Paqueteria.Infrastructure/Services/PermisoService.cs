@@ -15,7 +15,7 @@ public class PermisoService(IUnitOfWork unit) : IPermisoService
             var permiso = await unit.Permisos.GetByIdAsync(id, currentUser.EmpresaId);
 
             if (permiso == null)
-                return Result<PermisoResponseDto>.Failure(CodigoRespuesta.NotFound, "Permiso no encontrado.");
+                return Result<PermisoResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<PermisoResponseDto>.Success(PermisoResponseDto.FromEntity(permiso));
         }
@@ -51,7 +51,7 @@ public class PermisoService(IUnitOfWork unit) : IPermisoService
         {
             var permisoExistente = await unit.Permisos.GetByNameAsync(dto.Nombre, currentUser.EmpresaId);
             if (permisoExistente != null)
-                return Result<PermisoResponseDto>.Failure(CodigoRespuesta.Conflict, $"El permiso '{dto.Nombre}' ya existe en esta empresa.");
+                return Result<PermisoResponseDto>.Failure(Errors.Generic.NoEncontrado);
             
             var nuevoPermiso = dto.ToEntity(currentUser.EmpresaId);
             
@@ -73,7 +73,7 @@ public class PermisoService(IUnitOfWork unit) : IPermisoService
         {
             var permiso = await unit.Permisos.GetByIdAsync(dto.PermisoId, currentUser.EmpresaId);
             if (permiso == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Permiso no encontrado.");
+                return Result.Failure(Errors.Generic.NoEncontrado);
             
             dto.UpdateEntity(permiso);
             await unit.CompleteAsync();
@@ -93,7 +93,7 @@ public class PermisoService(IUnitOfWork unit) : IPermisoService
         {
             var permiso = await unit.Permisos.GetByIdAsync(id, currentUser.EmpresaId);
             if (permiso == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Permiso no encontrado.");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             unit.Permisos.Delete(permiso);
             await unit.CompleteAsync();

@@ -31,7 +31,7 @@ public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWorkBase u
             var seguro = await seguroRepository.GetByIdAsync(seguroId);
 
             if (seguro is null)
-                return Result<SeguroResponseDto>.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrada");
+                return Result<SeguroResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<SeguroResponseDto>.Success(SeguroResponseDto.FromEntity(seguro));
         }
@@ -51,7 +51,7 @@ public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWorkBase u
             var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
-                return Result<SeguroResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+                return Result<SeguroResponseDto>.Failure(Errors.Generic.NoCreado);
 
             return Result<SeguroResponseDto>.Success(SeguroResponseDto.FromEntity(seguro));
         }
@@ -69,14 +69,14 @@ public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWorkBase u
             var seguro = await seguroRepository.GetByIdAsync(dto.SeguroId);
 
             if (seguro is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Chofer no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(seguro);
             seguroRepository.Update(seguro);
             var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
-                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             return Result.Success();
         }

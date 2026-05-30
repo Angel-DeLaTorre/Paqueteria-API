@@ -5,31 +5,33 @@ namespace Paqueteria.Core.Common;
 public class Result
 {
     public bool IsSuccess { get; }
-    public BaseError? Error { get; }
-
-    private Result(bool isSuccess, BaseError? error)
+    public object? Value { get; }
+    public Error? DetalleError { get; }
+    
+    private Result(bool isSuccess, Error? detalleError)
     {
         IsSuccess = isSuccess;
-        Error = error;
+        Value = null;
+        DetalleError = detalleError;
     }
 
     public static Result Success() => new(true, null);
-    public static Result Failure(CodigoRespuesta code, string description) => new(false, new BaseError(code, description));
+    public static Result Failure(Error detalleError) => new(false, detalleError);
 }
 
 public class Result<T>
 {
     public bool IsSuccess { get; }
     public T? Value { get; }
-    public BaseError? Error { get; }
-
-    private Result(bool isSuccess, T? value, BaseError? error)
+    public Error? DetalleError { get; }
+    
+    private Result(bool isSuccess, T? value, Error? detalleError)
     {
         IsSuccess = isSuccess;
         Value = value;
-        Error = error;
+        DetalleError = detalleError;
     }
 
     public static Result<T> Success(T? value) => new(true, value, null);
-    public static Result<T> Failure(CodigoRespuesta code, string description) => new(false, default, new BaseError(code, description));
+    public static Result<T> Failure(Error detalleError) => new(false, default, detalleError);
 }

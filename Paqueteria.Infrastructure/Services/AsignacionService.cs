@@ -31,7 +31,7 @@ public class AsignacionService (IAsignacionRepository asignacionRepository, IUni
             var asignacion = await asignacionRepository.GetByIdAsync(asignacionId);
 
             if (asignacion is null)
-                return Result<AsignacionResponseDto>.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrada");
+                return Result<AsignacionResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<AsignacionResponseDto>.Success(AsignacionResponseDto.FromEntity(asignacion));
         }
@@ -51,7 +51,7 @@ public class AsignacionService (IAsignacionRepository asignacionRepository, IUni
             var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
-                return Result<AsignacionResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+                return Result<AsignacionResponseDto>.Failure(Errors.Generic.NoCreado);
 
             return Result<AsignacionResponseDto>.Success(AsignacionResponseDto.FromEntity(asignacion));
         }
@@ -69,14 +69,14 @@ public class AsignacionService (IAsignacionRepository asignacionRepository, IUni
             var asignacion = await asignacionRepository.GetByIdAsync(dto.Id);
 
             if (asignacion == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(asignacion);
             asignacionRepository.Update(asignacion);
             var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
-                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }
@@ -94,13 +94,13 @@ public class AsignacionService (IAsignacionRepository asignacionRepository, IUni
             var asignacion = (await asignacionRepository.GetByIdAsync(asignacionId));
 
             if (asignacion == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             asignacionRepository.Delete(asignacion);
 
             var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }

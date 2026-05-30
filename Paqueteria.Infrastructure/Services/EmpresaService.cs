@@ -32,7 +32,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWorkBas
             var empresa = (await empresaRepository.GetByIdAsync(id));
 
             if (empresa is null)
-                return Result<EmpresaResponseDto>.Failure(CodigoRespuesta.NotFound, "Empresa not found");
+                return Result<EmpresaResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<EmpresaResponseDto>.Success(EmpresaResponseDto.FromEntity(empresa));
         }
@@ -52,7 +52,7 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWorkBas
             var result = await unitOfWorkBase.CompleteAsync();
 
             if (result <= 0)
-                return Result<EmpresaResponseDto>.Failure(CodigoRespuesta.NotFound, "Empresa no creado");
+                return Result<EmpresaResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<EmpresaResponseDto>.Success(EmpresaResponseDto.FromEntity(empresa));
         }
@@ -70,13 +70,13 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWorkBas
             var empresa = (await empresaRepository.GetByIdAsync(dto.EmpresaId));
 
             if (empresa is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Empresa no encontrada");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(empresa);
             empresaRepository.Update(empresa);
             var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }
@@ -94,13 +94,13 @@ public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWorkBas
             var empresa = (await empresaRepository.GetByIdAsync(empresaId));
 
             if ( empresa is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Empresa no encontrada");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             empresaRepository.Delete(empresa);
 
             var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+                return Result.Failure(Errors.Generic.NoEliminado);
 
             return Result.Success();
         }

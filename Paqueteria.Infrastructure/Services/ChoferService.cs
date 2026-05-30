@@ -31,7 +31,7 @@ public class ChoferService(IChoferRepository choferRepository, IUnitOfWorkBase u
             var chofer = await choferRepository.GetByIdAsync(choferId);
 
             if (chofer is null)
-                return Result<ChoferResponseDto>.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrada");
+                return Result<ChoferResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<ChoferResponseDto>.Success(ChoferResponseDto.FromEntity(chofer));
         }
@@ -51,7 +51,7 @@ public class ChoferService(IChoferRepository choferRepository, IUnitOfWorkBase u
             var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
-                return Result<ChoferResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+                return Result<ChoferResponseDto>.Failure(Errors.Generic.NoCreado);
 
             return Result<ChoferResponseDto>.Success(ChoferResponseDto.FromEntity(chofer));
         }
@@ -69,14 +69,14 @@ public class ChoferService(IChoferRepository choferRepository, IUnitOfWorkBase u
             var chofer = await choferRepository.GetByIdAsync(dto.ChoferId);
 
             if (chofer is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Chofer no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(chofer);
             choferRepository.Update(chofer);
             var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
-                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }
@@ -94,13 +94,13 @@ public class ChoferService(IChoferRepository choferRepository, IUnitOfWorkBase u
             var chofer = (await choferRepository.GetByIdAsync(choferId));
 
             if (chofer is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Chofer no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             choferRepository.Delete(chofer);
 
             var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+                return Result.Failure(Errors.Generic.NoEliminado);
 
             return Result.Success();
         }

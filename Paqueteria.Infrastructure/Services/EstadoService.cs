@@ -12,7 +12,7 @@ public class EstadoService(IEstadoRepository estadoRepository) : IEstadoService
     {
         var estado = await estadoRepository.GetByIdAsync(id);
         if (estado is null)
-            return Result<EstadoResponseDto>.Failure(CodigoRespuesta.NotFound, "Estado no encontrado");
+            return Result<EstadoResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
         return Result<EstadoResponseDto>.Success(EstadoResponseDto.FromEntity(estado));
     }

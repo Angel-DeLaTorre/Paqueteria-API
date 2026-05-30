@@ -15,7 +15,7 @@ public class RolService( IUnitOfWork unit) : IRolService
             var rol = await unit.Roles.GetByIdAsync(id, currentUser.EmpresaId, includePermissions: true);
 
             if (rol == null)
-                return Result<RolResponseDto>.Failure(CodigoRespuesta.NotFound, "Rol no encontrado.");
+                return Result<RolResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<RolResponseDto>.Success(RolResponseDto.FromEntity(rol));
         }
@@ -49,7 +49,7 @@ public class RolService( IUnitOfWork unit) : IRolService
         {
             var rolExistente = await unit.Roles.GetByNameAsync(dto.Nombre, currentUser.EmpresaId);
             if (rolExistente != null)
-                return Result<RolResponseDto>.Failure(CodigoRespuesta.Conflict, $"El rol '{dto.Nombre}' ya existe.");
+                return Result<RolResponseDto>.Failure(Errors.Generic.Conflicto);
             
             var rol = dto.ToEntity(currentUser.EmpresaId);
             await unit.Roles.AddAsync(rol);
@@ -79,18 +79,15 @@ public class RolService( IUnitOfWork unit) : IRolService
         {
             var rol = await unit.Roles.GetByIdAsync(dto.RoleId, currentUser.EmpresaId, includePermissions: true);
             if (rol == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Rol no encontrado.");
+                return Result.Failure(Errors.Generic.NoEncontrado);
             
             dto.UpdateEntity(rol);
-            
-            if (rol.RolPermiso != null)
+
+            foreach (var rp in rol.RolPermiso.ToList())
             {
-                foreach (var rp in rol.RolPermiso.ToList())
-                {
-                    await unit.Roles.RemovePermissionFromRoleAsync(rol.Id, rp.PermisoId, currentUser.EmpresaId);
-                }
+                await unit.Roles.RemovePermissionFromRoleAsync(rol.Id, rp.PermisoId, currentUser.EmpresaId);
             }
-            
+
             if (dto.PermisosIds != null && dto.PermisosIds.Count != 0)
             {
                 foreach (var permisoId in dto.PermisosIds)
@@ -115,10 +112,8 @@ public class RolService( IUnitOfWork unit) : IRolService
         {
             var rol = await unit.Roles.GetByIdAsync(id, currentUser.EmpresaId);
             if (rol == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Rol no encontrado.");
-
-            // Nota: Si configuraste eliminación en cascada en la base de datos (ON DELETE CASCADE) 
-            // para la tabla intermedia UserRoles y RolePermissions, esto será completamente limpio.
+                return Result.Failure(Errors.Generic.NoEncontrado);
+            
             unit.Roles.Delete(rol);
             await unit.CompleteAsync();
 

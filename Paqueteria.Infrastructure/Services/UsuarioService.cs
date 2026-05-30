@@ -35,7 +35,7 @@ public class UsuarioService(IUnitOfWork unit) : IUsuarioService
             var usuario = await unit.Usuarios.GetByUsernameAsync(username);
 
             if (usuario == null)
-                return Result<UsuarioResponseDto>.Failure(CodigoRespuesta.Failure, "Usuario no encontrado");
+                return Result<UsuarioResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<UsuarioResponseDto>.Success(UsuarioResponseDto.FromEntity(usuario));
         }
@@ -81,7 +81,7 @@ public class UsuarioService(IUnitOfWork unit) : IUsuarioService
             var usuario = (await unit.Usuarios.GetByIdAsync(dto.UsuarioId, currentUser.EmpresaId));
 
             if (usuario == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Usuario no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(usuario);
             await unit.CompleteAsync();
@@ -102,7 +102,7 @@ public class UsuarioService(IUnitOfWork unit) : IUsuarioService
             var usuario = (await unit.Usuarios.GetByIdAsync(usuarioId, currentUser.EmpresaId));
 
             if (usuario == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Usuario no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             unit.Usuarios.Delete(usuario);
             await unit.CompleteAsync();

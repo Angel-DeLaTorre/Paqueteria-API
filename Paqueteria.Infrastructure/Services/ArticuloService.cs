@@ -3,7 +3,6 @@ using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
@@ -21,7 +20,7 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
         var articulo = await articuloRepository.GetByIdAsync(id);
 
         if (articulo == null)
-            return Result<ArticuloResponseDto>.Failure(CodigoRespuesta.NotFound, "Articulo no encontrado");
+            return Result<ArticuloResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
         return Result<ArticuloResponseDto>.Success(ArticuloResponseDto.FromEntity(articulo));
     }
@@ -33,7 +32,7 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
         var result = unitOfWorkBase.CompleteAsync();
 
         if (result.IsCompletedSuccessfully)
-            return Result<ArticuloResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+            return Result<ArticuloResponseDto>.Failure(Errors.Generic.NoCreado);
 
         return Result<ArticuloResponseDto>.Success(ArticuloResponseDto.FromEntity(articulo));
     }
@@ -43,14 +42,14 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
         var articulo = await articuloRepository.GetByIdAsync(dto.ArticuloId);
 
         if (articulo == null)
-            return Result.Failure(CodigoRespuesta.NotFound, "Articulo no encontrado");
+            return Result.Failure(Errors.Generic.NoEncontrado);
 
         dto.UpdateEntity(articulo);
         articuloRepository.Update(articulo);
         var result = await  unitOfWorkBase.CompleteAsync();
 
         if (result != 0)
-            return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+            return Result.Failure(Errors.Generic.NoActualizado);
 
         return Result.Success();
     }
@@ -62,13 +61,13 @@ public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWork
             var articulo = (await articuloRepository.GetByIdAsync(articuloId));
 
             if (articulo == null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Articulo no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             articuloRepository.Delete(articulo);
 
             var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+                return Result.Failure(Errors.Generic.NoEliminado);
 
             return Result.Success();
         }

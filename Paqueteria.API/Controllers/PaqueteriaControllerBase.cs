@@ -31,37 +31,17 @@ public abstract class PaqueteriaControllerBase : ControllerBase
         Username: User.FindFirstValue(ClaimTypes.Name) ?? "Anonymous",
         Sucursal: GetGuidClaim(ClaimTypes.Sid), // Ojo: Asegúrate de que el token lo traiga
         IpAddress: HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
-        EmpresaId: GetGuidClaim(ClaimTypes.System)
+        EmpresaId: GetGuidClaim("empresa_id")
     );
 
     protected ActionResult<T> ProcessResult<T>(Result<T> result)
     {
-        if (result.IsSuccess)
-        {
-            return result.Value is null ? NoContent() : Ok(result.Value);
-        }
-
-        return new ActionResult<T>(ProcessError(result.Error!));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     protected IActionResult ProcessResult(Result result)
     {
-        return result.IsSuccess ? NoContent() : ProcessError(result.Error!);
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
-
-    private ActionResult ProcessError(BaseError error)
-    {
-        return error.Code switch
-        {
-            CodigoRespuesta.NotFound => NotFound(error.Description),
-            CodigoRespuesta.BadRequest => BadRequest(error.Description),
-            CodigoRespuesta.Unauthorized => Unauthorized(error.Description),
-            CodigoRespuesta.Forbidden => Forbid(),
-            CodigoRespuesta.Conflict => Conflict(error.Description),
-            CodigoRespuesta.Failure => StatusCode(500, error.Description),
-            _ => BadRequest(error.Code)
-        };
-    }
-
-
+    
 }

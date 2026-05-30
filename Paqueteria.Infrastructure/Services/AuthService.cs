@@ -20,11 +20,11 @@ public class AuthService(IUsuarioRepository repoUsuario, IOptions<JwtSettings> j
         var usuario = await repoUsuario.GetByUsernameAsync(request.Username, true);
 
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.Password))
-            return Result<SesionResponseDto>.Failure(CodigoRespuesta.NotFound, $"Usuario o contraseña incorrectos.");
+            return Result<SesionResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
 
         if (usuario.Estatus != EstatusGenerico.Activo)
-            return Result<SesionResponseDto>.Failure(CodigoRespuesta.Forbidden, $"Usuario bloqueado");
+            return Result<SesionResponseDto>.Failure(Errors.Users.Bloqueado);
 
         return Result<SesionResponseDto>.Success( GenerateAuthResponse(usuario) );
     }

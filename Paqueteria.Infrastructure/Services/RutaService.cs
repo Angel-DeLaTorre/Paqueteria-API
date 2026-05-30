@@ -31,7 +31,7 @@ public class RutaService(IRutaRepository rutaRepository, IUnitOfWorkBase unitOfW
             var ruta = await rutaRepository.GetByIdAsync(rutaId);
 
             if (ruta is null)
-                return Result<RutaResponseDto>.Failure(CodigoRespuesta.NotFound, "Asignacion no encontrada");
+                return Result<RutaResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<RutaResponseDto>.Success(RutaResponseDto.FromEntity(ruta));
         }
@@ -51,7 +51,7 @@ public class RutaService(IRutaRepository rutaRepository, IUnitOfWorkBase unitOfW
             var result = unitOfWorkBase.CompleteAsync();
 
             if (result.IsCompletedSuccessfully)
-                return Result<RutaResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear articulo");
+                return Result<RutaResponseDto>.Failure(Errors.Generic.NoCreado);
 
             return Result<RutaResponseDto>.Success(RutaResponseDto.FromEntity(ruta));
         }
@@ -69,14 +69,14 @@ public class RutaService(IRutaRepository rutaRepository, IUnitOfWorkBase unitOfW
             var ruta = await rutaRepository.GetByIdAsync(dto.RutaId);
 
             if (ruta is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Chofer no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(ruta);
             rutaRepository.Update(ruta);
             var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
-                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }
@@ -94,13 +94,13 @@ public class RutaService(IRutaRepository rutaRepository, IUnitOfWorkBase unitOfW
             var ruta = (await rutaRepository.GetByIdAsync(rutaId));
 
             if (ruta is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Ruta no encontrada");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             rutaRepository.Delete(ruta);
 
             var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }

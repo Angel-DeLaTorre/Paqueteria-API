@@ -26,7 +26,7 @@ public record RolUpdateDto(
 };
 
 public record RolResponseDto(
-    Guid Id,
+    Guid RolId,
     string Nombre,
     string Descripcion,
     IEnumerable<PermisoResponseDto> Permissions

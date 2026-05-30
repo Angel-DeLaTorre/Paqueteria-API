@@ -32,7 +32,7 @@ public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork
             var sucursal = (await sucursalRepository.GetByIdAsync(sucursalId));
 
             if (sucursal == null)
-                return Result<SucursalResponseDto>.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
+                return Result<SucursalResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
         }
@@ -54,7 +54,7 @@ public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork
             var result = await unitOfWorkBase.CompleteAsync();
 
             if (result <= 0)
-                return Result<SucursalResponseDto>.Failure(CodigoRespuesta.Failure, "Error al crear sucursal");
+                return Result<SucursalResponseDto>.Failure(Errors.Generic.NoCreado);
 
             return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
         }
@@ -71,14 +71,14 @@ public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork
         {
             var sucursal = await sucursalRepository.GetByIdAsync(dto.SucursalId);
 
-            if (sucursal == null) return Result.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
+            if (sucursal == null) return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(sucursal);
             sucursalRepository.Update( sucursal );
             var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
-                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }
@@ -95,13 +95,13 @@ public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWork
         {
             var sucursal = await sucursalRepository.GetByIdAsync(idSucursal);
 
-            if (sucursal == null) return Result.Failure(CodigoRespuesta.NotFound, "Sucursal no encontrada");
+            if (sucursal == null) return Result.Failure(Errors.Generic.NoEncontrado);
 
             sucursalRepository.Delete(sucursal);
             var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
-                return Result.Failure(CodigoRespuesta.Failure, "Error al borrar");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }

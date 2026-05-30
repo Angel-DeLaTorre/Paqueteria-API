@@ -32,7 +32,7 @@ public class ClienteService(IClienteRepository clienteRepo, IUnitOfWorkBase unit
             var cliente = await clienteRepo.GetByIdAsync(clienteId);
 
             if (cliente == null)
-                return Result<ClienteResponseDto>.Failure(CodigoRespuesta.NotFound, "Cliente no encontrado");
+                return Result<ClienteResponseDto>.Failure(Errors.Generic.NoEncontrado);
 
             return Result<ClienteResponseDto>.Success(ClienteResponseDto.FromEntity(cliente));
         }
@@ -61,17 +61,14 @@ public class ClienteService(IClienteRepository clienteRepo, IUnitOfWorkBase unit
 
             if (rowsAffected <= 0)
             {
-                return Result<ClienteResponseDto>.Failure(CodigoRespuesta.Failure, "No se guardo el cliente");
+                return Result<ClienteResponseDto>.Failure(Errors.Generic.NoCreado);
             }
 
             return Result<ClienteResponseDto>.Success(ClienteResponseDto.FromEntity(cliente));
         }
         catch (DbUpdateException ex)
         {
-            return Result<ClienteResponseDto>.Failure(
-                CodigoRespuesta.BadRequest, 
-                "No se pudo guardar: verifique que el municipio y estado sean válidos."
-            );
+            return Result<ClienteResponseDto>.Failure( Errors.Generic.NoCreado );
         }
         catch (Exception e)
         {
@@ -87,14 +84,14 @@ public class ClienteService(IClienteRepository clienteRepo, IUnitOfWorkBase unit
             var cliente = await clienteRepo.GetByIdAsync(dto.ClienteId);
 
             if (cliente is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Cliente no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             dto.UpdateEntity(cliente);
             clienteRepo.Update(cliente);
             var result = await  unitOfWorkBase.CompleteAsync();
 
             if (result != 0)
-                return Result.Failure(CodigoRespuesta.Failure, "Error al actualizar");
+                return Result.Failure(Errors.Generic.NoActualizado);
 
             return Result.Success();
         }
@@ -112,13 +109,13 @@ public class ClienteService(IClienteRepository clienteRepo, IUnitOfWorkBase unit
             var cliente = (await clienteRepo.GetByIdAsync(clienteId));
 
             if (cliente is null)
-                return Result.Failure(CodigoRespuesta.NotFound, "Cliente no encontrado");
+                return Result.Failure(Errors.Generic.NoEncontrado);
 
             clienteRepo.Delete(cliente);
 
             var result = await unitOfWorkBase.CompleteAsync();
             if (result <= 0)
-                return Result.Failure(CodigoRespuesta.Failure, "No se realizaron cambios");
+                return Result.Failure(Errors.Generic.NoEliminado);
 
             return Result.Success();
         }
