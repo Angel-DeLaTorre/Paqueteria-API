@@ -1,9 +1,11 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Paqueteria.API.Middlewares;
 using Paqueteria.Core.Settings;
 using Paqueteria.Infrastructure;
+using Paqueteria.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,5 +65,20 @@ app.UseCors("CorsPolicy");
 app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        await context.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocurrió un error al aplicar las migraciones de EF Core en el arranque.");
+    }
+}
 
 app.Run();
