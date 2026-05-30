@@ -1,0 +1,81 @@
+using Paqueteria.Core.Entities;
+using Paqueteria.Core.Entities.Remisiones;
+
+namespace Paqueteria.Application.DTOs;
+
+public record AsignacionCreateDto(
+    Guid Id,
+    Guid ChoferId,
+    DateTime? FechaPartida,
+    string? St1,
+    string? St2,
+    string? St3,
+    string? St4,
+    string Camion,
+    string? NumContenedor,
+    string? NumContenedor2
+)
+{
+    public Asignacion ToEntity() => Asignacion.Create(
+        ChoferId,
+        FechaPartida,
+        St1,
+        St2,
+        St3,
+        St4,
+        Camion,
+        NumContenedor,
+        NumContenedor2);
+};
+
+public record AsignacionUpdateDto(
+    Guid Id,
+    DateTime FechaPartida,
+    string? St1,
+    string? St2,
+    string? St3,
+    string? St4,
+    string Camion,
+    string? NumContenedor,
+    string? NumContenedor2)
+{
+    public void UpdateEntity(Asignacion entity)
+    {
+        entity.FechaPartida = FechaPartida;
+        entity.St1 = St1;
+        entity.St2 = St2;
+        entity.St3 = St3;
+        entity.St4 = St4;
+        entity.Camion = Camion;
+        entity.NumContenedor = NumContenedor;
+        entity.NumContenedor2 = NumContenedor2;
+    }
+};
+
+public record AsignacionResponseDto(
+    Guid Id,
+    Guid ChoferId,
+    DateTime? FechaPartida,
+    string? St1,
+    string? St2,
+    string? St3,
+    string? St4,
+    string Camion,
+    string? NumContenedor,
+    string? NumContenedor2
+)
+{
+    public static AsignacionResponseDto FromEntity(Asignacion entity)
+        => new(
+            entity.Id,
+            entity.ChoferId,
+            entity.FechaPartida,
+            entity.St1,
+            entity.St2,
+            entity.St3,
+            entity.St4,
+            entity.Camion,
+            entity.NumContenedor,
+            entity.NumContenedor2
+        );
+}

@@ -7,7 +7,12 @@
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5005",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__DefaultConnection": "Host=localhost;Database=paqueteria_db;Username=postgres;Password=1234",
+        "JwtSettings__Key": "ESTA_ES_UNA_LLAVE_MUY_LARGA_Y_SEGURA_DE_PRUEBA_32_CHARS",
+        "JwtSettings__Issuer": "PaqueteriaAPI",
+        "JwtSettings__Audience": "PaqueteriaFrontEnd",
+        "JwtSettings__DurationInMinutes": "480"
       }
     },
     "https": {

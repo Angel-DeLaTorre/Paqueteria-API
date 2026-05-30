@@ -4,5 +4,6 @@ public enum AccionBitacora
 {
     Insert,
     Update,
-    Delete
+    Delete,
+    Lecture
 }

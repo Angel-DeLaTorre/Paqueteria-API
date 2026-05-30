@@ -2,6 +2,6 @@ namespace Paqueteria.Core.Enums;
 
 public enum EstatusGenerico
 {
-    Activo,
-    Inactivo
+    Activo = 1,
+    Inactivo = 0
 }

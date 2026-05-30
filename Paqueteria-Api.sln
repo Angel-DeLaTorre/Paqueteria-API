@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Paqueteria.Core", "Paqueteria.Core\Paqueteria.Core.csproj", "{E5E5AE11-9A3D-4B27-8E7A-FCE7FFCFD142}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49D61D29-A87A-443D-A011-FAC62A14197F}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Paqueteria.Infrastructure", "Paqueteria.Infrastructure\Paqueteria.Infrastructure.csproj", "{B2D6C7D8-18B0-4112-8D1E-DD3FFDA04D61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Paqueteria.Application", "Paqueteria.Application\Paqueteria.Application.csproj", "{366E4119-D606-4464-885E-57E6E5E94982}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Paqueteria.API", "Paqueteria.API\Paqueteria.API.csproj", "{A7EEBA1F-6784-4834-9E38-6A928E032E17}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5E5AE11-9A3D-4B27-8E7A-FCE7FFCFD142}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5E5AE11-9A3D-4B27-8E7A-FCE7FFCFD142}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5E5AE11-9A3D-4B27-8E7A-FCE7FFCFD142}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5E5AE11-9A3D-4B27-8E7A-FCE7FFCFD142}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2D6C7D8-18B0-4112-8D1E-DD3FFDA04D61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2D6C7D8-18B0-4112-8D1E-DD3FFDA04D61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2D6C7D8-18B0-4112-8D1E-DD3FFDA04D61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2D6C7D8-18B0-4112-8D1E-DD3FFDA04D61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{366E4119-D606-4464-885E-57E6E5E94982}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{366E4119-D606-4464-885E-57E6E5E94982}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{366E4119-D606-4464-885E-57E6E5E94982}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{366E4119-D606-4464-885E-57E6E5E94982}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7EEBA1F-6784-4834-9E38-6A928E032E17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7EEBA1F-6784-4834-9E38-6A928E032E17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7EEBA1F-6784-4834-9E38-6A928E032E17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7EEBA1F-6784-4834-9E38-6A928E032E17}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
