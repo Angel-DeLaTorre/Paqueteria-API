@@ -20,3 +20,9 @@
 *.dll
 *.exe
 Paqueteria.sln.DotSettings.user
+
+bin/
+obj/
+.idea/
+.vs/
+out/
