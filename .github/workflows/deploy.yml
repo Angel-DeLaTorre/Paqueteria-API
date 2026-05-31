@@ -1,0 +1,66 @@
+name: Build and Deploy .NET 10 API
+
+on:
+  push:
+    branches: [ "main" ] # Se activa automáticamente cuando haces push a la rama main
+
+env:
+  REGISTRY: ghcr.io
+  # Esto tomará automáticamente el nombre de tu repositorio en minúsculas para la imagen
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Permiso clave para que GitHub pueda guardar tu imagen de Docker
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Iniciar sesión en GitHub Packages (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # Token interno automático de GitHub
+
+      - name: Convertir nombre de imagen a minúsculas
+        run: |
+          echo "IMAGE_NAME_LOWER=$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Construir y subir imagen de Docker (.NET 10)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Desplegar en el VPS de Hetzner vía SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/paqueteria
+            
+            # Autenticar Docker en el VPS temporalmente usando las credenciales del Action
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Forzar la descarga de la nueva imagen que se acaba de compilar
+            docker compose pull paqueteria-api
+            
+            # Levantar o recrear los contenedores en segundo plano aplicando cambios
+            docker compose up -d postgres-db paqueteria-api
+            
+            # Limpieza opcional de imágenes viejas (para no saturar tus 40GB de disco)
+            docker image prune -f

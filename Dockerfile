@@ -14,7 +14,7 @@ COPY ["Paqueteria.Infrastructure/Paqueteria.Infrastructure.csproj", "Paqueteria.
 # 2. Restauramos las dependencias NuGet basándonos en el proyecto ejecutable principal
 RUN dotnet restore "Paqueteria.API/Paqueteria.API.csproj"
 
-# 3. Copiamos absolutamente todo el resto del código fuente del repositorio
+# 3. Copiamos absolutamente el resto del código fuente del repositorio
 COPY . .
 
 # 4. Nos movemos a la capa de la API y compilamos en modo Release sin generar el ejecutable nativo del Host
