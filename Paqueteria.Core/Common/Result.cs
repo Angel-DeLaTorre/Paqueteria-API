@@ -34,4 +34,5 @@ public class Result<T>
 
     public static Result<T> Success(T? value) => new(true, value, null);
     public static Result<T> Failure(Error detalleError) => new(false, default, detalleError);
+    public static Result<T> Failure(T value, Error detalleError) => new(false, value, detalleError);
 }

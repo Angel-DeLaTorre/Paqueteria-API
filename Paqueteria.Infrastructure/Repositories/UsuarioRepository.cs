@@ -75,10 +75,10 @@ public class UsuarioRepository(AppDbContext context) : IUsuarioRepository
     
     public async Task AddRoleToUserAsync(Guid userId, Guid roleId, Guid empresaId)
     {
-        var userExists = await context.Usuarios.AnyAsync(u => u.Id == userId && u.EmpresaId == empresaId);
+        //var userExists = await context.Usuarios.AnyAsync(u => u.Id == userId && u.EmpresaId == empresaId);
         var roleExists = await context.Roles.AnyAsync(r => r.Id == roleId && r.EmpresaId == empresaId);
 
-        if (!userExists || !roleExists)
+        if (!roleExists)
         {
             throw new InvalidOperationException("El Usuario o el Rol no existen");
         }

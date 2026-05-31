@@ -10,6 +10,10 @@ public class Errors
         public static readonly Error NoEliminado = new("ERROR_004", "Elemento no eliminado.");
         public static readonly Error Conflicto = new("ERROR_005", "Elemento ya existe.");
     }
+    public static class Validacion
+    {
+        public static readonly Error NoEncontrado = new("PARAM_001", "Parametro no enviado.");
+    }
     public static class Users
     {
         public static readonly Error NotFound = new("USER_001", "Usuario no encontrado.");

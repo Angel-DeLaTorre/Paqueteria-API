@@ -33,9 +33,7 @@ public record UsuarioResponseDto(
 {
     public static UsuarioResponseDto FromEntity(Usuario entity)
     {
-        var roles = entity.UsuarioRoles?
-            .Select(ur => RolResponseDto.FromEntity(ur.Rol))
-            .ToList() ?? [];
+        var roles = new List<RolResponseDto>();
         
         return new UsuarioResponseDto(
             entity.Id,

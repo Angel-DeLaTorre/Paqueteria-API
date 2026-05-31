@@ -28,7 +28,7 @@ public class Usuario
         [Required]
         [MaxLength(100)]
         [Column("password")]
-        public string Password { get; set; }  = string.Empty;
+        public string Password { get; private set; }  = string.Empty;
 
         [Required] [Column("estatus")] 
         public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;

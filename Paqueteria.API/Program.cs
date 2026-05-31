@@ -1,13 +1,8 @@
-using System;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Paqueteria.API.Configurations;
 using Paqueteria.API.Middlewares;
 using Paqueteria.Core.Settings;
 using Paqueteria.Infrastructure;
@@ -25,7 +20,8 @@ var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
 
 builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureCustomValidationErrorResponse();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructureServices(builder.Configuration);
