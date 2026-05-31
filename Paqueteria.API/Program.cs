@@ -10,7 +10,12 @@ using Paqueteria.Infrastructure.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
-var key = Encoding.ASCII.GetBytes(jwtSettings!.Key);
+if (jwtSettings == null || string.IsNullOrWhiteSpace(jwtSettings.Key))
+{
+    throw new InvalidOperationException(
+        $"Error Crítico de Configuración: La clave para la sección '{JwtSettings.SectionName}' no se encuentra definida en el entorno.");
+}
+var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
 
 builder.Configuration.AddEnvironmentVariables();
 
