@@ -18,6 +18,9 @@ public class Seguro
         [Column("nombre")]
         public string Nombre { get; set; } = string.Empty;
         
+        [Column("empresa_id")]
+        public Guid EmpresaId { get; init; }
+        
     #endregion
     
     #region Constructors

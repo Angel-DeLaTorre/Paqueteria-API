@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
@@ -35,7 +31,7 @@ public class ArticuloController(IArticuloService service) : PaqueteriaController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ArticuloResponseDto>> Create(ArticuloCreateDto dto)
     {
-        var result = await service.CreateAsync(dto, CurrentUser);
+        var result = await service.CreateAsync(dto);
         return ProcessResult(result);
     }
 
@@ -45,17 +41,17 @@ public class ArticuloController(IArticuloService service) : PaqueteriaController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromBody] ArticuloUpdateDto dto)
     {
-        var result = await service.UpdateAsync(dto, CurrentUser);
+        var result = await service.UpdateAsync(dto);
         return ProcessResult(result);
     }
 
-    [HttpDelete("{articuloId:guid}")]
+    [HttpDelete("{articuloId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid articuloId)
+    public async Task<IActionResult> Delete(string articuloId)
     {
-        var result = await service.DeleteAsync(articuloId, CurrentUser);
+        var result = await service.DeleteAsync(articuloId);
         return ProcessResult(result);
     }
 }

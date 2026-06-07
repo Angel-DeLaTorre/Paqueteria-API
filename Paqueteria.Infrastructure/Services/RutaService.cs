@@ -1,113 +1,87 @@
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Common.Errors;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class RutaService(IRutaRepository rutaRepository, IUnitOfWorkBase unitOfWorkBase) : IRutaService
+public class RutaService(IUnitOfWork unit, IUserContextService userContext) : IRutaService
 {
     public async Task<Result<IReadOnlyList<RutaResponseDto>>> GetAllAsync()
     {
-        try
-        {
-            var rutas = ( await rutaRepository.GetAllAsync() )
-                .Select( RutaResponseDto.FromEntity ).ToList();
-            return Result<IReadOnlyList<RutaResponseDto>>.Success(rutas);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        var rutas = ( await unit.Rutas.GetAllAsync(userContext.EmpresaId) )
+            .Select( RutaResponseDto.FromEntity ).ToList();
+        return Result<IReadOnlyList<RutaResponseDto>>.Success(rutas);
     }
 
     public async Task<Result<RutaResponseDto>> GetByIdAsync(Guid rutaId)
     {
-        try
-        {
-            var ruta = await rutaRepository.GetByIdAsync(rutaId);
+        var ruta = await unit.Rutas.GetByIdAsync(rutaId, userContext.EmpresaId);
 
-            if (ruta is null)
-                return Result<RutaResponseDto>.Failure(Errors.Generic.NoEncontrado);
+        if (ruta is null)
+            return Result<RutaResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            return Result<RutaResponseDto>.Success(RutaResponseDto.FromEntity(ruta));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<RutaResponseDto>.Success(RutaResponseDto.FromEntity(ruta));
     }
 
-    public async Task<Result<RutaResponseDto>> CreateAsync(RutaCreateDto dto, UserContext currentUser)
+    public async Task<Result<RutaResponseDto>> CreateAsync(RutaCreateDto dto)
     {
-        try
-        {
-            var ruta = await rutaRepository.AddAsync(dto.ToEntity(currentUser.EmpresaId));
+        var ruta = await unit.Rutas.AddAsync(dto.ToEntity(userContext.EmpresaId));
 
-            var result = unitOfWorkBase.CompleteAsync();
+        await unit.CompleteAsync();
+        
+        ruta = await unit.Rutas.GetByIdAsync(ruta.Id, userContext.EmpresaId);
 
-            if (result.IsCompletedSuccessfully)
-                return Result<RutaResponseDto>.Failure(Errors.Generic.NoCreado);
-
-            return Result<RutaResponseDto>.Success(RutaResponseDto.FromEntity(ruta));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<RutaResponseDto>.Success(RutaResponseDto.FromEntity(ruta));
     }
 
-    public async Task<Result> UpdateAsync(RutaUpdateDto dto, UserContext currentUser)
+    public async Task<Result> UpdateAsync(RutaUpdateDto dto)
     {
-        try
-        {
-            var ruta = await rutaRepository.GetByIdAsync(dto.RutaId);
+        var ruta = await unit.Rutas.GetByIdAsync(dto.RutaId, userContext.EmpresaId);
 
-            if (ruta is null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if (ruta is null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            dto.UpdateEntity(ruta);
-            rutaRepository.Update(ruta);
-            var result = await  unitOfWorkBase.CompleteAsync();
+        dto.UpdateEntity(ruta);
+        await unit.CompleteAsync();
 
-            if (result != 0)
-                return Result.Failure(Errors.Generic.NoActualizado);
-
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
+    }
+    
+    public async Task<Result> DesactivarAsync(Guid rutaId)
+    {
+        var ruta = await unit.Rutas.GetByIdAsync(rutaId, userContext.EmpresaId);
+        if (ruta == null) return Result.Failure(ErrorCodes.Generic.NoEncontrado);
+        
+        ruta.Estatus = EstatusBasico.Inactivo;
+        await  unit.CompleteAsync();
+        
+        return Result.Success();
+    }
+    
+    public async Task<Result> ActivarAsync(Guid rutaId)
+    {
+        var ruta = await unit.Rutas.GetByIdAsync(rutaId, userContext.EmpresaId);
+        if (ruta == null) return Result.Failure(ErrorCodes.Generic.NoEncontrado);
+        
+        ruta.Estatus = EstatusBasico.Activo;
+        await  unit.CompleteAsync();
+        
+        return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(Guid rutaId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid rutaId)
     {
-        try
-        {
-            var ruta = (await rutaRepository.GetByIdAsync(rutaId));
+        var ruta = await unit.Rutas.GetByIdAsync(rutaId, userContext.EmpresaId);
 
-            if (ruta is null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if (ruta is null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            rutaRepository.Delete(ruta);
+        unit.Rutas.Delete(ruta);
+        await unit.CompleteAsync();
 
-            var result = await unitOfWorkBase.CompleteAsync();
-            if (result <= 0)
-                return Result.Failure(Errors.Generic.NoActualizado);
-
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
     }
 }

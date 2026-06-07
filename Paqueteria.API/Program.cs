@@ -28,6 +28,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails(); 
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(options =>
 {
@@ -58,23 +59,27 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseExceptionHandler(); 
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseExceptionHandler(); 
 if (!app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
 
 app.UseCors("CorsPolicy");
-app.MapControllers();
+
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {

@@ -30,7 +30,7 @@ namespace Paqueteria.Core.Entities.Remisiones
             public string? ApellidoMaterno { get; set; }
 
             [Column("estatus")]
-            public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;
+            public EstatusBasico Estatus { get; set; } = EstatusBasico.Activo;
 
             public Direccion? Direccion { get; set; }
 
@@ -83,7 +83,7 @@ namespace Paqueteria.Core.Entities.Remisiones
                     Nombre = nombre,
                     ApellidoPaterno = apellidoPaterno,
                     ApellidoMaterno = apellidoMaterno,
-                    Estatus = EstatusGenerico.Activo,
+                    Estatus = EstatusBasico.Activo,
                     Direccion = direccion,
                     Telefono = telefono,
                     NumCamion = numCamion,

@@ -2,8 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
+using Paqueteria.Core.Common;
+using Paqueteria.Core.Common.Audit;
+using Paqueteria.Core.Interfaces.Repositories;
 using Paqueteria.Core.Settings;
 using Paqueteria.Infrastructure.Data;
 using Paqueteria.Infrastructure.Persistence;
@@ -82,6 +84,9 @@ public static class InfrastructureServiceRegistration
         
         services.AddScoped<IPermisoRepository, PermisoRepository>();
         services.AddScoped<IPermisoService, PermisoService>();
+        
+        services.AddScoped<IUserContextService, UserContextService>();
+        services.AddScoped<IAuditLogService, FakeAuditLogService>();
 
         return services;
     }

@@ -143,6 +143,10 @@ namespace Paqueteria.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("chofer_id");
 
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("empresa_id");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_creacion");
@@ -185,96 +189,9 @@ namespace Paqueteria.Infrastructure.Migrations
 
                     b.HasIndex("ChoferId");
 
+                    b.HasIndex("EmpresaId");
+
                     b.ToTable("asignaciones", "remisiones");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.BitacoraAcceso", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("ClienteIp")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("cliente_ip");
-
-                    b.Property<bool>("Exito")
-                        .HasColumnType("boolean")
-                        .HasColumnName("exito");
-
-                    b.Property<DateTime>("FechaAcceso")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_acceso");
-
-                    b.Property<Guid>("UsiarioId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("usuario_id");
-
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("bitacora_accesos", "remisiones");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.BitacoraSistema", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<int>("Accion")
-                        .HasColumnType("integer")
-                        .HasColumnName("accion");
-
-                    b.Property<string>("ClienteIp")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("cliente_ip");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha");
-
-                    b.Property<Guid>("RegistroId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("registro_id");
-
-                    b.Property<Guid>("SucursalId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sucursal_id");
-
-                    b.Property<string>("Tabla")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("tabla");
-
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("usuario_id");
-
-                    b.Property<string>("ValorAnterior")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("valor_anterior");
-
-                    b.Property<string>("ValorNuevo")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("valor_nuevo");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SucursalId");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("bitacora_sistema", "remisiones");
                 });
 
             modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Chofer", b =>
@@ -418,6 +335,10 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Property<Guid>("ClienteId")
                         .HasColumnType("uuid")
                         .HasColumnName("cliente_id");
+
+                    b.Property<int>("Estatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("estatus");
 
                     b.HasKey("Id");
 
@@ -614,79 +535,6 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("guias", "remisiones");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Permiso", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("descripcion");
-
-                    b.Property<Guid>("EmpresaId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("empresa_id");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("nombre");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmpresaId");
-
-                    b.ToTable("permisos", "remisiones");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Rol", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("descripcion");
-
-                    b.Property<Guid>("EmpresaId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("empresa_id");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("nombre");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmpresaId");
-
-                    b.ToTable("roles", "remisiones");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.RolPermiso", b =>
-                {
-                    b.Property<Guid>("RolId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("rol_id");
-
-                    b.Property<Guid>("PermisoId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("permiso_id");
-
-                    b.HasKey("RolId", "PermisoId");
-
-                    b.HasIndex("PermisoId");
-
-                    b.ToTable("roles_permisos", "remisiones");
-                });
-
             modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Ruta", b =>
                 {
                     b.Property<Guid>("Id")
@@ -702,6 +550,10 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Property<Guid>("EmpresaId")
                         .HasColumnType("uuid")
                         .HasColumnName("empresa_id");
+
+                    b.Property<int>("Estatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("estatus");
 
                     b.Property<Guid>("SucursalDestinoId")
                         .HasColumnType("uuid")
@@ -728,6 +580,10 @@ namespace Paqueteria.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("empresa_id");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -788,7 +644,217 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("sucursales", "remisiones");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Usuario", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sat.Articulo", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Clave")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("clave");
+
+                    b.Property<string>("MaterialPeligroso")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("material_peligroso");
+
+                    b.Property<string>("Similares")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("similares");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("texto");
+
+                    b.Property<DateTime>("VigenciaDesde")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("vigencia_desde");
+
+                    b.Property<DateTime>("VigenciaHasta")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("vigencia_hasta");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("articulos", "sat");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.BitacoraAcceso", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ClienteIp")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("cliente_ip");
+
+                    b.Property<bool>("Exito")
+                        .HasColumnType("boolean")
+                        .HasColumnName("exito");
+
+                    b.Property<DateTime>("FechaAcceso")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_acceso");
+
+                    b.Property<Guid>("UsiarioId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("usuario_id");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("bitacora_accesos", "sys");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.BitacoraSistema", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Accion")
+                        .HasColumnType("integer")
+                        .HasColumnName("accion");
+
+                    b.Property<string>("ClienteIp")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("cliente_ip");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha");
+
+                    b.Property<Guid>("RegistroId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("registro_id");
+
+                    b.Property<Guid>("SucursalId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sucursal_id");
+
+                    b.Property<string>("Tabla")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("tabla");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("usuario_id");
+
+                    b.Property<string>("ValorAnterior")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("valor_anterior");
+
+                    b.Property<string>("ValorNuevo")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("valor_nuevo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SucursalId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("bitacora_sistema", "sys");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Permiso", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("empresa_id");
+
+                    b.Property<int>("Estatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("estatus");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.ToTable("permisos", "remisiones");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Rol", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("empresa_id");
+
+                    b.Property<int>("Estatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("estatus");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.ToTable("roles", "remisiones");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.RolPermiso", b =>
+                {
+                    b.Property<Guid>("RolId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("rol_id");
+
+                    b.Property<Guid>("PermisoId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("permiso_id");
+
+                    b.HasKey("RolId", "PermisoId");
+
+                    b.HasIndex("PermisoId");
+
+                    b.ToTable("roles_permisos", "remisiones");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -836,7 +902,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("usuarios", "remisiones");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.UsuarioRol", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.UsuarioRol", b =>
                 {
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uuid")
@@ -851,46 +917,6 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.HasIndex("RolId");
 
                     b.ToTable("usuarios_roles", "remisiones");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sat.Articulo", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Clave")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("clave");
-
-                    b.Property<string>("MaterialPeligroso")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("material_peligroso");
-
-                    b.Property<string>("Similares")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("similares");
-
-                    b.Property<string>("Texto")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("texto");
-
-                    b.Property<DateTime>("VigenciaDesde")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("vigencia_desde");
-
-                    b.Property<DateTime>("VigenciaHasta")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("vigencia_hasta");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("articulos", "sat");
                 });
 
             modelBuilder.Entity("Paqueteria.Core.Entities.Catalogos.Municipio", b =>
@@ -931,37 +957,15 @@ namespace Paqueteria.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Chofer");
-                });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.BitacoraAcceso", b =>
-                {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.BitacoraSistema", b =>
-                {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "Sucursal")
-                        .WithMany()
-                        .HasForeignKey("SucursalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Sucursal");
-
-                    b.Navigation("Usuario");
+                    b.Navigation("Empresa");
                 });
 
             modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Chofer", b =>
@@ -1312,13 +1316,13 @@ namespace Paqueteria.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Usuario", "UsuarioAlta")
+                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "UsuarioAlta")
                         .WithMany()
                         .HasForeignKey("UsuarioAltaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Usuario", "UsuarioCobro")
+                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "UsuarioCobro")
                         .WithMany()
                         .HasForeignKey("UsuarioCobroId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -1344,47 +1348,6 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("UsuarioAlta");
 
                     b.Navigation("UsuarioCobro");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Permiso", b =>
-                {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
-                        .WithMany()
-                        .HasForeignKey("EmpresaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Empresa");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Rol", b =>
-                {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
-                        .WithMany()
-                        .HasForeignKey("EmpresaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Empresa");
-                });
-
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.RolPermiso", b =>
-                {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Permiso", "Permiso")
-                        .WithMany("RolPermiso")
-                        .HasForeignKey("PermisoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Rol", "Rol")
-                        .WithMany("RolPermiso")
-                        .HasForeignKey("RolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Permiso");
-
-                    b.Navigation("Rol");
                 });
 
             modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Ruta", b =>
@@ -1489,7 +1452,37 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Usuario", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.BitacoraAcceso", b =>
+                {
+                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.BitacoraSistema", b =>
+                {
+                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "Sucursal")
+                        .WithMany()
+                        .HasForeignKey("SucursalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Sucursal");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Permiso", b =>
                 {
                     b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
                         .WithMany()
@@ -1500,15 +1493,56 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.UsuarioRol", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Rol", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Rol", "Rol")
+                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.RolPermiso", b =>
+                {
+                    b.HasOne("Paqueteria.Core.Entities.Sistema.Permiso", "Permiso")
+                        .WithMany("RolPermiso")
+                        .HasForeignKey("PermisoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Paqueteria.Core.Entities.Sistema.Rol", "Rol")
+                        .WithMany("RolPermiso")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permiso");
+
+                    b.Navigation("Rol");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Usuario", b =>
+                {
+                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.UsuarioRol", b =>
+                {
+                    b.HasOne("Paqueteria.Core.Entities.Sistema.Rol", "Rol")
                         .WithMany("UsuarioRol")
                         .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Usuario", "Usuario")
+                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "Usuario")
                         .WithMany("UsuarioRoles")
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1529,19 +1563,19 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Direcciones");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Permiso", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Permiso", b =>
                 {
                     b.Navigation("RolPermiso");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Rol", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Rol", b =>
                 {
                     b.Navigation("RolPermiso");
 
                     b.Navigation("UsuarioRol");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Usuario", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Usuario", b =>
                 {
                     b.Navigation("UsuarioRoles");
                 });

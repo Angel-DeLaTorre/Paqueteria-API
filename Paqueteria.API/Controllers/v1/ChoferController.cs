@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
@@ -35,7 +31,7 @@ public class ChoferController(IChoferService service) : PaqueteriaControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ChoferResponseDto>> Create(ChoferCreateDto dto)
     {
-        var result = await service.CreateAsync(dto, CurrentUser);
+        var result = await service.CreateAsync(dto);
         return ProcessResult(result);
     }
 
@@ -45,7 +41,7 @@ public class ChoferController(IChoferService service) : PaqueteriaControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromBody] ChoferUpdateDto dto)
     {
-        var result = await service.UpdateAsync(dto, CurrentUser);
+        var result = await service.UpdateAsync(dto);
         return ProcessResult(result);
     }
 
@@ -55,7 +51,7 @@ public class ChoferController(IChoferService service) : PaqueteriaControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid choferId)
     {
-        var result = await service.DeleteAsync(choferId, CurrentUser);
+        var result = await service.DeleteAsync(choferId);
         return ProcessResult(result);
     }
 }

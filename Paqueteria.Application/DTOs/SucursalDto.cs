@@ -1,4 +1,3 @@
-using Paqueteria.Core.Entities;
 using Paqueteria.Core.Entities.Remisiones;
 using Paqueteria.Core.Enums;
 
@@ -52,7 +51,7 @@ public record SucursalResponseDto(
     string Codigo,
     DireccionResponseDto Direccion,
     string? Telefono,
-    EstatusGenerico Estatus
+    EstatusBasico Estatus
 )
 {
     public static SucursalResponseDto FromEntity(Sucursal entity)

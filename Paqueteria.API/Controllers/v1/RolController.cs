@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
 
@@ -13,7 +11,7 @@ public class RolController(IRolService service) : PaqueteriaControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RolResponseDto>>> Get()
     {
-        var result = await service.GetAllAsync(CurrentUser);
+        var result = await service.GetAllAsync();
         return ProcessResult(result);
     }
 }

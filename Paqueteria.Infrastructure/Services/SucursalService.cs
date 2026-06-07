@@ -1,114 +1,94 @@
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Common.Errors;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class SucursalService(ISucursalRepository sucursalRepository, IUnitOfWorkBase unitOfWorkBase) : ISucursalService
+public class SucursalService(IUnitOfWork unit, IUserContextService userContext) : ISucursalService
 {
     public async Task<Result<IReadOnlyList<SucursalResponseDto>>> GetAllAsync()
     {
-        try
-        {
-            var sucursales =  ( await sucursalRepository.GetAllAsync() )
-                .Select( SucursalResponseDto.FromEntity ).ToList();
+        var sucursales =  ( await unit.Sucursales.GetAllAsync(userContext.EmpresaId) )
+            .Select( SucursalResponseDto.FromEntity ).ToList();
 
-            return Result<IReadOnlyList<SucursalResponseDto>>.Success(sucursales);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<IReadOnlyList<SucursalResponseDto>>.Success(sucursales);
     }
 
     public async Task<Result<SucursalResponseDto>> GetByIdAsync(Guid sucursalId)
     {
-        try
-        {
-            var sucursal = (await sucursalRepository.GetByIdAsync(sucursalId));
+        var sucursal = await unit.Sucursales.GetByIdAsync(sucursalId, userContext.EmpresaId);
+        if (sucursal == null)
+            return Result<SucursalResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            if (sucursal == null)
-                return Result<SucursalResponseDto>.Failure(Errors.Generic.NoEncontrado);
-
-            return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-
+        return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
     }
 
-    public async Task<Result<SucursalResponseDto>> CreateAsync(SucursalCreateDto dto, UserContext currentUser)
+    public async Task<Result<SucursalResponseDto>> CreateAsync(SucursalCreateDto dto)
     {
-        try
-        {
-            var sucursalIn = dto.ToEntity(currentUser.EmpresaId);
-            var sucursal = await sucursalRepository.AddAsync( sucursalIn );
+        var sucursalIn = dto.ToEntity(userContext.EmpresaId);
+        var sucursal = await unit.Sucursales.AddAsync( sucursalIn );
 
-            var result = await unitOfWorkBase.CompleteAsync();
+        var result = await unit.CompleteAsync();
 
-            if (result <= 0)
-                return Result<SucursalResponseDto>.Failure(Errors.Generic.NoCreado);
+        if (result <= 0)
+            return Result<SucursalResponseDto>.Failure(ErrorCodes.Generic.NoCreado);
 
-            return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<SucursalResponseDto>.Success(SucursalResponseDto.FromEntity(sucursal));
     }
 
-    public async Task<Result> UpdateAsync(SucursaUpdateDto dto, UserContext currentUser)
+    public async Task<Result> UpdateAsync(SucursaUpdateDto dto)
     {
-        try
-        {
-            var sucursal = await sucursalRepository.GetByIdAsync(dto.SucursalId);
+        var sucursal = await unit.Sucursales.GetByIdAsync(dto.SucursalId, userContext.EmpresaId);
 
-            if (sucursal == null) return Result.Failure(Errors.Generic.NoEncontrado);
+        if (sucursal == null) return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            dto.UpdateEntity(sucursal);
-            sucursalRepository.Update( sucursal );
-            var result = await  unitOfWorkBase.CompleteAsync();
+        dto.UpdateEntity(sucursal);
+        unit.Sucursales.Update( sucursal );
+        var result = await  unit.CompleteAsync();
 
-            if (result != 0)
-                return Result.Failure(Errors.Generic.NoActualizado);
+        if (result != 0)
+            return Result.Failure(ErrorCodes.Generic.NoActualizado);
 
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
+    }
+    
+    public async Task<Result> DesactivarAsync(Guid sucursalId)
+    {
+        var sucursal = await unit.Sucursales.GetByIdAsync(sucursalId, userContext.EmpresaId);
+        if (sucursal == null) return Result.Failure(ErrorCodes.Generic.NoEncontrado);
+        
+        sucursal.Estatus = EstatusBasico.Inactivo;
+        await  unit.CompleteAsync();
+        
+        return Result.Success();
+    }
+    
+    public async Task<Result> ActivarAsync(Guid sucursalId)
+    {
+        var sucursal = await unit.Sucursales.GetByIdAsync(sucursalId, userContext.EmpresaId);
+        if (sucursal == null) return Result.Failure(ErrorCodes.Generic.NoEncontrado);
+        
+        sucursal.Estatus = EstatusBasico.Activo;
+        await  unit.CompleteAsync();
+        
+        return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(Guid idSucursal,  UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid idSucursal)
     {
-        try
-        {
-            var sucursal = await sucursalRepository.GetByIdAsync(idSucursal);
+        var sucursal = await unit.Sucursales.GetByIdAsync(idSucursal, userContext.EmpresaId);
 
-            if (sucursal == null) return Result.Failure(Errors.Generic.NoEncontrado);
+        if (sucursal == null) return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            sucursalRepository.Delete(sucursal);
-            var result = await  unitOfWorkBase.CompleteAsync();
+        unit.Sucursales.Delete(sucursal);
+        var result = await  unit.CompleteAsync();
 
-            if (result != 0)
-                return Result.Failure(Errors.Generic.NoActualizado);
+        if (result != 0)
+            return Result.Failure(ErrorCodes.Generic.NoActualizado);
 
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
+using Paqueteria.Core.Interfaces.Repositories;
 using Paqueteria.Infrastructure.Data;
 
 namespace Paqueteria.Infrastructure.Persistence;

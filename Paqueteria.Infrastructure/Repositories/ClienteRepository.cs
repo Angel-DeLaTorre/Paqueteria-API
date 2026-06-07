@@ -1,17 +1,35 @@
 using Microsoft.EntityFrameworkCore;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Interfaces.Repositories;
 using Paqueteria.Infrastructure.Data;
 
 namespace Paqueteria.Infrastructure.Repositories;
 
-public class ClienteRepository(AppDbContext context) : EntityRepository<Cliente>(context), IClienteRepository
+public class ClienteRepository(AppDbContext context) : IClienteRepository
 {
-    private readonly AppDbContext _context = context;
+    public async Task<Cliente?> GetByIdAsync(Guid clienteId, Guid empresaId, bool asTracking = true)
+    {
+       IQueryable<Cliente> query = context.Clientes;
+        if (!asTracking)
+            query = query.AsNoTracking();
+        
+        return await query.FirstOrDefaultAsync(s => s.Id == clienteId && s.EmpresaId == empresaId);
+    }
+    
+    public async Task<DireccionCliente?> GetDireccionByIdAsync(Guid clienteId, Guid direccionId, bool asTracking = true)
+    {
+        IQueryable<DireccionCliente> query = context.DireccionClientes;
+        if (!asTracking)
+            query = query.AsNoTracking();
+        
+        return await query.FirstOrDefaultAsync(dc => 
+            dc.Id == direccionId 
+            && dc.ClienteId == clienteId);
+    }
 
     public async Task<IReadOnlyList<Cliente>> GetAllAsync(Guid empresaId)
     {
-            return await _context.Clientes
+            return await context.Clientes
             .Include( x => x.Direcciones )
                 .ThenInclude( d => d.Direccion)
                     .ThenInclude( dir=> dir.Municipio )
@@ -19,8 +37,20 @@ public class ClienteRepository(AppDbContext context) : EntityRepository<Cliente>
             .AsNoTracking() 
             .ToListAsync();
     }
+
+    public async Task<Cliente> AddAsync(Cliente entity)
+    {
+        var ruta = await context.Clientes.AddAsync(entity);
+        return ruta.Entity;
+    }
+
+    public async void Delete(Cliente entity)
+    {
+        context.Clientes.Remove(entity);
+    }
+
     public async Task AddDireccion(DireccionCliente dir)
     {
-        await _context.DireccionClientes.AddAsync(dir);
+        await context.DireccionClientes.AddAsync(dir);
     }
 }

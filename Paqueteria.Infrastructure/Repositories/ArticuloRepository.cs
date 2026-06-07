@@ -1,12 +1,39 @@
-using Paqueteria.Application.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Paqueteria.Core.Entities.Sat;
+using Paqueteria.Core.Interfaces.Repositories;
 using Paqueteria.Infrastructure.Data;
 
 namespace Paqueteria.Infrastructure.Repositories;
 
-public class ArticuloRepository(AppDbContext context) : EntityRepository<Articulo>(context), IArticuloRepository
+public class ArticuloRepository(AppDbContext context) : IArticuloRepository
 {
-    private readonly AppDbContext _context = context;
+    public async Task<Articulo?> GetByIdAsync(string articuloId, bool asTracking = true)
+    {
+        IQueryable<Articulo> query = context.Articulos;
+        if (!asTracking)
+            query = query.AsNoTracking();
+        
+        return await query.FirstOrDefaultAsync(a => a.Id == articuloId);
+    }
     
-    public async Task<Articulo?> GetByIdAsync(string id) => await _context.Set<Articulo>().FindAsync(id);
+    public async Task<IReadOnlyList<Articulo>> GetAllAsync(bool asTracking = true)
+    {
+        IQueryable<Articulo> query = context.Articulos;
+        if (!asTracking)
+            query = query.AsNoTracking();
+        
+        return await query
+            .ToListAsync();
+    }
+    
+    public async Task<Articulo> AddAsync(Articulo entity)
+    {
+        var ruta = await context.Articulos.AddAsync(entity);
+        return ruta.Entity;
+    }
+
+    public void Delete(Articulo entity)
+    {
+        context.Articulos.Remove(entity);
+    }
 }

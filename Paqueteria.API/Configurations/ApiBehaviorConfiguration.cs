@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Common.Errors;
 
 namespace Paqueteria.API.Configurations
 {
@@ -23,7 +24,7 @@ namespace Paqueteria.API.Configurations
                     string descripcionError = string.Join(" ", erroresLista.Select(e => 
                         $"{e.Campo}: {string.Join(", ", e.Mensajes)}"));
                     
-                    return new BadRequestObjectResult(Result<string>.Failure(descripcionError, Errors.Validacion.NoEncontrado));
+                    return new BadRequestObjectResult(Result<string>.Failure(descripcionError, ErrorCodes.Validacion.NoEncontrado));
                 };
             });
         }

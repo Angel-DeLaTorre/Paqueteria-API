@@ -7,7 +7,7 @@ public interface IArticuloService
 {
     Task<Result<IReadOnlyList<ArticuloResponseDto>>> GetAllAsync();
     Task<Result<ArticuloResponseDto>> GetByIdAsync(string articuloId);
-    Task<Result<ArticuloResponseDto>> CreateAsync(ArticuloCreateDto dto, UserContext currentUser);
-    Task<Result> UpdateAsync(ArticuloUpdateDto dto, UserContext currentUser);
-    Task<Result> DeleteAsync(Guid articuloId, UserContext currentUser);
+    Task<Result<ArticuloResponseDto>> CreateAsync(ArticuloCreateDto dto);
+    Task<Result> UpdateAsync(ArticuloUpdateDto dto);
+    Task<Result> DeleteAsync(string articuloId);
 }

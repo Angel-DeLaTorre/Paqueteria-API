@@ -3,6 +3,7 @@ using Paqueteria.Core.Entities;
 using Paqueteria.Core.Entities.Catalogos;
 using Paqueteria.Core.Entities.Remisiones;
 using Paqueteria.Core.Entities.Sat;
+using Paqueteria.Core.Entities.Sistema;
 
 namespace Paqueteria.Infrastructure.Data;
 
@@ -29,7 +30,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<DireccionCliente> DireccionClientes { get; set; }
     public DbSet<Seguro> Seguros { get; set; }
-    public DbSet<Articulo> ArticulosCatalogo { get; set; }
+    public DbSet<Articulo> Articulos { get; set; }
 
     // Core: Guías y Envíos
     public DbSet<Guia> Guias { get; set; }

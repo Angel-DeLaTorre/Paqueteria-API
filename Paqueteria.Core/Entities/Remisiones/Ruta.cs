@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Core.Entities.Remisiones;
 
@@ -23,6 +24,9 @@ public class Ruta
         [Column("sucursal_destino_id")]
         public Guid SucursalDestinoId { get; set; }
         
+        [Column("estatus")]
+        public EstatusBasico Estatus { get; set; } = EstatusBasico.Activo;
+        
         [Column("empresa_id")]
         public Guid EmpresaId { get; init; }
         
@@ -30,11 +34,10 @@ public class Ruta
 
     #region ForeignKey
     
-        [ForeignKey("SucursalOrigenId")] public virtual Sucursal SucursalOrigen { get; set; } = null!;
-
-        [ForeignKey("SucursalDestinoId")] public virtual Sucursal SucursalDestino { get; set; } = null!;
-
-        [ForeignKey("EmpresaId")] public Empresa Empresa { get; set; } = null!;
+        [ForeignKey("SucursalOrigenId")] public Sucursal SucursalOrigen { get; private set; } = null!;
+        [ForeignKey("SucursalDestinoId")] public Sucursal SucursalDestino { get; private set; } = null!;
+        
+        [ForeignKey("EmpresaId")] public Empresa Empresa { get; init; } = null!;
 
     #endregion
     

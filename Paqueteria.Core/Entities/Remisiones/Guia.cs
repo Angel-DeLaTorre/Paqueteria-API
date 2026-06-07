@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Entities.Sistema;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Core.Entities.Remisiones;
@@ -115,22 +116,22 @@ public class Guia
         public Usuario? UsuarioCobro { get; set; }
     
         [ForeignKey("ClienteOrigenId")]
-        public virtual Cliente ClienteOrigen { get; set; } = null!;
+        public Cliente ClienteOrigen { get; set; } = null!;
 
         [ForeignKey("ClienteDestinoId")]
         public Cliente ClienteDestino { get; set; } = null!;
         
         [ForeignKey("DireccionOrigenId")]
-        public virtual DireccionGuiaSnapshot DireccionOrigen { get; set; } = null!;
+        public DireccionGuiaSnapshot DireccionOrigen { get; set; } = null!;
 
         [ForeignKey("DireccionDestinoId")]
-        public virtual DireccionGuiaSnapshot DireccionDestino { get; set; } = null!;
+        public DireccionGuiaSnapshot DireccionDestino { get; set; } = null!;
 
         [ForeignKey("SucursalOrigenId")]
-        public virtual Sucursal SucursalOrigen { get; set; } = null!;
+        public Sucursal SucursalOrigen { get; set; } = null!;
 
         [ForeignKey("SucursalDestinoId")]
-        public virtual Sucursal SucursalDestino { get; set; } = null!;
+        public Sucursal SucursalDestino { get; set; } = null!;
         
         [ForeignKey("AsignacionId")]
         public Asignacion? Asignacion { get; set; }

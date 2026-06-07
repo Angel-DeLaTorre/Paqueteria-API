@@ -1,4 +1,4 @@
-using Paqueteria.Core.Enums;
+using Paqueteria.Core.Common.Errors;
 
 namespace Paqueteria.Core.Common;
 

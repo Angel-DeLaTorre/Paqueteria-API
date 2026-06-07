@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
@@ -36,7 +32,7 @@ public class SeguroController(ISeguroService service ) : PaqueteriaControllerBas
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<SeguroResponseDto>> Create(SeguroCreateDto dto)
     {
-        var result = await service.CreateAsync(dto, CurrentUser);
+        var result = await service.CreateAsync(dto);
         return ProcessResult(result);
     }
 
@@ -47,7 +43,7 @@ public class SeguroController(ISeguroService service ) : PaqueteriaControllerBas
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromBody] SeguroUpdateDto dto)
     {
-        var result = await service.UpdateAsync(dto, CurrentUser);
+        var result = await service.UpdateAsync(dto);
         return ProcessResult(result);
     }
 
@@ -58,7 +54,7 @@ public class SeguroController(ISeguroService service ) : PaqueteriaControllerBas
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid seguroId)
     {
-        var result = await service.DeleteAsync(seguroId, CurrentUser);
+        var result = await service.DeleteAsync(seguroId);
         return ProcessResult(result);
     }
 }

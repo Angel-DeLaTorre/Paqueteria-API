@@ -2,108 +2,89 @@ using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Common.Errors;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class PermisoService(IUnitOfWork unit) : IPermisoService
+public class PermisoService(IUnitOfWork unit, IUserContextService userContext) : IPermisoService
 {
-    public async Task<Result<PermisoResponseDto>> GetByIdAsync(Guid id, UserContext currentUser)
+    public async Task<Result<PermisoResponseDto>> GetByIdAsync(Guid id)
     {
-        try
-        {
-            var permiso = await unit.Permisos.GetByIdAsync(id, currentUser.EmpresaId);
+        var permiso = await unit.Permisos.GetByIdAsync(id, userContext.EmpresaId);
 
-            if (permiso == null)
-                return Result<PermisoResponseDto>.Failure(Errors.Generic.NoEncontrado);
+        if (permiso == null)
+            return Result<PermisoResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            return Result<PermisoResponseDto>.Success(PermisoResponseDto.FromEntity(permiso));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
-
-    // Listar todos los permisos que le pertenecen a la empresa actual
-    public async Task<Result<IEnumerable<PermisoResponseDto>>> GetAllAsync(UserContext currentUser)
-    {
-        try
-        {
-            var listaPermisos = await unit.Permisos.GetAllAsync(currentUser.EmpresaId);
-            
-            var dtos = listaPermisos.Select(PermisoResponseDto.FromEntity).ToList();
-            
-            return Result<IEnumerable<PermisoResponseDto>>.Success(dtos);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
-
-    // Crear un nuevo permiso dentro del catálogo de la empresa
-    public async Task<Result<PermisoResponseDto>> CreateAsync(PermisoCreateDto dto, UserContext currentUser)
-    {
-        try
-        {
-            var permisoExistente = await unit.Permisos.GetByNameAsync(dto.Nombre, currentUser.EmpresaId);
-            if (permisoExistente != null)
-                return Result<PermisoResponseDto>.Failure(Errors.Generic.NoEncontrado);
-            
-            var nuevoPermiso = dto.ToEntity(currentUser.EmpresaId);
-            
-            await unit.Permisos.AddAsync(nuevoPermiso);
-            await unit.CompleteAsync();
-
-            return Result<PermisoResponseDto>.Success(PermisoResponseDto.FromEntity(nuevoPermiso));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<PermisoResponseDto>.Success(PermisoResponseDto.FromEntity(permiso));
     }
     
-    public async Task<Result> UpdateAsync(PermisoUpdateDto dto, UserContext currentUser)
+    public async Task<Result<IEnumerable<PermisoResponseDto>>> GetAllAsync()
     {
-        try
-        {
-            var permiso = await unit.Permisos.GetByIdAsync(dto.PermisoId, currentUser.EmpresaId);
-            if (permiso == null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
-            
-            dto.UpdateEntity(permiso);
-            await unit.CompleteAsync();
-
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        var listaPermisos = await unit.Permisos.GetAllAsync(userContext.EmpresaId);
+        
+        var dtos = listaPermisos.Select(PermisoResponseDto.FromEntity).ToList();
+        
+        return Result<IEnumerable<PermisoResponseDto>>.Success(dtos);
     }
     
-    public async Task<Result> DeleteAsync(Guid id, UserContext currentUser)
+    public async Task<Result<PermisoResponseDto>> CreateAsync(PermisoCreateDto dto)
     {
-        try
-        {
-            var permiso = await unit.Permisos.GetByIdAsync(id, currentUser.EmpresaId);
-            if (permiso == null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        var permisoExistente = await unit.Permisos.GetByNameAsync(dto.Nombre, userContext.EmpresaId);
+        if (permisoExistente != null)
+            return Result<PermisoResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
+        
+        var nuevoPermiso = dto.ToEntity(userContext.EmpresaId);
+        
+        await unit.Permisos.AddAsync(nuevoPermiso);
+        await unit.CompleteAsync();
 
-            unit.Permisos.Delete(permiso);
-            await unit.CompleteAsync();
+        return Result<PermisoResponseDto>.Success(PermisoResponseDto.FromEntity(nuevoPermiso));
+    }
+    
+    public async Task<Result> UpdateAsync(PermisoUpdateDto dto)
+    {
+        var permiso = await unit.Permisos.GetByIdAsync(dto.PermisoId, userContext.EmpresaId);
+        if (permiso == null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
+        
+        dto.UpdateEntity(permiso);
+        await unit.CompleteAsync();
 
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
+    }
+    
+    public async Task<Result> DesactivarAsync(Guid permisoId)
+    {
+        var permiso = await unit.Permisos.GetByIdAsync(permisoId, userContext.EmpresaId);
+        if (permiso == null) return Result.Failure(ErrorCodes.Generic.NoEncontrado);
+        
+        permiso.Estatus = EstatusBasico.Inactivo;
+        await  unit.CompleteAsync();
+        
+        return Result.Success();
+    }
+    
+    public async Task<Result> ActivarAsync(Guid permisoId)
+    {
+        var permiso = await unit.Permisos.GetByIdAsync(permisoId, userContext.EmpresaId);
+        if (permiso == null) return Result.Failure(ErrorCodes.Generic.NoEncontrado);
+        
+        permiso.Estatus = EstatusBasico.Activo;
+        await  unit.CompleteAsync();
+        
+        return Result.Success();
+    }
+    
+    public async Task<Result> DeleteAsync(Guid id)
+    {
+        var permiso = await unit.Permisos.GetByIdAsync(id, userContext.EmpresaId);
+        if (permiso == null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
+
+        unit.Permisos.Delete(permiso);
+        await unit.CompleteAsync();
+
+        return Result.Success();
     }
 }

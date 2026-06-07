@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
@@ -36,7 +32,7 @@ public class SucursalController(ISucursalService service) : PaqueteriaController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<SucursalResponseDto>> Create(SucursalCreateDto dto)
     {
-        var result = await service.CreateAsync(dto, CurrentUser);
+        var result = await service.CreateAsync(dto);
         return ProcessResult(result);
     }
 
@@ -47,7 +43,7 @@ public class SucursalController(ISucursalService service) : PaqueteriaController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromBody] SucursaUpdateDto dto)
     {
-        var result = await service.UpdateAsync(dto, CurrentUser);
+        var result = await service.UpdateAsync(dto);
         return ProcessResult(result);
     }
 
@@ -58,7 +54,7 @@ public class SucursalController(ISucursalService service) : PaqueteriaController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid sucursalId)
     {
-        var result = await service.DeleteAsync(sucursalId, CurrentUser);
+        var result = await service.DeleteAsync(sucursalId);
         return ProcessResult(result);
     }
 }

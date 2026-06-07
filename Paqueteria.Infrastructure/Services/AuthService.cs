@@ -4,27 +4,33 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Paqueteria.Application.DTOs;
-using Paqueteria.Application.Interfaces.Repositories;
+using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Common.Errors;
 using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Entities.Sistema;
 using Paqueteria.Core.Enums;
 using Paqueteria.Core.Settings;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class AuthService(IUsuarioRepository repoUsuario, IOptions<JwtSettings> jwtOptions) : IAuthService
+public class AuthService(IUnitOfWork unit, IOptions<JwtSettings> jwtOptions) : IAuthService
 {
     public async Task<Result<SesionResponseDto>> LoginAsync(LoginRequestDto request)
     {
-        var usuario = await repoUsuario.GetByUsernameAsync(request.Username, true);
+        var usuario = await unit.Usuarios.GetByUsernameAsync(request.Username, true);
 
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.Password))
-            return Result<SesionResponseDto>.Failure(Errors.Generic.NoEncontrado);
+            return Result<SesionResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
 
-        if (usuario.Estatus != EstatusGenerico.Activo)
-            return Result<SesionResponseDto>.Failure(Errors.Users.Bloqueado);
+        if (usuario.Estatus != EstatusBasico.Activo)
+            return Result<SesionResponseDto>.Failure(ErrorCodes.Users.Bloqueado);
+        
+        await unit.Usuarios.RegistrarIngreso(usuario);
+
+        await unit.CompleteAsync();
 
         return Result<SesionResponseDto>.Success( GenerateAuthResponse(usuario) );
     }
@@ -46,21 +52,13 @@ public class AuthService(IUsuarioRepository repoUsuario, IOptions<JwtSettings> j
             new ("empresa_id", usuario.EmpresaId.ToString())
         };
         
-        /*
-        var permisos = usuario.UsuarioRoles?
-            .Select(ur => ur.Rol)
-            .SelectMany(r => r.RolPermiso)
-            .Select(rp => rp.Permiso.Nombre)
-            .Distinct()
-            .ToList() ?? [];
-        */
         var permisos = usuario.UsuarioRoles?
             .Select(ur => ur.Rol)
             .Where(r => r != null && r.RolPermiso != null)
             .SelectMany(r => r.RolPermiso)
             .Where(rp => rp.Permiso != null)
-            .Select(rp => rp.Permiso.Nombre) // 👈 Extrae "clientes.modificar", "clientes.consultar", etc.
-            .Distinct() // Evita duplicados si el usuario llega a tener dos roles con el mismo permiso
+            .Select(rp => rp.Permiso.Nombre) // Extrae "clientes.modificar", "clientes.consultar", etc.
+            .Distinct() // Evitar duplicados
             .ToList() ?? new List<string>();
 
         claims.AddRange(permisos.Select(permiso => new Claim("permisos", permiso)));

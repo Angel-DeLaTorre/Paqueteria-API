@@ -20,7 +20,7 @@ public class Cliente
         public string Nombre { get; set; } = string.Empty;
 
         [Column("estatus")]
-        public EstatusGenerico Estatus { get; set; }
+        public EstatusBasico Estatus { get; set; }
 
         [MaxLength(20)]
         [Column("rfc")]
@@ -62,7 +62,7 @@ public class Cliente
 
         [ForeignKey("EmpresaId")] public Empresa Empresa { get; init; } = null!;
         
-        public virtual ICollection<DireccionCliente> Direcciones { get; set; } = new List<DireccionCliente>();
+        public ICollection<DireccionCliente> Direcciones { get; set; } = new List<DireccionCliente>();
 
     #endregion
 
@@ -85,7 +85,7 @@ public class Cliente
             {
                 Id = Guid.NewGuid(),
                 Nombre = nombre,
-                Estatus = EstatusGenerico.Activo,
+                Estatus = EstatusBasico.Activo,
                 Rfc = rfc,
                 Telefono = telefono,
                 Telefono2 = telefono2,

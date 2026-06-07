@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Paqueteria.Application.Interfaces.Repositories;
-using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Entities.Sistema;
+using Paqueteria.Core.Interfaces.Repositories;
 using Paqueteria.Infrastructure.Data;
 
 namespace Paqueteria.Infrastructure.Repositories;
@@ -91,6 +91,12 @@ public class UsuarioRepository(AppDbContext context) : IUsuarioRepository
             var usuarioRol = UsuarioRol.Create(userId, roleId);
             await context.UsuarioRol.AddAsync(usuarioRol);
         }
+    }
+
+    public async Task RegistrarIngreso(Usuario usuario)
+    {
+        if (usuario == null) return;
+        usuario.FechaUltimoAcceso = DateTime.UtcNow;
     }
     
     public async Task RemoveRoleFromUserAsync(Guid userId, Guid roleId, Guid empresaId)

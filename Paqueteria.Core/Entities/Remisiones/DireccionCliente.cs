@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Entities.Catalogos;
+using Paqueteria.Core.Enums;
 using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Core.Entities.Remisiones;
@@ -17,6 +17,9 @@ public class DireccionCliente
 
         public Direccion Direccion { get; set; } = null!;
         
+        [Column("estatus")]
+        public EstatusBasico Estatus { get; set; }
+        
         [Column("cliente_id")]
         public Guid ClienteId { get; set; }
 
@@ -24,7 +27,7 @@ public class DireccionCliente
     
     #region Foreign Keys
     
-    [ForeignKey("ClienteId")] public virtual Cliente Cliente { get; set; } = null!;
+    [ForeignKey("ClienteId")] public Cliente Cliente { get; set; } = null!;
     
     #endregion
     

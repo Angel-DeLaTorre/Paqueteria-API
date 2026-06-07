@@ -1,80 +1,60 @@
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
+using Paqueteria.Core.Common.Errors;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class ArticuloService(IArticuloRepository articuloRepository, IUnitOfWorkBase unitOfWorkBase) : IArticuloService
+public class ArticuloService(IUnitOfWork unit) : IArticuloService
 {
     public async Task<Result<IReadOnlyList<ArticuloResponseDto>>> GetAllAsync()
     {
-        var articulos = ( await articuloRepository.GetAllAsync() )
+        var articulos = ( await unit.Articulos.GetAllAsync() )
             .Select( ArticuloResponseDto.FromEntity ).ToList();
         return Result<IReadOnlyList<ArticuloResponseDto>>.Success(articulos);
     }
 
     public async Task<Result<ArticuloResponseDto>> GetByIdAsync(string id)
     {
-        var articulo = await articuloRepository.GetByIdAsync(id);
+        var articulo = await unit.Articulos.GetByIdAsync(id);
 
         if (articulo == null)
-            return Result<ArticuloResponseDto>.Failure(Errors.Generic.NoEncontrado);
+            return Result<ArticuloResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
         return Result<ArticuloResponseDto>.Success(ArticuloResponseDto.FromEntity(articulo));
     }
 
-    public async Task<Result<ArticuloResponseDto>> CreateAsync(ArticuloCreateDto dto, UserContext currentUser)
+    public async Task<Result<ArticuloResponseDto>> CreateAsync(ArticuloCreateDto dto)
     {
-        var articulo = await articuloRepository.AddAsync(dto.ToEntity());
-
-        var result = unitOfWorkBase.CompleteAsync();
-
-        if (result.IsCompletedSuccessfully)
-            return Result<ArticuloResponseDto>.Failure(Errors.Generic.NoCreado);
-
+        var articulo = await unit.Articulos.AddAsync(dto.ToEntity());
+        await unit.CompleteAsync();
         return Result<ArticuloResponseDto>.Success(ArticuloResponseDto.FromEntity(articulo));
     }
 
-    public async Task<Result> UpdateAsync(ArticuloUpdateDto dto, UserContext currentUser)
+    public async Task<Result> UpdateAsync(ArticuloUpdateDto dto)
     {
-        var articulo = await articuloRepository.GetByIdAsync(dto.ArticuloId);
+        var articulo = await unit.Articulos.GetByIdAsync(dto.ArticuloId);
 
         if (articulo == null)
-            return Result.Failure(Errors.Generic.NoEncontrado);
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
         dto.UpdateEntity(articulo);
-        articuloRepository.Update(articulo);
-        var result = await  unitOfWorkBase.CompleteAsync();
-
-        if (result != 0)
-            return Result.Failure(Errors.Generic.NoActualizado);
+        await  unit.CompleteAsync();
 
         return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(Guid articuloId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(string articuloId)
     {
-        try
-        {
-            var articulo = (await articuloRepository.GetByIdAsync(articuloId));
+        var articulo = await unit.Articulos.GetByIdAsync(articuloId);
 
-            if (articulo == null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if (articulo == null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            articuloRepository.Delete(articulo);
+        unit.Articulos.Delete(articulo);
+        await unit.CompleteAsync();
 
-            var result = await unitOfWorkBase.CompleteAsync();
-            if (result <= 0)
-                return Result.Failure(Errors.Generic.NoEliminado);
-
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
     }
 }

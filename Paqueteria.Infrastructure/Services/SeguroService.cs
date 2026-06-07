@@ -1,93 +1,59 @@
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Enums;
+using Paqueteria.Core.Common.Errors;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class SeguroService(ISeguroRepository seguroRepository, IUnitOfWorkBase unitOfWorkBase) : ISeguroService
+public class SeguroService(IUnitOfWork unit, IUserContextService userContext) : ISeguroService
 {
     public async Task<Result<IReadOnlyList<SeguroResponseDto>>> GetAllAsync()
     {
-        try
-        {
-            var seguros = ( await seguroRepository.GetAllAsync() )
-                .Select( SeguroResponseDto.FromEntity ).ToList();
-            return Result<IReadOnlyList<SeguroResponseDto>>.Success(seguros);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        var seguros = ( await unit.Seguros.GetAllAsync(userContext.EmpresaId, false) )
+            .Select( SeguroResponseDto.FromEntity ).ToList();
+        return Result<IReadOnlyList<SeguroResponseDto>>.Success(seguros);
     }
 
     public async Task<Result<SeguroResponseDto>> GetByIdAsync(Guid seguroId)
     {
-        try
-        {
-            var seguro = await seguroRepository.GetByIdAsync(seguroId);
+        var seguro = await unit.Seguros.GetByIdAsync(seguroId, userContext.EmpresaId, false);
 
-            if (seguro is null)
-                return Result<SeguroResponseDto>.Failure(Errors.Generic.NoEncontrado);
+        if (seguro is null)
+            return Result<SeguroResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            return Result<SeguroResponseDto>.Success(SeguroResponseDto.FromEntity(seguro));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<SeguroResponseDto>.Success(SeguroResponseDto.FromEntity(seguro));
     }
 
-    public async Task<Result<SeguroResponseDto>> CreateAsync(SeguroCreateDto dto, UserContext currentUser)
+    public async Task<Result<SeguroResponseDto>> CreateAsync(SeguroCreateDto dto)
     {
-        try
-        {
-            var seguro = await seguroRepository.AddAsync(dto.ToEntity());
+        var seguro = await unit.Seguros.AddAsync(dto.ToEntity());
 
-            var result = unitOfWorkBase.CompleteAsync();
+        var result = unit.CompleteAsync();
 
-            if (result.IsCompletedSuccessfully)
-                return Result<SeguroResponseDto>.Failure(Errors.Generic.NoCreado);
+        if (result.IsCompletedSuccessfully)
+            return Result<SeguroResponseDto>.Failure(ErrorCodes.Generic.NoCreado);
 
-            return Result<SeguroResponseDto>.Success(SeguroResponseDto.FromEntity(seguro));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<SeguroResponseDto>.Success(SeguroResponseDto.FromEntity(seguro));
     }
 
-    public async Task<Result> UpdateAsync(SeguroUpdateDto dto, UserContext currentUser)
+    public async Task<Result> UpdateAsync(SeguroUpdateDto dto)
     {
-        try
-        {
-            var seguro = await seguroRepository.GetByIdAsync(dto.SeguroId);
+        var seguro = await unit.Seguros.GetByIdAsync(dto.SeguroId, userContext.EmpresaId);
 
-            if (seguro is null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if (seguro is null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            dto.UpdateEntity(seguro);
-            seguroRepository.Update(seguro);
-            var result = await  unitOfWorkBase.CompleteAsync();
+        dto.UpdateEntity(seguro);
+        var result = await  unit.CompleteAsync();
 
-            if (result != 0)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if (result != 0)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(Guid seguroId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid seguroId)
     {
         throw new NotImplementedException();
     }

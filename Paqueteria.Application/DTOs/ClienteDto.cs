@@ -1,4 +1,5 @@
 using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Enums;
 using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Application.DTOs;
@@ -76,6 +77,7 @@ public record ClienteResponseDto(
     Guid ClienteId,
     string Nombre,
     string? Rfc,
+    EstatusBasico Estatus,
     string? Telefono,
     string? Telefono2,
     string? Correo,
@@ -90,6 +92,7 @@ public record ClienteResponseDto(
             cliente.Id,
             cliente.Nombre,
             cliente.Rfc,
+            cliente.Estatus,
             cliente.Telefono,
             cliente.Telefono2,
             cliente.Correo,
@@ -105,7 +108,8 @@ public record ClienteResponseDto(
 
 public record ClienteDireccionResponseDto(
     Guid IdDireccion,
-    DireccionResponseDto Direccion
+    DireccionResponseDto Direccion,
+    EstatusBasico Estatus
 )
 {
     public static ClienteDireccionResponseDto FromEntity(DireccionCliente entity)
@@ -113,7 +117,8 @@ public record ClienteDireccionResponseDto(
         var direccion = DireccionResponseDto.FromEntity(entity.Direccion);
         return new ClienteDireccionResponseDto(
             entity.Id,
-            direccion
+            direccion,
+            entity.Estatus
         );        
     }
 }

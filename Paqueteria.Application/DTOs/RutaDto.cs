@@ -37,15 +37,25 @@ public record RutaUpdateDto(
 public record RutaResponseDto(
     Guid RutaId,
     Guid SucursalOrigenId,
+    SucursalResponseDto SucursalOrigen,
     Guid SucursalDestinoId,
+    SucursalResponseDto SucursalDestino,
     string? Descripcion
 )
 {
-    public static RutaResponseDto FromEntity(Ruta entity) =>
-        new RutaResponseDto(
+    public static RutaResponseDto FromEntity(Ruta entity)
+    {
+        var sucursalOrigen = SucursalResponseDto.FromEntity(entity.SucursalOrigen);
+        var sucursalDestino = SucursalResponseDto.FromEntity(entity.SucursalDestino);
+        
+        return new RutaResponseDto(
             entity.Id,
             entity.SucursalOrigenId,
+            sucursalOrigen,
             entity.SucursalDestinoId,
+            sucursalDestino,
             entity.Descripcion
         );
+    }
+        
 }

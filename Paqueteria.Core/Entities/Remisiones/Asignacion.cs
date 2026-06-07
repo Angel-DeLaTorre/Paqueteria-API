@@ -48,6 +48,9 @@ namespace Paqueteria.Core.Entities.Remisiones
             [MaxLength(50)]
             [Column("num_contenedor2")]
             public string? NumContenedor2 { get; set; }
+            
+            [Column("empresa_id")]
+            public Guid EmpresaId { get; init; }
 
         #endregion
 
@@ -55,6 +58,8 @@ namespace Paqueteria.Core.Entities.Remisiones
 
             [ForeignKey("ChoferId")]
             public Chofer Chofer { get; init; } = null!;
+            
+            [ForeignKey("EmpresaId")] public Empresa Empresa { get; init; } = null!;
 
         #endregion
 

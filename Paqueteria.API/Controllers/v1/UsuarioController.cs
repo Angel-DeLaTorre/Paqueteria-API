@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
@@ -14,7 +11,7 @@ public class UsuarioController(IUsuarioService service) : PaqueteriaControllerBa
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<UsuarioResponseDto>>> GetAll()
     {
-        var result = await service.GetAllAsync(CurrentUser);
+        var result = await service.GetAllAsync();
         return ProcessResult(result);
     }
 
@@ -28,21 +25,21 @@ public class UsuarioController(IUsuarioService service) : PaqueteriaControllerBa
     [HttpPost]
     public async Task<ActionResult<UsuarioResponseDto>> Create([FromBody] UsuarioCreateDto dto)
     {
-        var result = await service.CreateAsync(dto, CurrentUser);
+        var result = await service.CreateAsync(dto);
         return ProcessResult(result);
     }
 
     [HttpPut]
     public async Task<IActionResult> Update(UsuarioUpdateDto dto)
     {
-        var result = await service.UpdateAsync(dto, CurrentUser);
+        var result = await service.UpdateAsync(dto);
         return ProcessResult(result);
     }
 
     [HttpDelete("{usuarioId:guid}")]
     public async Task<IActionResult> Delete(Guid usuarioId)
     {
-        var result = await service.DeleteAsync(usuarioId, CurrentUser);
+        var result = await service.DeleteAsync(usuarioId);
         return ProcessResult(result);
     }
 }

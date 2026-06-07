@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Paqueteria.Infrastructure.Data;
 using System.Linq.Expressions;
-using Paqueteria.Application.Interfaces.Repositories;
+using Paqueteria.Core.Interfaces.Repositories;
 
 namespace Paqueteria.Infrastructure.Repositories;
 

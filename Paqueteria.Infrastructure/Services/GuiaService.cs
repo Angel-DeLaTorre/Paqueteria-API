@@ -1,113 +1,65 @@
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Enums;
+using Paqueteria.Core.Common.Errors;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class GuiaService(IGuiaRepository guiaRepository, IUnitOfWorkBase unitOfWorkBase) : IGuiaService
+public class GuiaService(IUnitOfWork unit, IUserContextService userContext) : IGuiaService
 {
     public async Task<Result<IReadOnlyList<GuiaResponseDto>>> GetAllAsync()
     {
-        try
-        {
-            var guias = ( await guiaRepository.GetAllAsync() )
-                .Select( GuiaResponseDto.FromEntity ).ToList();
-            return Result<IReadOnlyList<GuiaResponseDto>>.Success(guias);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        var guias = ( await unit.Guias.GetAllAsync(userContext.EmpresaId, false) )
+            .Select( GuiaResponseDto.FromEntity ).ToList();
+        return Result<IReadOnlyList<GuiaResponseDto>>.Success(guias);
     }
 
     public async Task<Result<GuiaResponseDto>> GetByIdAsync(Guid guiaId)
     {
-        try
-        {
-            var guia = await guiaRepository.GetByIdAsync(guiaId);
+        var guia = await unit.Guias.GetByIdAsync(guiaId, userContext.EmpresaId, false);
 
-            if (guia is null)
-                return Result<GuiaResponseDto>.Failure(Errors.Generic.NoEncontrado);
+        if (guia is null)
+            return Result<GuiaResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            return Result<GuiaResponseDto>.Success(GuiaResponseDto.FromEntity(guia));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<GuiaResponseDto>.Success(GuiaResponseDto.FromEntity(guia));
     }
 
-    public async Task<Result<GuiaResponseDto>> CreateAsync(GuiaCreateDto dto, UserContext currentUser)
+    public async Task<Result<GuiaResponseDto>> CreateAsync(GuiaCreateDto dto)
     {
-        try
-        {
-            var guia = await guiaRepository.AddAsync(dto.ToEntity(currentUser.UserId, currentUser.EmpresaId));
+        var guia = await unit.Guias.AddAsync(dto.ToEntity(userContext.UserId, userContext.EmpresaId));
 
-            var result = unitOfWorkBase.CompleteAsync();
+        var result = unit.CompleteAsync();
 
-            if (result.IsCompletedSuccessfully)
-                return Result<GuiaResponseDto>.Failure(Errors.Generic.NoCreado);
+        if (result.IsCompletedSuccessfully)
+            return Result<GuiaResponseDto>.Failure(ErrorCodes.Generic.NoCreado);
 
-            return Result<GuiaResponseDto>.Success(GuiaResponseDto.FromEntity(guia));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<GuiaResponseDto>.Success(GuiaResponseDto.FromEntity(guia));
     }
 
-    public async Task<Result> UpdateAsync(GuiaUpdateDto dto, UserContext currentUser)
+    public async Task<Result> UpdateAsync(GuiaUpdateDto dto)
     {
-        try
-        {
-            var guia = await guiaRepository.GetByIdAsync(dto.GuiaId);
+        var guia = await unit.Guias.GetByIdAsync(dto.GuiaId, userContext.EmpresaId);
 
-            if (guia is null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if (guia is null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            dto.UpdateEntity(guia);
-            guiaRepository.Update(guia);
-            var result = await  unitOfWorkBase.CompleteAsync();
+        dto.UpdateEntity(guia);
+        await unit.CompleteAsync();
 
-            if (result != 0)
-                return Result.Failure(Errors.Generic.NoActualizado);
-
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(Guid guiaId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid guiaId)
     {
-        try
-        {
-            var guia = (await guiaRepository.GetByIdAsync(guiaId));
+        var guia = await unit.Guias.GetByIdAsync(guiaId, userContext.EmpresaId, false);
 
-            if (guia is null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if (guia is null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            guiaRepository.Delete(guia);
+        unit.Guias.Delete(guia);
+        await unit.CompleteAsync();
 
-            var result = await unitOfWorkBase.CompleteAsync();
-            if (result <= 0)
-                return Result.Failure(Errors.Generic.NoEliminado);
-
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
     }
 }

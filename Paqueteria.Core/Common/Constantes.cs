@@ -7,5 +7,6 @@ public static class Constantes
         public const string Sat = "sat";
         public const string Catalogos = "catalogos";
         public const string Remisiones = "remisiones";
+        public const string Sistema = "sys";
     }
 }

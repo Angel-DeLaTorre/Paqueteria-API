@@ -1,4 +1,5 @@
 using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Entities.Sistema;
 
 namespace Paqueteria.Application.DTOs;
 

@@ -1,12 +1,24 @@
-using Paqueteria.Application.Interfaces.Repositories;
+using Paqueteria.Core.Interfaces.Repositories;
 
 namespace Paqueteria.Application.Interfaces.Persistence;
 
 public interface IUnitOfWork : IDisposable
 {
-    IUsuarioRepository Usuarios { get; }
-    IRolRepository Roles { get; }
+    IArticuloRepository Articulos { get; }
+    IAsignacionRepository Asignaciones { get; }
+    IChoferRepository Choferes { get; }
+    IClienteRepository Clientes { get; }
+    IEmpresaRepository Empresas { get; }
+    IEstadoRepository Estados { get; }
+    IGuiaRepository Guias { get; }
+    IMunicipioRepository Municipios { get; }
     IPermisoRepository Permisos { get; }
+    IRolRepository Roles { get; }
+    IRutaRepository Rutas { get; }
+    ISeguroRepository Seguros { get; }
+    ISucursalRepository Sucursales { get; }
+    IUsuarioRepository Usuarios { get; }
+    
     
     Task<int> CompleteAsync();
     Task BeginTransactionAsync();

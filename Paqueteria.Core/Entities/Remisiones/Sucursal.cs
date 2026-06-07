@@ -36,7 +36,7 @@ public class Sucursal
         public string? Telefono { get; set; }
 
         [Column("estatus")]
-        public EstatusGenerico Estatus { get; set; } = EstatusGenerico.Activo;
+        public EstatusBasico Estatus { get; set; } = EstatusBasico.Activo;
 
         [Column("servidor_ip")]
         [MaxLength(50)]
@@ -65,7 +65,7 @@ public class Sucursal
                 EsMatriz = esMatriz,
                 Direccion = direccion,
                 Telefono = telefono,
-                Estatus = EstatusGenerico.Activo,
+                Estatus = EstatusBasico.Activo,
                 EmpresaId = empresaId
             };
         }

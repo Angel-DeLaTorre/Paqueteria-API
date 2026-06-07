@@ -1,113 +1,70 @@
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Repositories;
 using Paqueteria.Application.Interfaces.Services;
 using Paqueteria.Core.Common;
-using Paqueteria.Core.Enums;
+using Paqueteria.Core.Common.Errors;
 
 namespace Paqueteria.Infrastructure.Services;
 
-public class EmpresaService(IEmpresaRepository empresaRepository, IUnitOfWorkBase unitOfWorkBase) : IEmpresaService
+public class EmpresaService(IUnitOfWork unit, IUserContextService userContext) : IEmpresaService
 {
     public async Task<Result<IReadOnlyList<EmpresaResponseDto>>> GetAllAsync()
     {
-        try
-        {
-            var empresas =  ( await empresaRepository.GetAllAsync() )
-                .Select( EmpresaResponseDto.FromEntity ).ToList();
 
-            return Result<IReadOnlyList<EmpresaResponseDto>>.Success(empresas);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        var empresas =  ( await unit.Empresas.GetAllAsync(false) )
+            .Select( EmpresaResponseDto.FromEntity ).ToList();
+
+        return Result<IReadOnlyList<EmpresaResponseDto>>.Success(empresas);
     }
 
-    public async Task<Result<EmpresaResponseDto>> GetByIdAsync(Guid id)
+    public async Task<Result<EmpresaResponseDto>> GetByIdAsync()
     {
-        try
-        {
-            var empresa = (await empresaRepository.GetByIdAsync(id));
+        var empresa = await unit.Empresas.GetByIdAsync(userContext.EmpresaId);
 
-            if (empresa is null)
-                return Result<EmpresaResponseDto>.Failure(Errors.Generic.NoEncontrado);
+        if (empresa is null)
+            return Result<EmpresaResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            return Result<EmpresaResponseDto>.Success(EmpresaResponseDto.FromEntity(empresa));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<EmpresaResponseDto>.Success(EmpresaResponseDto.FromEntity(empresa));
     }
 
-    public async Task<Result<EmpresaResponseDto>> CreateAsync(EmpresaCreateDto dto, UserContext currentUser)
+    public async Task<Result<EmpresaResponseDto>> CreateAsync(EmpresaCreateDto dto)
     {
-        try
-        {
-            var empresa = await empresaRepository.AddAsync(dto.ToEntity());
+        var empresa = await unit.Empresas.AddAsync(dto.ToEntity());
 
-            var result = await unitOfWorkBase.CompleteAsync();
+        var result = await unit.CompleteAsync();
 
-            if (result <= 0)
-                return Result<EmpresaResponseDto>.Failure(Errors.Generic.NoEncontrado);
+        if (result <= 0)
+            return Result<EmpresaResponseDto>.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            return Result<EmpresaResponseDto>.Success(EmpresaResponseDto.FromEntity(empresa));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result<EmpresaResponseDto>.Success(EmpresaResponseDto.FromEntity(empresa));
     }
 
-    public async Task<Result> UpdateAsync(EmpresaUpdateDto dto, UserContext currentUser)
+    public async Task<Result> UpdateAsync(EmpresaUpdateDto dto)
     {
-        try
-        {
-            var empresa = (await empresaRepository.GetByIdAsync(dto.EmpresaId));
+        var empresa = (await unit.Empresas.GetByIdAsync(dto.EmpresaId));
 
-            if (empresa is null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if (empresa is null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            dto.UpdateEntity(empresa);
-            empresaRepository.Update(empresa);
-            var result = await unitOfWorkBase.CompleteAsync();
-            if (result <= 0)
-                return Result.Failure(Errors.Generic.NoActualizado);
+        dto.UpdateEntity(empresa);
+        await unit.CompleteAsync();
 
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(Guid empresaId, UserContext currentUser)
+    public async Task<Result> DeleteAsync(Guid empresaId)
     {
-        try
-        {
-            var empresa = (await empresaRepository.GetByIdAsync(empresaId));
+        var empresa = (await unit.Empresas.GetByIdAsync(empresaId));
 
-            if ( empresa is null)
-                return Result.Failure(Errors.Generic.NoEncontrado);
+        if ( empresa is null)
+            return Result.Failure(ErrorCodes.Generic.NoEncontrado);
 
-            empresaRepository.Delete(empresa);
+        unit.Empresas.Delete(empresa);
 
-            var result = await unitOfWorkBase.CompleteAsync();
-            if (result <= 0)
-                return Result.Failure(Errors.Generic.NoEliminado);
+        var result = await unit.CompleteAsync();
+        if (result <= 0)
+            return Result.Failure(ErrorCodes.Generic.NoEliminado);
 
-            return Result.Success();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return Result.Success();
     }
 }
