@@ -1,30 +1,12 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
-
 namespace Paqueteria.Core.Entities.Remisiones;
 
-[Table("camiones", Schema = Constantes.Esquemas.Remisiones)]
-public class Camion
+public partial class Camion
 {
-    [Key]
-    [Column("id")]
     public Guid Id { get; init; }
-    
-    [Column("num_camion")]
     public string? NumCamion { get; set; }
-    
-    [Column("placa")]
     public string? Placa { get; set; }
-    
-    [Column("empresa_id")]
     public Guid EmpresaId { get; init; }
-    
-    #region ForeignKeys
-    
-    [ForeignKey("EmpresaId")] public Empresa Empresa { get; set; } = null!;
-    
-    #endregion
+    public Empresa Empresa { get; init; } = null!;
     
     #region Constructors
         
@@ -35,7 +17,6 @@ public class Camion
     {
         return new Camion()
         {
-            Id =  Guid.NewGuid(),
             NumCamion = numCamion,
             Placa = placa,
             EmpresaId = Guid.Parse(empresaId)

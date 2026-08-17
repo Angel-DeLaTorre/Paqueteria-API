@@ -1,22 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Entities.Remisiones;
-
 namespace Paqueteria.Core.Entities.Sistema;
 
-[Table("roles_permisos", Schema = Constantes.Esquemas.Remisiones)]
-public class RolPermiso
+public partial class RolPermiso
 {
     #region Columns
     
-        [Required]
-        [Column("rol_id")]
-        public Guid RolId { get; init; }
-        
-        [Required]
-        [Column("permiso_id")]
-        public Guid PermisoId { get; init; }
+        public Guid RolId { get; private init; }
+        public Guid PermisoId { get; private init; }
 
         public Rol Rol { get; private set; } = null!;
         public Permiso Permiso { get; private set; } = null!;

@@ -1,22 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Entities.Remisiones;
-
 namespace Paqueteria.Core.Entities.Sistema;
 
-[Table("usuarios_roles", Schema = Constantes.Esquemas.Remisiones)]
-public class UsuarioRol
+public partial class UsuarioRol
 {
     #region Columns
 
-        [Required]
-        [Column("usuario_id")]
-        public Guid UsuarioId { get; init; }
-        
-        [Required]
-        [Column("rol_id")]
-        public Guid RolId { get; init; }
+        public Guid UsuarioId { get; private init; }
+        public Guid RolId { get; private init; }
 
     #endregion
     

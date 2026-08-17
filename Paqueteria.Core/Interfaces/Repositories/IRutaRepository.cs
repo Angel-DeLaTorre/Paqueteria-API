@@ -4,8 +4,8 @@ namespace Paqueteria.Core.Interfaces.Repositories;
 
 public interface IRutaRepository
 {
-    public Task<Ruta?> GetByIdAsync(Guid rutaId, Guid empresaId);
-    public Task<IEnumerable<Ruta>> GetAllAsync(Guid empresaId);
-    public Task<Ruta> AddAsync(Ruta entity);
-    public void Delete(Ruta entity);
+    public Task<Ruta?> ObtenerPorIdAsync(Guid rutaId, Guid empresaId);
+    public Task<IEnumerable<Ruta>> ObtenerTodosAsync(Guid empresaId);
+    public Task<Ruta> AgregarAsync(Ruta entity);
+    public void Eliminar(Ruta entity);
 }

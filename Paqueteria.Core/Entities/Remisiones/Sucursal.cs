@@ -1,54 +1,21 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Entities.Catalogos;
 using Paqueteria.Core.Enums;
 using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Core.Entities.Remisiones;
 
-[Table("sucursales", Schema = Constantes.Esquemas.Remisiones)]
-public class Sucursal
+public partial class Sucursal
 {
     #region Columns
-    
-        [Key]
-        [Column("id")]
         public Guid Id { get; init; }
-
-        [Required]
-        [MaxLength(100)]
-        [Column("nombre")]
         public string Nombre { get; set; } = string.Empty;
-
-        [Required]
-        [MaxLength(50)]
-        [Column("codigo")]
         public string Codigo { get; set; }  = string.Empty;
-
-        [Column("es_matriz")]
         public bool EsMatriz { get; set; }
-
         public Direccion Direccion { get; set; } = null!;
-
-        [Column("telefono")]
-        [MaxLength(20)]
         public string? Telefono { get; set; }
-
-        [Column("estatus")]
-        public EstatusBasico Estatus { get; set; } = EstatusBasico.Activo;
-
-        [Column("servidor_ip")]
-        [MaxLength(50)]
-        public string? ServidorIp { get; set; }
-        
-        [Column("empresa_id")]
+        public EstatusBasico Estatus { get; private set; } = EstatusBasico.Activo;
+        public string? ServidorIp { get; init; }
         public Guid EmpresaId { get; init; }
-        
-    #endregion
-
-    #region ForeignKey
-        [ForeignKey("EmpresaId")] public Empresa Empresa { get; init; } = null!;
+        public Empresa Empresa { get; init; } = null!;
     #endregion
 
     #region Constructors
@@ -59,7 +26,6 @@ public class Sucursal
         {
             return new Sucursal()
             {
-                Id = Guid.NewGuid(),
                 Nombre = nombre,
                 Codigo = codigo,
                 EsMatriz = esMatriz,

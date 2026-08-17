@@ -24,7 +24,7 @@ namespace Paqueteria.API.Configurations
                     string descripcionError = string.Join(" ", erroresLista.Select(e => 
                         $"{e.Campo}: {string.Join(", ", e.Mensajes)}"));
                     
-                    return new BadRequestObjectResult(Result<string>.Failure(descripcionError, ErrorCodes.Validacion.NoEncontrado));
+                    return new BadRequestObjectResult(Resultado<string>.Error(descripcionError, CodigosError.Validacion.NoEncontrado));
                 };
             });
         }

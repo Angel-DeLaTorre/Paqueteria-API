@@ -1,17 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
+using Paqueteria.Application.Modulos.Choferes;
 
 namespace Paqueteria.API.Controllers.v1;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ChoferController(IChoferService service) : PaqueteriaControllerBase
+public class ChoferController(IChoferServicio servicio) : PaqueteriaControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ChoferResponseDto>>> Get()
     {
-        var result = await service.GetAllAsync();
+        var result = await servicio.ObtenerTodosAsync();
         return ProcessResult(result);
     }
 
@@ -21,7 +22,7 @@ public class ChoferController(IChoferService service) : PaqueteriaControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ChoferResponseDto>> Get(Guid choferId)
     {
-        var result = await service.GetByIdAsync(choferId);
+        var result = await servicio.ObtenerPorIdAsync(choferId);
         return ProcessResult(result);
     }
 
@@ -31,7 +32,7 @@ public class ChoferController(IChoferService service) : PaqueteriaControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ChoferResponseDto>> Create(ChoferCreateDto dto)
     {
-        var result = await service.CreateAsync(dto);
+        var result = await servicio.AgregarAsync(dto);
         return ProcessResult(result);
     }
 
@@ -41,7 +42,7 @@ public class ChoferController(IChoferService service) : PaqueteriaControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromBody] ChoferUpdateDto dto)
     {
-        var result = await service.UpdateAsync(dto);
+        var result = await servicio.ActualizarAsync(dto);
         return ProcessResult(result);
     }
 
@@ -51,7 +52,7 @@ public class ChoferController(IChoferService service) : PaqueteriaControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid choferId)
     {
-        var result = await service.DeleteAsync(choferId);
+        var result = await servicio.EliminarAsync(choferId);
         return ProcessResult(result);
     }
 }

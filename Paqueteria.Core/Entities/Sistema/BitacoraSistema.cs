@@ -13,7 +13,7 @@ public class BitacoraSistema
 
         [Key]
         [Column("id")]
-        public Guid Id { get; init; } = Guid.NewGuid();
+        public Guid Id { get; init; }
 
         [Required]
         [Column("sucursal_id")]
@@ -70,7 +70,6 @@ public class BitacoraSistema
 
             return new BitacoraSistema()
             {
-                Id = Guid.NewGuid(),
                 SucursalId = sucursalId,
                 UsuarioId = usuario,
                 Accion = accion,

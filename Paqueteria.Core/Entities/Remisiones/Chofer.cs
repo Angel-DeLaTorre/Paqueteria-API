@@ -1,100 +1,61 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
 using Paqueteria.Core.ValueObjects;
 
-namespace Paqueteria.Core.Entities.Remisiones
+namespace Paqueteria.Core.Entities.Remisiones;
+
+public partial class Chofer
 {
-    [Table("choferes", Schema = Constantes.Esquemas.Remisiones)]
-    public class Chofer
-    {
-        #region Columns
+    #region Columns
+        public Guid Id { get; init; }
+        public string Nombre { get; private set; } = string.Empty;
+        public string ApellidoPaterno { get; private set; } = string.Empty;
+        public string? ApellidoMaterno { get; private set; }
+        public EstatusBasico Estatus { get; private set; }
+        public Direccion? Direccion { get; private set; }
+        public string? Telefono { get; private set; }
+        public string? NumCamion { get; private set; }
+        public string? NumContenedor { get; private set; }
+        public string? NumContenedor2 { get; private set; }
+        public Guid? CamionId { get; private set; }
+        public DateTime FechaAlta { get; private init; }
+        public DateTime? FechaBaja { get; private set; }
+        public Guid EmpresaId { get; private init; }
+        public Camion Camion { get; private set; } = null!;
+        public Empresa Empresa { get; private set; } = null!;
+    #endregion
 
-            [Key]
-            [Column("id")]
-            public Guid Id { get; init; }
+    #region Constructors
+    
+        private Chofer() { }
 
-            [Required]
-            [MaxLength(100)]
-            [Column("nombre")]
-            public string Nombre { get; set; } = string.Empty;
-
-            [Required]
-            [MaxLength(100)]
-            [Column("apellido_paterno")]
-            public string ApellidoPaterno { get; set; } = string.Empty;
-
-            [MaxLength(100)]
-            [Column("apellido_materno")]
-            public string? ApellidoMaterno { get; set; }
-
-            [Column("estatus")]
-            public EstatusBasico Estatus { get; set; } = EstatusBasico.Activo;
-
-            public Direccion? Direccion { get; set; }
-
-            [MaxLength(20)]
-            [Column("telefono")]
-            public string? Telefono { get; set; }
-
-            [Column("num_camion")]
-            public string? NumCamion { get; set; }
-
-            [Column("num_contenedor")]
-            public string? NumContenedor { get; set; }
-
-            [Column("num_contenedor2")]
-            public string? NumContenedor2 { get; set; }
-
-            [Column("fecha_alta")]
-            public DateTime FechaAlta { get; init; } = DateTime.UtcNow;
-
-            [Column("fecha_baja")]
-            public DateTime? FechaBaja { get; set; }
-            
-            [Column("empresa_id")]
-            public Guid EmpresaId { get; init; }
-
-        #endregion
-
-        #region ForeignKeys
-            [ForeignKey("EmpresaId")] public Empresa Empresa { get; set; } = null!;
-        #endregion
-
-        #region Constructors
-        
-            private Chofer() { }
-
-            public static Chofer Create(
-                string nombre, 
-                string apellidoPaterno, 
-                string? apellidoMaterno, 
-                Direccion direccion, 
-                string? telefono,
-                string? numCamion,
-                string? numContenedor,
-                string? numContenedor2,
-                Guid empresaId
-                )
+        public static Chofer Crear(
+            string nombre, 
+            string apellidoPaterno, 
+            string? apellidoMaterno, 
+            Direccion direccion, 
+            string? telefono,
+            string? numCamion,
+            string? numContenedor,
+            string? numContenedor2,
+            Guid empresaId
+        )
+        {
+            return new Chofer()
             {
-                return new Chofer()
-                {
-                    Nombre = nombre,
-                    ApellidoPaterno = apellidoPaterno,
-                    ApellidoMaterno = apellidoMaterno,
-                    Estatus = EstatusBasico.Activo,
-                    Direccion = direccion,
-                    Telefono = telefono,
-                    NumCamion = numCamion,
-                    NumContenedor = numContenedor,
-                    NumContenedor2 = numContenedor2,
-                    FechaAlta = DateTime.UtcNow,
-                    FechaBaja = null,
-                    EmpresaId = empresaId
-                };
-            }
-            
-        #endregion
-    }
+                Nombre = nombre,
+                ApellidoPaterno = apellidoPaterno,
+                ApellidoMaterno = apellidoMaterno,
+                Estatus = EstatusBasico.Activo,
+                Direccion = direccion,
+                Telefono = telefono,
+                NumCamion = numCamion,
+                NumContenedor = numContenedor,
+                NumContenedor2 = numContenedor2,
+                FechaAlta = DateTime.UtcNow,
+                FechaBaja = null,
+                EmpresaId = empresaId
+            };
+        }
+        
+    #endregion
 }

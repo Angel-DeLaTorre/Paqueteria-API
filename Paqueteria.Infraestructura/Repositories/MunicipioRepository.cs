@@ -1,0 +1,25 @@
+using Microsoft.EntityFrameworkCore;
+using Paqueteria.Core.Entities.Catalogos;
+using Paqueteria.Core.Interfaces.Repositories;
+using Paqueteria.Infrastructure.Data;
+
+namespace Paqueteria.Infrastructure.Repositories;
+
+public class MunicipioRepository(AppDbContext context) : EntityRepository<Municipio>(context), IMunicipioRepository
+{
+    private readonly AppDbContext _context = context;
+
+    public async Task<IReadOnlyList<Municipio>> ObtenerTodosAsync()
+    {
+        return await _context.Municipios
+            .Include(m => m.Estado)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+    public async Task<IEnumerable<Municipio>> ObtenerTodosPorEstadoAsync(string estadoId)
+    {
+        return await _context.Municipios
+            .Where(m => m.EstadoId == estadoId)
+            .ToListAsync();
+    }
+}

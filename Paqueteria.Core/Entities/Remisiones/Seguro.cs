@@ -1,25 +1,16 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
+using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Core.Entities.Remisiones;
 
-[Table("seguros", Schema = Constantes.Esquemas.Remisiones)]
-public class Seguro
+public partial class Seguro
 {
     #region Columns
-    
-        [Key]
-        [Column("id")]
         public Guid Id { get; init; }
-
-        [Required]
-        [MaxLength(100)]
-        [Column("nombre")]
         public string Nombre { get; set; } = string.Empty;
-        
-        [Column("empresa_id")]
+        public EstatusBasico Estatus { get; private set; } = EstatusBasico.Activo;
         public Guid EmpresaId { get; init; }
+        
+        public Empresa Empresa { get; init; } = null!;
         
     #endregion
     
@@ -27,12 +18,12 @@ public class Seguro
         
         private Seguro() {}
 
-        public static Seguro Create(string nombre)
+        public static Seguro Create(string nombre, Guid empresaId)
         {
             return new Seguro()
             {
-                Id = Guid.NewGuid(),
-                Nombre = nombre
+                Nombre = nombre,
+                EmpresaId = empresaId
             };
         }
     

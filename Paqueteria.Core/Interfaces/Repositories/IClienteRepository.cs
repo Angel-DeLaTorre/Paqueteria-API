@@ -4,11 +4,12 @@ namespace Paqueteria.Core.Interfaces.Repositories;
 
 public interface IClienteRepository
 {
-    Task<Cliente?> GetByIdAsync(Guid clienteId, Guid empresaId, bool asTraking = true);
-    Task<DireccionCliente?> GetDireccionByIdAsync(Guid clienteId, Guid direccionId, bool asTracking = true);
-    Task<IReadOnlyList<Cliente>> GetAllAsync(Guid empresaId);
-    Task<Cliente> AddAsync(Cliente entity);
-    void Delete(Cliente entity);
+    Task<Cliente?> ObtenerPorIdAsync(Guid clienteId, Guid empresaId, bool asTraking = true);
+    Task<DireccionCliente?> ObtenerDireccionPorIdAsync(Guid clienteId, Guid direccionId, bool asTracking = true);
     
-    Task AddDireccion(DireccionCliente dir);
+    Task<IReadOnlyList<Cliente>> ObtenerTodosAsync(Guid empresaId);
+    Task<Cliente> AgregarAsync(Cliente entity);
+    void Eliminar(Cliente entity);
+    
+    Task AgregarDireccionAsync(DireccionCliente dir);
 }

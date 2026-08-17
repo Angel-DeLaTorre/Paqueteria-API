@@ -1,6 +1,6 @@
 namespace Paqueteria.Core.Common.Errors;
 
-public abstract class ErrorCodes
+public abstract class CodigosError
 {
     public static class Generic
     {
@@ -19,10 +19,16 @@ public abstract class ErrorCodes
         public static readonly Error NotFound = new((string)"USER_001", (string)"Usuario no encontrado.");
         public static readonly Error InvalidUser = new((string)"USER_002", (string)"El correo electrónico no tiene un formato válido.");
         public static readonly Error Bloqueado = new((string)"USER_003", (string)"El usuario se encuentra desactivado.");
+        public static readonly Error ContrasennaErronea = new((string)"USER_004", (string)"Contraseña equivocada.");
     }
 
     public static class Roles
     {
         public static readonly Error NotFound = new((string)"ROLE_015", (string)"Usuario no encontrado.");
+    }
+
+    public static class Reportes
+    {
+        public static readonly Error SinDatos = new((string)"REPORTES_01", (string)"Sin datos para el reporte.");
     }
 }

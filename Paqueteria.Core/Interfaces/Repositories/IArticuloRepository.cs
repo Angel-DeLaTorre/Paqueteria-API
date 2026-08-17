@@ -4,8 +4,8 @@ namespace Paqueteria.Core.Interfaces.Repositories;
 
 public interface IArticuloRepository
 {
-    Task<Articulo?> GetByIdAsync(string articuloId, bool asTracking = true);
-    Task<IReadOnlyList<Articulo>> GetAllAsync(bool asTracking = true);
-    Task<Articulo> AddAsync(Articulo entity);
-    void Delete(Articulo entity);
+    Task<Articulo?> ObtenerPorIdAsync(Guid articuloId, bool asTracking = true);
+    Task<IReadOnlyList<Articulo>> ObtenerTodosAsync(bool asTracking = true);
+    Task<Articulo> AgregarAsync(Articulo entity);
+    void Eliminar(Articulo entity);
 }

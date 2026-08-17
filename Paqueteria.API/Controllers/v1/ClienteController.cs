@@ -2,18 +2,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Interfaces.Services;
+using Paqueteria.Application.Modulos.Clientes;
 
 namespace Paqueteria.API.Controllers.v1;
 
 [Authorize]
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ClienteController(IClienteService service) : PaqueteriaControllerBase
+public class ClienteController(IClienteServicio servicio) : PaqueteriaControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ClienteResponseDto>>> Get()
     {
-        var result = await service.GetAllAsync();
+        var result = await servicio.ObtenerTodosAsync();
         return ProcessResult(result);
     }
 
@@ -23,7 +24,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ClienteResponseDto>> Get(Guid id)
     {
-        var result = await service.GetByIdAsync(id);
+        var result = await servicio.ObtenerPorIdAsync(id);
         return ProcessResult(result);
     }
 
@@ -33,7 +34,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ClienteResponseDto>> Create([FromBody] ClienteCreateDto dto)
     {
-        var result = await service.CreateAsync(dto);
+        var result = await servicio.AgregarAsync(dto);
         return ProcessResult(result);
     }
 
@@ -44,7 +45,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromBody] ClienteUpdateDto dto)
     {
-        var result = await service.UpdateAsync(dto);
+        var result = await servicio.ActualizarAsync(dto);
         return ProcessResult(result);
     }
 
@@ -55,7 +56,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid sucursalId)
     {
-        var result = await service.DeleteAsync(sucursalId);
+        var result = await servicio.EliminarAsync(sucursalId);
         return ProcessResult(result);
     }
     
@@ -66,7 +67,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Activar([FromRoute] Guid id)
     {
-        var result = await service.ActivarAsync(id);
+        var result = await servicio.ActivarAsync(id);
         return ProcessResult(result);
     }
     
@@ -77,7 +78,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Desativar([FromRoute] Guid id)
     {
-        var result = await service.DesactivarAsync(id);
+        var result = await servicio.DesactivarAsync(id);
         return ProcessResult(result);
     }
     
@@ -88,7 +89,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ActivarDireccion([FromRoute] Guid direccionId, Guid clienteId)
     {
-        var result = await service.ActivarDireccionAsync(clienteId, direccionId);
+        var result = await servicio.ActivarDireccionAsync(clienteId, direccionId);
         return ProcessResult(result);
     }
     
@@ -99,7 +100,7 @@ public class ClienteController(IClienteService service) : PaqueteriaControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DesativarDireccion([FromRoute] Guid direccionId, Guid clienteId)
     {
-        var result = await service.DesactivarDireccionAsync(clienteId, direccionId);
+        var result = await servicio.DesactivarDireccionAsync(clienteId, direccionId);
         return ProcessResult(result);
     }
     

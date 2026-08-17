@@ -1,33 +1,21 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
 using Paqueteria.Core.Enums;
 using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Core.Entities.Remisiones;
 
-[Table("direcciones_cliente", Schema = Constantes.Esquemas.Remisiones)]
-public class DireccionCliente
+public partial class DireccionCliente
 {
     #region Columns
-
-        [Key]
-        [Column("id")]
-        public Guid Id { get; init; } = Guid.NewGuid();
-
-        public Direccion Direccion { get; set; } = null!;
-        
-        [Column("estatus")]
-        public EstatusBasico Estatus { get; set; }
-        
-        [Column("cliente_id")]
-        public Guid ClienteId { get; set; }
+        public Guid Id { get; init; }
+        public Direccion Direccion { get; private set; } = null!;
+        public EstatusBasico Estatus { get; private set; }
+        public Guid ClienteId { get; init; }
 
     #endregion
     
     #region Foreign Keys
     
-    [ForeignKey("ClienteId")] public Cliente Cliente { get; set; } = null!;
+        public Cliente Cliente { get; init; } = null!;
     
     #endregion
     
@@ -41,7 +29,6 @@ public class DireccionCliente
 
             return new DireccionCliente()
             {
-                Id = Guid.NewGuid(),
                 Direccion = direccion,
                 ClienteId = clienteId
             };

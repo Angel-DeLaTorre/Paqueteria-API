@@ -1,45 +1,27 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
 using Paqueteria.Core.Entities.Sat;
 
 namespace Paqueteria.Core.Entities.Remisiones;
 
-[Table("articulos_guia", Schema = Constantes.Esquemas.Remisiones)]
 public class ArticuloGuia
 {
     #region Columns
-
-        [Key]
-        [Column("id")]
-        public Guid Id { get; init; } = Guid.NewGuid();
-        
-        [Column("descipcion")]
-        public string Descripcion { get; set; } = string.Empty;
-
-        [Column("guia_id")]
-        public Guid GuiaId { get; init; }
-
-        [Column("articulo_id")]
-        public string ArticuloId { get; init; } = string.Empty;
-
-        [Column("cantidad")]
+        public Guid Id { get; init; }
+        public string ClaveProdServSat { get; set; } = null!;
+        public string Descripcion { get; set; } = null!;
         public int Cantidad { get; set; }
-
-        [Column("peso_unidad", TypeName = "decimal(10,2)")]
-        public decimal PesoUnidad { get; set; }
-
-        [Column("valor_unidad", TypeName = "decimal(10,2)")]
+        public string ClaveUnidadSat { get; set; } = null!;
+        public decimal PesoUnitarioKg { get; set; }
+        public decimal PesoTotalKg => Cantidad * PesoUnitarioKg;
+        public string? ClaveTipoEmbalajeSat { get; set; }
         public decimal ValorUnidad { get; set; }
-
-    #endregion
-
-    #region ForeignKeys
-
-        [ForeignKey("GuiaId")]
+        public decimal Largo { get; set; }
+        public decimal Ancho { get; set; }
+        public decimal Alto { get; set; }
+        public bool EsMaterialPeligroso { get; set; }
+        public string? ClaveMaterialPeligrosoSat { get; set; }
+        public Guid GuiaId { get; set; }
+        public Guid? ArticuloId { get; init; }
         public Guia Guia { get; init; } = null!;
-
-        [ForeignKey("ArticuloId")]
         public Articulo Articulo { get; init; } = null!;
 
     #endregion
@@ -48,26 +30,75 @@ public class ArticuloGuia
         
         private ArticuloGuia() {}
 
-        public static ArticuloGuia Create
+        public static ArticuloGuia Crear
         (
-            Guid guiaId,
+            string claveProdServSat,
             string descripcion,
-            string articuloId,
+            int cantidad,
+            string claveUnidadSat,
+            decimal pesoUnitarioKg,
+            string? claveTipoEmbalajeSat,
+            decimal valorUnidad,
+            decimal largo,
+            decimal ancho,
+            decimal alto,
+            bool esMaterialPeligroso,
+            string? claveMaterialPeligrosoSat
+        )
+        {
+            if (string.IsNullOrWhiteSpace(descripcion))
+                throw new ArgumentException("La descripción del artículo no puede estar vacía.", nameof(descripcion));
+
+            if (cantidad <= 0)
+                throw new ArgumentException("La cantidad debe ser mayor a cero.", nameof(cantidad));
+
+            if (pesoUnitarioKg < 0 || valorUnidad < 0)
+                throw new ArgumentException("El peso y el valor unitario no pueden ser negativos.");
+            
+            return new ArticuloGuia()
+            {
+                ClaveProdServSat = claveProdServSat,
+                Descripcion = descripcion,
+                Cantidad =  cantidad,
+                ClaveUnidadSat = claveUnidadSat,
+                PesoUnitarioKg =  pesoUnitarioKg,
+                ClaveTipoEmbalajeSat = claveTipoEmbalajeSat,
+                ValorUnidad = valorUnidad,
+                Largo = largo,
+                Ancho = ancho,
+                Alto = alto,
+                EsMaterialPeligroso = esMaterialPeligroso,
+                ClaveMaterialPeligrosoSat = claveMaterialPeligrosoSat
+            };
+        }
+        
+        public static ArticuloGuia Crear
+        (
+            Guid articuloId,
+            string descripcion,
             int cantidad,
             decimal pesoUnidad,
             decimal valorUnidad
         )
         {
-            //TODO Validar campos
+            if (articuloId == Guid.Empty)
+                throw new ArgumentException("El identificador del artículo no es válido.", nameof(articuloId));
 
+            if (string.IsNullOrWhiteSpace(descripcion))
+                throw new ArgumentException("La descripción del artículo no puede estar vacía.", nameof(descripcion));
+
+            if (cantidad <= 0)
+                throw new ArgumentException("La cantidad debe ser mayor a cero.", nameof(cantidad));
+
+            if (pesoUnidad < 0 || valorUnidad < 0)
+                throw new ArgumentException("El peso y el valor unitario no pueden ser negativos.");
+            
             return new ArticuloGuia()
             {
-                Id = Guid.NewGuid(),
                 Descripcion = descripcion,
-                GuiaId =  guiaId,
                 ArticuloId =  articuloId,
                 Cantidad =  cantidad,
-                PesoUnidad = pesoUnidad,
+                PesoUnitarioKg = pesoUnidad,
                 ValorUnidad = valorUnidad
             };
         }

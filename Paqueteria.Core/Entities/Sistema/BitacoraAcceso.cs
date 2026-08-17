@@ -46,7 +46,6 @@ public class BitacoraAcceso
         {
             return new BitacoraAcceso()
             {
-                Id = Guid.NewGuid(),
                 UsiarioId = usuarioId,
                 Exito = exito,
                 FechaAcceso = DateTime.UtcNow,

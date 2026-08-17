@@ -1,45 +1,45 @@
 using Microsoft.AspNetCore.Mvc;
-using Paqueteria.Application.DTOs;
-using Paqueteria.Application.Interfaces.Services;
+using Paqueteria.Application.Modulos.Usuarios;
+using Paqueteria.Application.Modulos.Usuarios.Dtos;
 
 namespace Paqueteria.API.Controllers.v1;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class UsuarioController(IUsuarioService service) : PaqueteriaControllerBase
+public class UsuarioController(IUsuarioServicio servicio) : PaqueteriaControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<UsuarioResponseDto>>> GetAll()
+    public async Task<ActionResult<IReadOnlyList<UsuarioRespuestaDto>>> GetAll()
     {
-        var result = await service.GetAllAsync();
+        var result = await servicio.ObtenerTodosAsync();
         return ProcessResult(result);
     }
 
     [HttpGet("{username}")]
-    public async Task<ActionResult<UsuarioResponseDto>> GetById(string username)
+    public async Task<ActionResult<UsuarioRespuestaDto>> GetById(string username)
     {
-        var result = await service.GetByUsername(username);
+        var result = await servicio.ObtenerPorUsername(username);
         return ProcessResult(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<UsuarioResponseDto>> Create([FromBody] UsuarioCreateDto dto)
+    public async Task<ActionResult<UsuarioRespuestaDto>> Create([FromBody] UsuarioCrearDto dto)
     {
-        var result = await service.CreateAsync(dto);
+        var result = await servicio.AgregarAsync(dto);
         return ProcessResult(result);
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update(UsuarioUpdateDto dto)
+    public async Task<IActionResult> Update(UsuarioActualizarDto dto)
     {
-        var result = await service.UpdateAsync(dto);
+        var result = await servicio.ActualizarAsync(dto);
         return ProcessResult(result);
     }
 
     [HttpDelete("{usuarioId:guid}")]
     public async Task<IActionResult> Delete(Guid usuarioId)
     {
-        var result = await service.DeleteAsync(usuarioId);
+        var result = await servicio.EliminarAsync(usuarioId);
         return ProcessResult(result);
     }
 }

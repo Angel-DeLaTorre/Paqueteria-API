@@ -6,12 +6,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>c0d2c6e2-f8c4-455f-9dd8-f6c5d143dc09</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <RootNamespace>Paqueteria.API</RootNamespace>
   </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath />
-    </PropertyGroup>
-
+    
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
@@ -23,8 +20,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Paqueteria.Application\Paqueteria.Application.csproj" />
-      <ProjectReference Include="..\Paqueteria.Infrastructure\Paqueteria.Infrastructure.csproj" />
+      <ProjectReference Include="..\Paqueteria.Aplicacion\Paqueteria.Aplicacion.csproj" />
+      <ProjectReference Include="..\Paqueteria.Infraestructura\Paqueteria.Infraestructura.csproj" />
     </ItemGroup>
 
 </Project>

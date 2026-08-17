@@ -1,38 +1,17 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
 using Paqueteria.Core.ValueObjects;
 
 namespace Paqueteria.Core.Entities.Remisiones;
 
-[Table("empresas", Schema = Constantes.Esquemas.Remisiones)]
-public class Empresa
+public partial class Empresa
 {
     #region Columns
-
-        [Key]
-        [Column("id")]
         public Guid Id { get; init; }
-
-        [Required]
-        [MaxLength(150)]
-        [Column("nombre")]
         public string Nombre { get; set; } = string.Empty;
-
-        [MaxLength(50)]
-        [Column("nombre_corto")]
         public string? NombreCorto { get; set; }
-
-        [Required]
-        [MaxLength(20)]
-        [Column("rfc")]
         public string Rfc { get; set; } = string.Empty;
-
-        public Direccion Direccion { get; set; } = null!;
-
-        [Column("fecha_alta")]
+        public Direccion? Direccion { get; set; }
         public DateTime FechaAlta { get; init; }
-
+        
     #endregion
     
     #region Constructors
@@ -45,7 +24,6 @@ public class Empresa
             
             return new Empresa()
             {
-                Id = Guid.NewGuid(),
                 Nombre = nombre,
                 NombreCorto = nombreCorto,
                 Rfc = rfc,

@@ -1,105 +1,61 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Paqueteria.Core.Common;
+namespace Paqueteria.Core.Entities.Remisiones;
 
-namespace Paqueteria.Core.Entities.Remisiones
+public partial class Asignacion
 {
-    [Table("asignaciones", Schema = Constantes.Esquemas.Remisiones)]
-    public class Asignacion
-    {
-        #region Columns
+    #region Columns
+    
+        public Guid Id { get; init; } = Guid.CreateVersion7();
+        public DateTime FechaCreacion { get; init; } = DateTime.UtcNow;
+        public DateTime? FechaPartida { get; set; } = DateTime.UtcNow;
+        public Guid SucursalOrigenId { get; set; }
+        public Guid SucursalDestinoId { get; set; }
+        public string? St1 { get; set; }
+        public string? St2 { get; set; }
+        public string? St3 { get; set; }
+        public string? St4 { get; set; }
+        public Guid? ChoferId { get; init; }
+        public Guid EmpresaId { get; private init; }
+
+        public Sucursal? SucursalOrigen { get; set; }
+        public Sucursal? SucursalDestino { get; set; }
+        public Chofer? Chofer { get; init; }
+        public Empresa Empresa { get; init; } = null!;
         
-            [Key]
-            [Column("id")]
-            public Guid Id { get; init; } = Guid.NewGuid();
+        public ICollection<Guia> Guias { get; private set; } = new List<Guia>();
 
-            [Column("chofer_id")]
-            public Guid ChoferId { get; init; }
+    #endregion
 
-            [Column("fecha_creacion")]
-            public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
-            
-            [Column("fecha_partida")]
-            public DateTime? FechaPartida { get; set; } = DateTime.UtcNow;
+    #region Constructos
 
-            [MaxLength(10)]
-            [Column("st1")]
-            public string? St1 { get; set; }
+        private Asignacion() { }
 
-            [MaxLength(10)]
-            [Column("st2")]
-            public string? St2 { get; set; }
-
-            [MaxLength(10)]
-            [Column("st3")]
-            public string? St3 { get; set; }
-
-            [MaxLength(10)]
-            [Column("st4")]
-            public string? St4 { get; set; }
-
-            [Column("camion")]
-            public string Camion { get; set; } =  string.Empty;
-
-            [MaxLength(50)]
-            [Column("num_contenedor")]
-            public string? NumContenedor { get; set; }
-
-            [MaxLength(50)]
-            [Column("num_contenedor2")]
-            public string? NumContenedor2 { get; set; }
-            
-            [Column("empresa_id")]
-            public Guid EmpresaId { get; init; }
-
-        #endregion
-
-        #region ForeignKey
-
-            [ForeignKey("ChoferId")]
-            public Chofer Chofer { get; init; } = null!;
-            
-            [ForeignKey("EmpresaId")] public Empresa Empresa { get; init; } = null!;
-
-        #endregion
-
-        #region Constructos
-
-            private Asignacion() { }
-
-            public static Asignacion Create(
-                Guid choferId, 
-                DateTime? fechaPartida,
-                string? st1, 
-                string? st2, 
-                string? st3, 
-                string? st4, 
-                string camion,
-                string? numContenedor,
-                string? numContenedor2)
+        public static Asignacion Crear(
+            Guid sucursalOrigenId,
+            Guid sucursalDestinoId,
+            DateTime? fechaPartida,
+            string? st1, 
+            string? st2, 
+            string? st3, 
+            string? st4,
+            Guid? choferId, 
+            Guid empresaId
+            )
+        {
+            return new Asignacion()
             {
-                return new Asignacion()
-                {
-                    Id = Guid.NewGuid(),
-                    ChoferId = choferId,
-                    FechaCreacion = DateTime.UtcNow,
-                    FechaPartida = fechaPartida,
-                    St1 = st1,
-                    St2 = st2,
-                    St3 = st3,
-                    St4 = st4,
-                    Camion = camion,
-                    NumContenedor = numContenedor,
-                    NumContenedor2 = numContenedor2
-                };
-            }
+                
+                SucursalOrigenId = sucursalOrigenId,
+                SucursalDestinoId = sucursalDestinoId,
+                FechaCreacion = DateTime.UtcNow,
+                FechaPartida = fechaPartida,
+                St1 = st1,
+                St2 = st2,
+                St3 = st3,
+                St4 = st4,
+                ChoferId = choferId,
+                EmpresaId = empresaId
+            };
+        }
 
-        #endregion
-            
-        #region Relations
-        
-            public ICollection<Guia> Guias { get; private set; } = new List<Guia>();
-            
-        #endregion
-    }
+    #endregion
 }
