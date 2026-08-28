@@ -6,7 +6,7 @@ WORKDIR /src
 
 # 1. Copiamos todos los archivos .csproj replicando su estructura exacta de carpetas
 # Esto permite aprovechar la caché de Docker para acelerar futuras compilaciones
-COPY ["Paqueteria.API/Paqueteria.Api.csproj", "Paqueteria.Api/"]
+COPY ["Paqueteria.Api/Paqueteria.Api.csproj", "Paqueteria.Api/"]
 COPY ["Paqueteria.Applicacion/Paqueteria.Aplicacion.csproj", "Paqueteria.Aplicacion/"]
 COPY ["Paqueteria.Core/Paqueteria.Core.csproj", "Paqueteria.Core/"]
 COPY ["Paqueteria.Infraestructura/Paqueteria.Infraestructura.csproj", "Paqueteria.Infraestructura/"]
