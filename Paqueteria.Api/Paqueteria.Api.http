@@ -1,0 +1,6 @@
+@Paqueteria.Api_HostAddress = http://localhost:5005
+
+GET {{Paqueteria.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
