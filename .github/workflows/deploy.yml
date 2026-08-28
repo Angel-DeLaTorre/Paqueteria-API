@@ -53,7 +53,6 @@ jobs:
           script: |
             cd ~/paqueteria
             
-          # Autenticar Docker en el VPS temporalmente usando las credenciales del Action
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
             echo "POSTGRES_DB_CONN=Host=postgres-db;Database=paqueteria_db;Username=admin_paqueteria;Password=${{ secrets.DB_PASSWORD }};" > .env
@@ -64,11 +63,11 @@ jobs:
             echo "ASPNETCORE_HTTPS_PORT=0" >> .env
   
   
-          # Forzar la descarga de la nueva imagen que se acaba de compilar
+            # Forzar la descarga de la nueva imagen que se acaba de compilar
             docker compose pull paqueteria-api
             
-          # Levantar o recrear los contenedores en segundo plano aplicando cambios
+            # Levantar o recrear los contenedores en segundo plano aplicando cambios
             docker compose up -d postgres-db paqueteria-api
             
-          # Limpieza opcional de imágenes viejas (para no saturar tus 40GB de disco)
+            # Limpieza opcional de imágenes viejas (para no saturar tus 40GB de disco)
             docker image prune -f
