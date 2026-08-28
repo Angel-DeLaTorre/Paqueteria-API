@@ -1,13 +1,13 @@
-using Paqueteria.Application.DTOs;
-using Paqueteria.Core.Common;
+using Paqueteria.Application.Modulos.Rutas.Dtos;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Rutas;
 
 public interface IRutaServicio
 {
-    Task<Resultado<IReadOnlyList<RutaResponseDto>>> ObtenerTodosAsync();
-    Task<Resultado<RutaResponseDto>> ObtenerPorIdAsync(Guid rutaId);
-    Task<Resultado<RutaResponseDto>> AgregarAsync(RutaCreateDto dto);
-    Task<Resultado> ActualizarAsync(RutaUpdateDto dto);
-    Task<Resultado> EliminarAsync(Guid rutaId);
+    Task<Respuesta<IReadOnlyList<RutaRespuestaDto>>> ObtenerTodosAsync();
+    Task<Respuesta<RutaRespuestaDto>> ObtenerPorIdAsync(Guid rutaId);
+    Task<Respuesta<RutaRespuestaDto>> AgregarAsync(RutaCrearDto dto);
+    Task<Respuesta> ActualizarAsync(RutaActualizarDto dto);
+    Task<Respuesta> EliminarAsync(Guid rutaId);
 }

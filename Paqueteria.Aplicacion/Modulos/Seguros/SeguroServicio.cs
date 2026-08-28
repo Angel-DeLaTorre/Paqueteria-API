@@ -1,71 +1,72 @@
 using Paqueteria.Application.Comun.Interfaces;
-using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Dtos;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Errors;
+using Paqueteria.Application.Modulos.Seguros.Dtos;
+using Paqueteria.Core.Comun;
+using Paqueteria.Core.Comun.Errors;
 
 namespace Paqueteria.Application.Modulos.Seguros;
 
 public class SeguroServicio(IUnitOfWork unit, IUsuarioContextoServicio contextoUsuario) : ISeguroServicio
 {
-    public async Task<Resultado<IReadOnlyList<SeguroResponseDto>>> ObtenerTodosAsync()
+    public async Task<Respuesta<IReadOnlyList<SeguroResponseDto>>> ObtenerTodosAsync()
     {
         var seguros = ( await unit.Seguros.ObtenerTodosAsync(contextoUsuario.EmpresaId, false) )
             .Select( SeguroResponseDto.FromEntity ).ToList();
-        return Resultado<IReadOnlyList<SeguroResponseDto>>.Exitoso(seguros);
+        return Respuesta<IReadOnlyList<SeguroResponseDto>>.Exitoso(seguros);
     }
 
-    public async Task<Resultado<SeguroResponseDto>> ObtenerPorIdAsync(Guid seguroId)
+    public async Task<Respuesta<SeguroResponseDto>> ObtenerPorIdAsync(Guid seguroId)
     {
         var seguro = await unit.Seguros.ObtenerPorIdAsync(seguroId, contextoUsuario.EmpresaId, false);
 
         if (seguro is null)
-            return Resultado<SeguroResponseDto>.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta<SeguroResponseDto>.Error(CodigosError.Generic.NoEncontrado);
 
-        return Resultado<SeguroResponseDto>.Exitoso(SeguroResponseDto.FromEntity(seguro));
+        return Respuesta<SeguroResponseDto>.Exitoso(SeguroResponseDto.FromEntity(seguro));
     }
 
-    public async Task<Resultado<SeguroResponseDto>> AgregarAsync(SeguroCreateDto dto)
+    public async Task<Respuesta<SeguroResponseDto>> AgregarAsync(SeguroCreateDto dto)
     {
         var seguro = await unit.Seguros.AgregarAsync(dto.ToEntity(contextoUsuario.EmpresaId));
 
-        var result = unit.CompletarAsync();
+        var result = unit.GuardarCambiosAsync();
 
         if (result.IsCompletedSuccessfully)
-            return Resultado<SeguroResponseDto>.Error(CodigosError.Generic.NoCreado);
+            return Respuesta<SeguroResponseDto>.Error(CodigosError.Generic.NoCreado);
 
-        return Resultado<SeguroResponseDto>.Exitoso(SeguroResponseDto.FromEntity(seguro));
+        return Respuesta<SeguroResponseDto>.Exitoso(SeguroResponseDto.FromEntity(seguro));
     }
 
-    public async Task<Resultado> ActualizarAsync(SeguroUpdateDto dto)
+    public async Task<Respuesta> ActualizarAsync(SeguroUpdateDto dto)
     {
         var seguro = await unit.Seguros.ObtenerPorIdAsync(dto.SeguroId, contextoUsuario.EmpresaId);
 
         if (seguro is null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         dto.UpdateEntity(seguro);
-        var result = await  unit.CompletarAsync();
+        var result = await  unit.GuardarCambiosAsync();
 
         if (result != 0)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 
-    public async Task<Resultado> EliminarAsync(Guid seguroId)
+    public async Task<Respuesta> EliminarAsync(Guid seguroId)
     {
         throw new NotImplementedException();
     }
     
-    public async Task<Resultado> DesactivarAsync(Guid seguroId)
+    public async Task<Respuesta> DesactivarAsync(Guid seguroId)
     {
         var seguro = await unit.Seguros.ObtenerPorIdAsync(seguroId, contextoUsuario.EmpresaId);
-        if (seguro == null) return Resultado.Error(CodigosError.Generic.NoEncontrado);
+        if (seguro == null) return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         seguro.Desactivar();
-        await  unit.CompletarAsync();
+        await  unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 }

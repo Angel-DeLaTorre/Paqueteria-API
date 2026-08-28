@@ -3,35 +3,51 @@ using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Modulos.Guias.Interfaces;
 using Paqueteria.Application.Modulos.Guias.Mapeador;
 using Paqueteria.Application.Modulos.Reportes.Constantes;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Errors;
+using Paqueteria.Core.Comun;
+using Paqueteria.Core.Comun.Errors;
 
 namespace Paqueteria.Application.Modulos.Guias.Servicios;
 
-public class GuiaPdfServicio(
-    IUnitOfWork unidadDeTrabajo, 
+public sealed class GuiaPdfServicio(
+    IUnitOfWork unidad, 
     IUsuarioContextoServicio contextoUsuario, 
     IFabricaPdf fabricaPdf
     ) 
     : IGuiaPdfServicio
 {
-public async Task<Resultado<byte[]>> GenerarEtiquetaPaqueteAsync(Guid guiaId)
-{
-    // 1. Obtener la entidad con sus relaciones desde la persistencia
-    var guia = await unidadDeTrabajo.Guias.ObtenerPorIdAsync(guiaId, contextoUsuario.EmpresaId, asTracking: false);
+    public async Task<Respuesta<byte[]>> GenerarEtiquetaPaqueteAsync(Guid guiaId)
+    {
+        var guia = await unidad.Guias.ObtenerPorIdAsync(guiaId, contextoUsuario.EmpresaId, asTracking: false);
 
-    if (guia == null)
-        return Resultado<byte[]>.Error(CodigosError.Generic.NoCreado);
+        if (guia == null)
+            return Respuesta<byte[]>.Error(CodigosError.Generic.NoCreado);
+        
+        var dto = guia.AEtiquetaDto();
+        var estrategia = fabricaPdf.SeleccionarEstrategia(TipoDocumentoPdf.EtiquetaGuia);
+        var pdfBytes = await estrategia.GenerarPdfAsync(dto);
 
-    // 2. Proyectar la entidad al DTO necesario para el reporte
-    var dto = guia.AEtiquetaDto();
+        return Respuesta<byte[]>.Exitoso(pdfBytes);
+    }
 
-    // 3. Seleccionar la estrategia de PDF mediante la fábrica
-    var estrategia = fabricaPdf.SeleccionarEstrategia(TipoDocumentoPdf.EtiquetaGuia);
+    public async Task<Respuesta<byte[]>> GenerarRemisionPdfAsync(Guid guiaId)
+    {
+        try
+        {
+            var guia = await unidad.Guias.ObtenerPorIdAsync(guiaId, contextoUsuario.EmpresaId, asTracking: false);
 
-    // 4. Generar el arreglo de bytes
-    var pdfBytes = await estrategia.GenerarPdfAsync(dto);
+            if (guia == null)
+                return Respuesta<byte[]>.Error(CodigosError.Generic.NoEncontrado);
 
-    return Resultado<byte[]>.Exitoso(pdfBytes);
-}
+            var dto = guia.ToRemisionPdfDto();
+            var estrategia = fabricaPdf.SeleccionarEstrategia(TipoDocumentoPdf.RemisionGuia);
+            var pdfBytes = await estrategia.GenerarPdfAsync(dto);
+
+            return Respuesta<byte[]>.Exitoso(pdfBytes);
+        }
+        catch (Exception ex)
+        {
+            return Respuesta<byte[]>.Error(CodigosError.Generic.NoEncontrado);
+        }        
+
+    }
 }

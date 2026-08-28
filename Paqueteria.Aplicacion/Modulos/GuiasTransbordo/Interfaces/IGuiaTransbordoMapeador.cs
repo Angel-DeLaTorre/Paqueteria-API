@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Paqueteria.Application.Modulos.GuiasTransbordo.Dtos;
-using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Entidades.Remisiones;
 
 namespace Paqueteria.Application.Modulos.GuiasTransbordo.Interfaces;
 

@@ -1,40 +1,47 @@
 using Paqueteria.Application.Comun.Interfaces;
-using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Dtos;
 using Paqueteria.Application.Interfaces.Persistence;
+using Paqueteria.Application.Modulos.Asignaciones.Dtos;
+using Paqueteria.Application.Modulos.Folios;
 using Paqueteria.Application.Modulos.Reportes.Constantes;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Errors;
-using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Comun;
+using Paqueteria.Core.Comun.Errors;
+using Paqueteria.Core.Entidades.Remisiones;
+using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Application.Modulos.Asignaciones;
 
 public sealed class AsignacionServicio (
     IUnitOfWork unit,
     IUsuarioContextoServicio contextoUsuario,
-    IFabricaPdf fabricaPdf
+    IFabricaPdf fabricaPdf,
+    IFolioServicio folioServicio
 ) : IAsignacionServicio
 {
-    public async Task<Resultado<IReadOnlyList<AsignacionResponseDto>>> ObtenerTodosAsync()
+    public async Task<Respuesta<IReadOnlyList<AsignacionRespuestaDto>>> ObtenerTodosAsync()
     {
         var asignaciones = ( await unit.Asignaciones.ObtenerTodosAsync(contextoUsuario.EmpresaId) )
-            .Select( AsignacionResponseDto.FromEntity ).ToList();
-        return Resultado<IReadOnlyList<AsignacionResponseDto>>.Exitoso(asignaciones);
+            .Select( AsignacionRespuestaDto.FromEntity ).ToList();
+        return Respuesta<IReadOnlyList<AsignacionRespuestaDto>>.Exitoso(asignaciones);
     }
 
-    public async Task<Resultado<AsignacionResponseDto>> ObtenerPorIdAsync(Guid asignacionId)
+    public async Task<Respuesta<AsignacionRespuestaDto>> ObtenerPorIdAsync(Guid asignacionId)
     {
         var asignacion = await unit.Asignaciones.ObtenerPorIdAsync(asignacionId, contextoUsuario.EmpresaId);
 
         if (asignacion is null)
-            return Resultado<AsignacionResponseDto>.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta<AsignacionRespuestaDto>.Error(CodigosError.Generic.NoEncontrado);
 
-        return Resultado<AsignacionResponseDto>.Exitoso(AsignacionResponseDto.FromEntity(asignacion));
+        return Respuesta<AsignacionRespuestaDto>.Exitoso(AsignacionRespuestaDto.FromEntity(asignacion));
     }
 
-    public async Task<Resultado<AsignacionResponseDto>> AgregarAsync(AsignacionCreateDto dto)
+    public async Task<Respuesta<AsignacionRespuestaDto>> AgregarAsync(AsignacionCrearDto dto)
     {
+
+        var clave = await folioServicio.GenerarSiguienteFolioAsync(dto.SucursalOrigenId, TipoFolio.Asignacion);
         
         var asignacion = Asignacion.Crear(
+            clave,
             dto.SucursalOrigenId,
             dto.SucursalDestinoId,
             dto.FechaPartida,
@@ -56,43 +63,43 @@ public sealed class AsignacionServicio (
         await unit.Asignaciones.AgregarAsync(asignacion);
         
         
-        var resultado = await unit.CompletarAsync();
+        var resultado = await unit.GuardarCambiosAsync();
         
         if (resultado <= 0)
-            return Resultado<AsignacionResponseDto>.Error(CodigosError.Generic.NoCreado);
+            return Respuesta<AsignacionRespuestaDto>.Error(CodigosError.Generic.NoCreado);
 
-        return Resultado<AsignacionResponseDto>.Exitoso(AsignacionResponseDto.FromEntity(asignacion));
+        return Respuesta<AsignacionRespuestaDto>.Exitoso(AsignacionRespuestaDto.FromEntity(asignacion));
     }
 
-    public async Task<Resultado> ActualizarAsync(AsignacionUpdateDto dto)
+    public async Task<Respuesta> ActualizarAsync(AsignacionActualizarDto dto)
     {
-        var asignacion = await unit.Asignaciones.ObtenerPorIdAsync(dto.Id, contextoUsuario.EmpresaId);
+        var asignacion = await unit.Asignaciones.ObtenerPorIdAsync(dto.AsignacionId, contextoUsuario.EmpresaId);
 
         if (asignacion == null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         dto.UpdateEntity(asignacion);
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 
-    public async Task<Resultado> EliminarAsync(Guid asignacionId)
+    public async Task<Respuesta> EliminarAsync(Guid asignacionId)
     {
         var asignacion = (await unit.Asignaciones.ObtenerPorIdAsync(asignacionId, contextoUsuario.EmpresaId));
 
         if (asignacion == null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         unit.Asignaciones.Eliminar(asignacion);
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
 
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 
     #region Reportes
 
-    public async Task<Resultado<byte[]>> GenerarReporteSalidasPdfAsync(Guid? sucursalOrigenId, DateTime? fechaInicio, DateTime? fechaFin)
+    public async Task<Respuesta<byte[]>> GenerarReporteSalidasPdfAsync(Guid? sucursalOrigenId, DateTime? fechaInicio, DateTime? fechaFin)
     {
         var hoyUtc = DateTime.UtcNow.Date;
 
@@ -113,13 +120,13 @@ public sealed class AsignacionServicio (
         );
 
         if (!asignaciones.Any())
-            return Resultado<byte[]>.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta<byte[]>.Error(CodigosError.Generic.NoEncontrado);
 
         // 3. Generar el PDF
         var estrategia = fabricaPdf.SeleccionarEstrategia(TipoDocumentoPdf.ReporteSalidaOperador);
         var pdfBytes = await estrategia.GenerarPdfAsync(asignaciones);
 
-        return Resultado<byte[]>.Exitoso(pdfBytes);
+        return Respuesta<byte[]>.Exitoso(pdfBytes);
     }
 
     #endregion

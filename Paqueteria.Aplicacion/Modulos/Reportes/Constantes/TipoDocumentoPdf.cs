@@ -4,6 +4,5 @@ public static class TipoDocumentoPdf
 {
     public const string EtiquetaGuia = "EtiquetaGuia";
     public const string ReporteSalidaOperador = "ReporteSalidaOperador";
-    public const string GuiaCarta = "GuiaCarta";
-    public const string ManifiestoCarga = "ManifiestoCarga";
+    public const string RemisionGuia = "RemisionGuia";
 }

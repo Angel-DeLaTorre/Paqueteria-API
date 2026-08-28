@@ -5,7 +5,7 @@ using Paqueteria.Application.Modulos.Choferes;
 using Paqueteria.Application.Modulos.Clientes;
 using Paqueteria.Application.Modulos.Empresas;
 using Paqueteria.Application.Modulos.Estados;
-using Paqueteria.Application.Modulos.Guias;
+using Paqueteria.Application.Modulos.Folios;
 using Paqueteria.Application.Modulos.Guias.Interfaces;
 using Paqueteria.Application.Modulos.Guias.Servicios;
 using Paqueteria.Application.Modulos.GuiasTransbordo.Interfaces;
@@ -32,6 +32,7 @@ public static class InyeccionDependencias
         services.AddScoped<IClienteServicio, ClienteServicio>();
         services.AddScoped<IEmpresaServicio, EmpresaServicio>();
         services.AddScoped<IEstadoServicio, EstadoServicio>();
+        services.AddScoped<IFolioServicio, FolioServicio>();
         services.AddScoped<IGuiaServicio, GuiaServicio>();
         services.AddScoped<IGuiaTransbordoServicio, GuiaTransbordoServicio>();
         services.AddScoped<IMunicipioServicio, MunicipioServicio>();

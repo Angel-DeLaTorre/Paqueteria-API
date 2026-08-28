@@ -1,6 +1,6 @@
 using Paqueteria.Application.Comun.Interfaces;
 using Paqueteria.Application.Modulos.Reportes.Constantes;
-using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Core.Entidades.Remisiones;
 using Paqueteria.Core.Enums;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;

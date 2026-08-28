@@ -1,29 +1,29 @@
-using Paqueteria.Core.Interfaces.Repositories;
+using Paqueteria.Core.Interfaces.Repositorios;
 
 namespace Paqueteria.Application.Interfaces.Persistence;
 
 public interface IUnitOfWork : IDisposable
 {
-    IArticuloRepository Articulos { get; }
-    IAsignacionRepository Asignaciones { get; }
-    IChoferRepository Choferes { get; }
-    IClienteRepository Clientes { get; }
-    IEmpresaRepository Empresas { get; }
-    IEstadoRepository Estados { get; }
-    IFolioSucursalRepository FoliosSucursal { get; }
-    IGuiaRepository Guias { get; }
+    IArticuloRepositorio Articulos { get; }
+    IAsignacionRepositorio Asignaciones { get; }
+    IChoferRepositorio Choferes { get; }
+    IClienteRepositorio Clientes { get; }
+    IEmpresaRepositorio Empresas { get; }
+    IEstadoRepositorio Estados { get; }
+    IFolioSucursalRepositorio FoliosSucursal { get; }
+    IGuiaRepositorio Guias { get; }
     IGuiaTransbordoRepositorio GuiaTransbordos { get; }
-    IMunicipioRepository Municipios { get; }
-    IPermisoRepository Permisos { get; }
-    IRolRepository Roles { get; }
-    IRutaRepository Rutas { get; }
-    ISeguroRepository Seguros { get; }
-    ISucursalRepository Sucursales { get; }
-    IUsuarioRepository Usuarios { get; }
+    IMunicipioRepositorio Municipios { get; }
+    IPermisoRepositorio Permisos { get; }
+    IRolRepositorio Roles { get; }
+    IRutaRepositorio Rutas { get; }
+    ISeguroRepositorio Seguros { get; }
+    ISucursalRepositorio Sucursales { get; }
+    IUsuarioRepositorio Usuarios { get; }
     
     
-    Task<int> CompletarAsync();
-    Task BeginTransactionAsync();
-    Task CommitTransactionAsync();
-    Task RollbackTransactionAsync();
+    Task<int> GuardarCambiosAsync();
+    Task ComenzarTransaccionAsync();
+    Task GuardarTransaccionAsync();
+    Task ReverzarTransaccionAsync();
 }

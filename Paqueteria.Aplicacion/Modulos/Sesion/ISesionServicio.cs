@@ -1,11 +1,10 @@
-using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Modulos.Sesion.Dtos;
-using Paqueteria.Core.Common;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Sesion;
 
 public interface ISesionServicio
 {
-    Task<Resultado<SesionRespuestaDto>> IniciarSesionAsync(LoginSolicitudDto request);
-    Task<Resultado> CambiarContraseniaAsync(LoginSolicitudDto request);
+    Task<Respuesta<SesionRespuestaDto>> IniciarSesionAsync(LoginSolicitudDto request);
+    Task<Respuesta> CambiarContraseniaAsync(LoginSolicitudDto request);
 }

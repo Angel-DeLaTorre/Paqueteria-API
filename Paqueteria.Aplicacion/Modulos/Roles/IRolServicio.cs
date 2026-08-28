@@ -1,15 +1,16 @@
-using Paqueteria.Application.DTOs;
-using Paqueteria.Core.Common;
+using Paqueteria.Application.Dtos;
+using Paqueteria.Application.Modulos.Roles.Dtos;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Roles;
 
 public interface IRolServicio
 {
-    Task<Resultado<RolResponseDto>> ObtenerPorIdAsync(Guid id);
-    Task<Resultado<IEnumerable<RolResponseDto>>> ObtenerTodosAsync();
-    Task<Resultado<RolResponseDto>> AgregarAsync(RolCreateDto dto);
-    Task<Resultado> ActualizarAsync(RolUpdateDto dto);
-    Task<Resultado> EliminarAsync(Guid id);
-    Task<Resultado> ActivarAsync(Guid rolId);
-    Task<Resultado> DesactivarAsync(Guid rolId);
+    Task<Respuesta<RolResponseDto>> ObtenerPorIdAsync(Guid id);
+    Task<Respuesta<IEnumerable<RolResponseDto>>> ObtenerTodosAsync();
+    Task<Respuesta<RolResponseDto>> AgregarAsync(RolCreateDto dto);
+    Task<Respuesta> ActualizarAsync(RolUpdateDto dto);
+    Task<Respuesta> EliminarAsync(Guid id);
+    Task<Respuesta> ActivarAsync(Guid rolId);
+    Task<Respuesta> DesactivarAsync(Guid rolId);
 }

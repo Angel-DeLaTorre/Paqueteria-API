@@ -1,14 +1,15 @@
-using Paqueteria.Application.DTOs;
-using Paqueteria.Core.Common;
+using Paqueteria.Application.Dtos;
+using Paqueteria.Application.Modulos.Seguros.Dtos;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Seguros;
 
 public interface ISeguroServicio
 {
-    Task<Resultado<IReadOnlyList<SeguroResponseDto>>> ObtenerTodosAsync();
-    Task<Resultado<SeguroResponseDto>> ObtenerPorIdAsync(Guid seguroId);
-    Task<Resultado<SeguroResponseDto>> AgregarAsync(SeguroCreateDto dto);
-    Task<Resultado> ActualizarAsync(SeguroUpdateDto dto);
-    Task<Resultado> EliminarAsync(Guid seguroId);
-    Task<Resultado> DesactivarAsync(Guid seguroId);
+    Task<Respuesta<IReadOnlyList<SeguroResponseDto>>> ObtenerTodosAsync();
+    Task<Respuesta<SeguroResponseDto>> ObtenerPorIdAsync(Guid seguroId);
+    Task<Respuesta<SeguroResponseDto>> AgregarAsync(SeguroCreateDto dto);
+    Task<Respuesta> ActualizarAsync(SeguroUpdateDto dto);
+    Task<Respuesta> EliminarAsync(Guid seguroId);
+    Task<Respuesta> DesactivarAsync(Guid seguroId);
 }

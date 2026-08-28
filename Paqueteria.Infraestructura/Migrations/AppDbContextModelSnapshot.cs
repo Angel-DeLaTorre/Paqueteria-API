@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Paqueteria.Infrastructure.Data;
+using Paqueteria.Infrastructure.Persistencia;
 
 #nullable disable
 
@@ -23,7 +23,7 @@ namespace Paqueteria.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Catalogos.Estado", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Catalogos.Estado", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text")
@@ -49,7 +49,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("estados", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Catalogos.Municipio", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Catalogos.Municipio", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -79,7 +79,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("municipios", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.ArticuloGuia", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.ArticuloGuia", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -159,7 +159,7 @@ namespace Paqueteria.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Asignacion", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Asignacion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -169,6 +169,11 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Property<Guid?>("ChoferId")
                         .HasColumnType("uuid")
                         .HasColumnName("chofer_id");
+
+                    b.Property<string>("Clave")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("clave");
 
                     b.Property<Guid>("EmpresaId")
                         .HasColumnType("uuid")
@@ -223,7 +228,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("asignaciones", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Camion", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Camion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -252,7 +257,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("camiones", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Chofer", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Chofer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -318,7 +323,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("choferes", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Cliente", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Cliente", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -388,7 +393,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("clientes", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.DireccionCliente", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.DireccionCliente", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -410,7 +415,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("direcciones_clientes", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.DireccionGuiaSnapshot", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.DireccionGuiaSnapshot", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -422,7 +427,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("direcciones_guia_snapshot", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Empresa", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Empresa", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -458,22 +463,29 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("empresas", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.FolioSucursal", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.FolioSucursal", b =>
                 {
                     b.Property<Guid>("SucursalId")
                         .HasColumnType("uuid")
                         .HasColumnName("sucursal_id");
 
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer")
+                        .HasColumnName("tipo");
+
                     b.Property<int>("UltimoConsecutivo")
                         .HasColumnType("integer")
                         .HasColumnName("ultimo_consecutivo");
 
-                    b.HasKey("SucursalId");
+                    b.HasKey("SucursalId", "Tipo");
+
+                    b.HasIndex("SucursalId")
+                        .IsUnique();
 
                     b.ToTable("folios_sucursales", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Guia", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Guia", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -607,6 +619,9 @@ namespace Paqueteria.Infrastructure.Migrations
                         .HasColumnType("numeric(15,2)")
                         .HasColumnName("subtotal");
 
+                    b.Property<Guid?>("SucursalActualId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("SucursalDestinoId")
                         .HasColumnType("uuid")
                         .HasColumnName("sucursal_destino_id");
@@ -644,6 +659,8 @@ namespace Paqueteria.Infrastructure.Migrations
 
                     b.HasIndex("SeguroId");
 
+                    b.HasIndex("SucursalActualId");
+
                     b.HasIndex("SucursalDestinoId");
 
                     b.HasIndex("SucursalOrigenId");
@@ -655,7 +672,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("guias", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.GuiaTransbordo", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.GuiaTransbordo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -696,7 +713,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("guia_transbordos", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Ruta", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Ruta", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -735,7 +752,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("rutas", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Seguro", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Seguro", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -762,7 +779,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("seguros", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Sucursal", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Sucursal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -810,7 +827,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("sucursales", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sat.Articulo", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sat.Articulo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -853,7 +870,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("articulos", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.BitacoraAcceso", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.BitacoraAcceso", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -887,7 +904,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("bitacora_accesos", "sys");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.BitacoraSistema", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.BitacoraSistema", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -942,7 +959,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("bitacora_sistema", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Permiso", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Permiso", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -976,7 +993,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("permisos", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Rol", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Rol", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1009,7 +1026,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("roles", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.RolPermiso", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.RolPermiso", b =>
                 {
                     b.Property<Guid>("RolId")
                         .HasColumnType("uuid")
@@ -1026,7 +1043,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("roles_permisos", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Usuario", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1077,7 +1094,7 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("usuarios", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.UsuarioRol", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.UsuarioRol", b =>
                 {
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uuid")
@@ -1094,9 +1111,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.ToTable("usuarios_roles", (string)null);
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Catalogos.Municipio", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Catalogos.Municipio", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Catalogos.Estado", "Estado")
+                    b.HasOne("Paqueteria.Core.Entidades.Catalogos.Estado", "Estado")
                         .WithMany()
                         .HasForeignKey("EstadoId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1105,20 +1122,20 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Estado");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.ArticuloGuia", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.ArticuloGuia", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Sat.Articulo", "Articulo")
+                    b.HasOne("Paqueteria.Core.Entidades.Sat.Articulo", "Articulo")
                         .WithMany()
                         .HasForeignKey("ArticuloId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Guia", "Guia")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Guia", "Guia")
                         .WithMany()
                         .HasForeignKey("GuiaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Guia", null)
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Guia", null)
                         .WithMany("ArticulosGuia")
                         .HasForeignKey("guia_id")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1129,26 +1146,26 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Guia");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Asignacion", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Asignacion", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Chofer", "Chofer")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Chofer", "Chofer")
                         .WithMany()
                         .HasForeignKey("ChoferId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "SucursalDestino")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "SucursalDestino")
                         .WithMany()
                         .HasForeignKey("SucursalDestinoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "SucursalOrigen")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "SucursalOrigen")
                         .WithMany()
                         .HasForeignKey("SucursalOrigenId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1163,9 +1180,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("SucursalOrigen");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Camion", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Camion", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1174,14 +1191,14 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Chofer", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Chofer", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Camion", "Camion")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Camion", "Camion")
                         .WithMany()
                         .HasForeignKey("CamionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1239,7 +1256,7 @@ namespace Paqueteria.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("ChoferId");
 
-                            b1.HasOne("Paqueteria.Core.Entities.Catalogos.Municipio", "Municipio")
+                            b1.HasOne("Paqueteria.Core.Entidades.Catalogos.Municipio", "Municipio")
                                 .WithMany()
                                 .HasForeignKey("MunicipioId")
                                 .OnDelete(DeleteBehavior.Restrict)
@@ -1255,9 +1272,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Cliente", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Cliente", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1266,9 +1283,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.DireccionCliente", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.DireccionCliente", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Cliente", "Cliente")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Cliente", "Cliente")
                         .WithMany("Direcciones")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1326,7 +1343,7 @@ namespace Paqueteria.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("DireccionClienteId");
 
-                            b1.HasOne("Paqueteria.Core.Entities.Catalogos.Municipio", "Municipio")
+                            b1.HasOne("Paqueteria.Core.Entidades.Catalogos.Municipio", "Municipio")
                                 .WithMany()
                                 .HasForeignKey("MunicipioId")
                                 .OnDelete(DeleteBehavior.Restrict)
@@ -1341,7 +1358,7 @@ namespace Paqueteria.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.DireccionGuiaSnapshot", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.DireccionGuiaSnapshot", b =>
                 {
                     b.OwnsOne("Paqueteria.Core.ValueObjects.Direccion", "Direccion", b1 =>
                         {
@@ -1395,7 +1412,7 @@ namespace Paqueteria.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("DireccionGuiaSnapshotId");
 
-                            b1.HasOne("Paqueteria.Core.Entities.Catalogos.Municipio", "Municipio")
+                            b1.HasOne("Paqueteria.Core.Entidades.Catalogos.Municipio", "Municipio")
                                 .WithMany()
                                 .HasForeignKey("MunicipioId")
                                 .OnDelete(DeleteBehavior.Restrict)
@@ -1408,7 +1425,7 @@ namespace Paqueteria.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Empresa", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Empresa", b =>
                 {
                     b.OwnsOne("Paqueteria.Core.ValueObjects.Direccion", "Direccion", b1 =>
                         {
@@ -1462,7 +1479,7 @@ namespace Paqueteria.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("EmpresaId");
 
-                            b1.HasOne("Paqueteria.Core.Entities.Catalogos.Municipio", "Municipio")
+                            b1.HasOne("Paqueteria.Core.Entidades.Catalogos.Municipio", "Municipio")
                                 .WithMany()
                                 .HasForeignKey("MunicipioId")
                                 .OnDelete(DeleteBehavior.Restrict)
@@ -1474,78 +1491,83 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Direccion");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.FolioSucursal", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.FolioSucursal", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "Sucursal")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "Sucursal")
                         .WithOne()
-                        .HasForeignKey("Paqueteria.Core.Entities.Remisiones.FolioSucursal", "SucursalId")
+                        .HasForeignKey("Paqueteria.Core.Entidades.Remisiones.FolioSucursal", "SucursalId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Sucursal");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Guia", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Guia", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Asignacion", "Asignacion")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Asignacion", "Asignacion")
                         .WithMany("Guias")
                         .HasForeignKey("AsignacionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Cliente", "ClienteDestino")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Cliente", "ClienteDestino")
                         .WithMany()
                         .HasForeignKey("ClienteDestinoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Cliente", "ClienteOrigen")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Cliente", "ClienteOrigen")
                         .WithMany()
                         .HasForeignKey("ClienteOrigenId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.DireccionGuiaSnapshot", "DireccionDestino")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.DireccionGuiaSnapshot", "DireccionDestino")
                         .WithMany()
                         .HasForeignKey("DireccionDestinoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.DireccionGuiaSnapshot", "DireccionOrigen")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.DireccionGuiaSnapshot", "DireccionOrigen")
                         .WithMany()
                         .HasForeignKey("DireccionOrigenId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Seguro", "Seguro")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Seguro", "Seguro")
                         .WithMany()
                         .HasForeignKey("SeguroId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "SucursalDestino")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "SucursalActual")
+                        .WithMany()
+                        .HasForeignKey("SucursalActualId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "SucursalDestino")
                         .WithMany()
                         .HasForeignKey("SucursalDestinoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "SucursalOrigen")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "SucursalOrigen")
                         .WithMany()
                         .HasForeignKey("SucursalOrigenId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "UsuarioAlta")
+                    b.HasOne("Paqueteria.Core.Entidades.Sistema.Usuario", "UsuarioAlta")
                         .WithMany()
                         .HasForeignKey("UsuarioAltaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "UsuarioCobro")
+                    b.HasOne("Paqueteria.Core.Entidades.Sistema.Usuario", "UsuarioCobro")
                         .WithMany()
                         .HasForeignKey("UsuarioCobroId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -1564,6 +1586,8 @@ namespace Paqueteria.Infrastructure.Migrations
 
                     b.Navigation("Seguro");
 
+                    b.Navigation("SucursalActual");
+
                     b.Navigation("SucursalDestino");
 
                     b.Navigation("SucursalOrigen");
@@ -1573,21 +1597,21 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("UsuarioCobro");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.GuiaTransbordo", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.GuiaTransbordo", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Asignacion", "Asignacion")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Asignacion", "Asignacion")
                         .WithMany()
                         .HasForeignKey("AsignacionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Guia", "Guia")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Guia", "Guia")
                         .WithMany()
                         .HasForeignKey("GuiaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "SucursalTransbordo")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "SucursalTransbordo")
                         .WithMany()
                         .HasForeignKey("SucursalTransbordoId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1600,21 +1624,21 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("SucursalTransbordo");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Ruta", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Ruta", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "SucursalDestino")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "SucursalDestino")
                         .WithMany()
                         .HasForeignKey("SucursalDestinoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "SucursalOrigen")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "SucursalOrigen")
                         .WithMany()
                         .HasForeignKey("SucursalOrigenId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1627,9 +1651,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("SucursalOrigen");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Seguro", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Seguro", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1638,9 +1662,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Sucursal", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Sucursal", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1695,7 +1719,7 @@ namespace Paqueteria.Infrastructure.Migrations
 
                             b1.ToTable("sucursales");
 
-                            b1.HasOne("Paqueteria.Core.Entities.Catalogos.Municipio", "Municipio")
+                            b1.HasOne("Paqueteria.Core.Entidades.Catalogos.Municipio", "Municipio")
                                 .WithMany()
                                 .HasForeignKey("MunicipioId")
                                 .OnDelete(DeleteBehavior.Restrict)
@@ -1713,9 +1737,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.BitacoraAcceso", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.BitacoraAcceso", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "Usuario")
+                    b.HasOne("Paqueteria.Core.Entidades.Sistema.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1724,15 +1748,15 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.BitacoraSistema", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.BitacoraSistema", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Sucursal", "Sucursal")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "Sucursal")
                         .WithMany()
                         .HasForeignKey("SucursalId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "Usuario")
+                    b.HasOne("Paqueteria.Core.Entidades.Sistema.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1743,9 +1767,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Permiso", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Permiso", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1754,9 +1778,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Rol", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Rol", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1765,15 +1789,15 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.RolPermiso", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.RolPermiso", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Sistema.Permiso", "Permiso")
+                    b.HasOne("Paqueteria.Core.Entidades.Sistema.Permiso", "Permiso")
                         .WithMany("RolPermiso")
                         .HasForeignKey("PermisoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Sistema.Rol", "Rol")
+                    b.HasOne("Paqueteria.Core.Entidades.Sistema.Rol", "Rol")
                         .WithMany("RolPermiso")
                         .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1784,9 +1808,9 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Rol");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Usuario", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Usuario", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Remisiones.Empresa", "Empresa")
+                    b.HasOne("Paqueteria.Core.Entidades.Remisiones.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1795,15 +1819,15 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Empresa");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.UsuarioRol", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.UsuarioRol", b =>
                 {
-                    b.HasOne("Paqueteria.Core.Entities.Sistema.Rol", "Rol")
+                    b.HasOne("Paqueteria.Core.Entidades.Sistema.Rol", "Rol")
                         .WithMany("UsuarioRol")
                         .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Paqueteria.Core.Entities.Sistema.Usuario", "Usuario")
+                    b.HasOne("Paqueteria.Core.Entidades.Sistema.Usuario", "Usuario")
                         .WithMany("UsuarioRoles")
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1814,34 +1838,34 @@ namespace Paqueteria.Infrastructure.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Asignacion", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Asignacion", b =>
                 {
                     b.Navigation("Guias");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Cliente", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Cliente", b =>
                 {
                     b.Navigation("Direcciones");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Remisiones.Guia", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.Guia", b =>
                 {
                     b.Navigation("ArticulosGuia");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Permiso", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Permiso", b =>
                 {
                     b.Navigation("RolPermiso");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Rol", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Rol", b =>
                 {
                     b.Navigation("RolPermiso");
 
                     b.Navigation("UsuarioRol");
                 });
 
-            modelBuilder.Entity("Paqueteria.Core.Entities.Sistema.Usuario", b =>
+            modelBuilder.Entity("Paqueteria.Core.Entidades.Sistema.Usuario", b =>
                 {
                     b.Navigation("UsuarioRoles");
                 });

@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using Paqueteria.Application.Modulos.Permisos;
 using Paqueteria.Application.Modulos.Permisos.Dtos;
 using Paqueteria.Application.Modulos.Roles.Dtos;
-using Paqueteria.Core.Entities.Sistema;
+using Paqueteria.Core.Entidades.Sistema;
 
 namespace Paqueteria.Application.Modulos.Roles;
 
@@ -27,12 +27,18 @@ public static class RolMapeador
     {
         var permisos = entidad.RolPermiso?
             .Where(rp => rp.Permiso != null)
-            .Select(rp => rp.Permiso!.ARespuestaDto()) ?? [];
+            .Select(rp => new PermisoRespuestaDto(
+                rp.Permiso.Id,
+                rp.Permiso.Nombre,
+                rp.Permiso.Descripcion
+            ))
+            .ToList() ?? [];
+
 
         return new RolRespuestaDto(
             entidad.Id,
             entidad.Nombre,
-            entidad.Descripcion ?? string.Empty,
+            entidad.Descripcion,
             permisos
         );
     }

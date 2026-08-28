@@ -2,9 +2,9 @@ using Paqueteria.Application.Comun.Interfaces;
 using Paqueteria.Application.Interfaces.Persistence;
 
 using Paqueteria.Application.Modulos.Usuarios.Dtos;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Errors;
-using Paqueteria.Core.Entities.Sistema;
+using Paqueteria.Core.Comun;
+using Paqueteria.Core.Comun.Errors;
+using Paqueteria.Core.Entidades.Sistema;
 
 namespace Paqueteria.Application.Modulos.Usuarios;
 
@@ -14,30 +14,30 @@ public class UsuarioServicio(
     IHashServicio hashServicio
 ) : IUsuarioServicio
 {
-    public async Task<Resultado<IReadOnlyList<UsuarioRespuestaDto>>> ObtenerTodosAsync()
+    public async Task<Respuesta<IReadOnlyList<UsuarioRespuestaDto>>> ObtenerTodosAsync()
     {
         var usuarios = await unit.Usuarios.ObtenerTodosAsync(contextoUsuario.EmpresaId);
         var respuesta = usuarios.Select(u => u.ARespuestaDto()).ToList();
         
-        return Resultado<IReadOnlyList<UsuarioRespuestaDto>>.Exitoso(respuesta);
+        return Respuesta<IReadOnlyList<UsuarioRespuestaDto>>.Exitoso(respuesta);
     }
 
-    public Task<Resultado<UsuarioRespuestaDto>> ObtenerPorIdAsync(Guid usuarioId)
+    public Task<Respuesta<UsuarioRespuestaDto>> ObtenerPorIdAsync(Guid usuarioId)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Resultado<UsuarioRespuestaDto>> ObtenerPorUsername(string username)
+    public async Task<Respuesta<UsuarioRespuestaDto>> ObtenerPorUsername(string username)
     {
         var usuario = await unit.Usuarios.ObtenerPorUsernameAsync(username);
 
         if (usuario == null)
-            return Resultado<UsuarioRespuestaDto>.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta<UsuarioRespuestaDto>.Error(CodigosError.Generic.NoEncontrado);
 
-        return Resultado<UsuarioRespuestaDto>.Exitoso(usuario.ARespuestaDto());
+        return Respuesta<UsuarioRespuestaDto>.Exitoso(usuario.ARespuestaDto());
     }
 
-    public async Task<Resultado<UsuarioRespuestaDto>> AgregarAsync(UsuarioCrearDto dto)
+    public async Task<Respuesta<UsuarioRespuestaDto>> AgregarAsync(UsuarioCrearDto dto)
     {
         var passwordHash = hashServicio.Hash(dto.Password);
         
@@ -52,56 +52,56 @@ public class UsuarioServicio(
             await unit.Usuarios.AgregarRolAlUsuarioAsync(usuario.Id, rolId, contextoUsuario.EmpresaId);
         }
         
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
 
-        return Resultado<UsuarioRespuestaDto>.Exitoso(usuario.ARespuestaDto());
+        return Respuesta<UsuarioRespuestaDto>.Exitoso(usuario.ARespuestaDto());
     }
 
-    public async Task<Resultado> ActualizarAsync(UsuarioActualizarDto dto)
+    public async Task<Respuesta> ActualizarAsync(UsuarioActualizarDto dto)
     {
         var usuario = (await unit.Usuarios.ObtenerPorIdAsync(dto.UsuarioId, contextoUsuario.EmpresaId));
 
         if (usuario == null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         usuario.Actualizar(dto.Nombre);
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
     
-    public async Task<Resultado> DesactivarAsync(Guid usuarioId)
+    public async Task<Respuesta> DesactivarAsync(Guid usuarioId)
     {
         var usuario = await unit.Usuarios.ObtenerPorIdAsync(usuarioId, contextoUsuario.EmpresaId);
-        if (usuario == null) return Resultado.Error(CodigosError.Generic.NoEncontrado);
+        if (usuario == null) return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         usuario.Desactivar();
-        await  unit.CompletarAsync();
+        await  unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
     
-    public async Task<Resultado> ActivarAsync(Guid usuarioId)
+    public async Task<Respuesta> ActivarAsync(Guid usuarioId)
     {
         var usuario = await unit.Usuarios.ObtenerPorIdAsync(usuarioId, contextoUsuario.EmpresaId);
-        if (usuario == null) return Resultado.Error(CodigosError.Generic.NoEncontrado);
+        if (usuario == null) return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         usuario.Activar();
-        await  unit.CompletarAsync();
+        await  unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 
-    public async Task<Resultado> EliminarAsync(Guid usuarioId)
+    public async Task<Respuesta> EliminarAsync(Guid usuarioId)
     {
         var usuario = (await unit.Usuarios.ObtenerPorIdAsync(usuarioId, contextoUsuario.EmpresaId));
 
         if (usuario == null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         unit.Usuarios.Eliminar(usuario);
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
 
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 }

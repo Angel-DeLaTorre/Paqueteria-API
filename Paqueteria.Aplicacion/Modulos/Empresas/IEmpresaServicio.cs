@@ -1,13 +1,14 @@
-using Paqueteria.Application.DTOs;
-using Paqueteria.Core.Common;
+using Paqueteria.Application.Dtos;
+using Paqueteria.Application.Modulos.Empresas.Dtos;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Empresas;
 
 public interface IEmpresaServicio
 {
-    Task<Resultado<IReadOnlyList<EmpresaResponseDto>>> ObtenerTodosAsync();
-    Task<Resultado<EmpresaResponseDto>> ObtenerPorIdAsync();
-    Task<Resultado<EmpresaResponseDto>> AgregarAsync(EmpresaCreateDto dto);
-    Task<Resultado> ActualizarAsync(EmpresaUpdateDto dto);
-    Task<Resultado> EliminarAsync(Guid empresaId);
+    Task<Respuesta<IReadOnlyList<EmpresaResponseDto>>> ObtenerTodosAsync();
+    Task<Respuesta<EmpresaResponseDto>> ObtenerPorIdAsync();
+    Task<Respuesta<EmpresaResponseDto>> AgregarAsync(EmpresaCreateDto dto);
+    Task<Respuesta> ActualizarAsync(EmpresaUpdateDto dto);
+    Task<Respuesta> EliminarAsync(Guid empresaId);
 }

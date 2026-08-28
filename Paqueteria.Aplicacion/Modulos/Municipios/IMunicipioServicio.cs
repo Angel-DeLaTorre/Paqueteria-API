@@ -1,11 +1,12 @@
-using Paqueteria.Application.DTOs;
-using Paqueteria.Core.Common;
+using Paqueteria.Application.Dtos;
+using Paqueteria.Application.Modulos.Municipios.Dtos;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Municipios;
 
 public interface IMunicipioServicio
 {
-    Task<Resultado<IReadOnlyList<MunicipioResponseDto>>> ObtenerTodosAsync();
-    Task<Resultado<MunicipioResponseDto>> ObtenerPorIdAsync(Guid id);
-    Task<Resultado<IReadOnlyList<MunicipioResponseDto>>> ObtenerPorEstadoAsync(string estado);
+    Task<Respuesta<IReadOnlyList<MunicipioResponseDto>>> ObtenerTodosAsync();
+    Task<Respuesta<MunicipioResponseDto>> ObtenerPorIdAsync(Guid id);
+    Task<Respuesta<IReadOnlyList<MunicipioResponseDto>>> ObtenerPorEstadoAsync(string estado);
 }

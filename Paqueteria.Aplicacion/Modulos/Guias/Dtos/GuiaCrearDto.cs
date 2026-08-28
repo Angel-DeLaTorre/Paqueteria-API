@@ -1,4 +1,3 @@
-using Paqueteria.Application.DTOs;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Application.Modulos.Guias.Dtos;
@@ -30,5 +29,5 @@ public record GuiaCrearDto
     string? PolizaSeguro,
     Guid? SeguroId,
     
-    List<ArticuloGuiaCreateDto> ArticulosGuia
+    List<ArticulosGuiaCrearDto> ArticulosGuia
 );

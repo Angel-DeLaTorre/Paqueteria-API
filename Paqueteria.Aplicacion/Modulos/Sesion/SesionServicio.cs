@@ -7,9 +7,9 @@ using Paqueteria.Application.Comun.Interfaces;
 using Paqueteria.Application.Interfaces.Persistence;
 using Paqueteria.Application.Modulos.Sesion.Configuracion;
 using Paqueteria.Application.Modulos.Sesion.Dtos;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Errors;
-using Paqueteria.Core.Entities.Sistema;
+using Paqueteria.Core.Comun;
+using Paqueteria.Core.Comun.Errors;
+using Paqueteria.Core.Entidades.Sistema;
 using Paqueteria.Core.Enums;
 
 namespace Paqueteria.Application.Modulos.Sesion;
@@ -19,26 +19,26 @@ public class SesionServicio(
     IOptions<JwtOpciones> jwtOpciones,
     IHashServicio hashServicio) : ISesionServicio
 {
-    public async Task<Resultado<SesionRespuestaDto>> IniciarSesionAsync(LoginSolicitudDto solicitud)
+    public async Task<Respuesta<SesionRespuestaDto>> IniciarSesionAsync(LoginSolicitudDto solicitud)
     {
         var usuario = await unidadDeTrabajo.Usuarios.ObtenerPorUsernameAsync(solicitud.Username, true);
 
         if (usuario == null)
-            return Resultado<SesionRespuestaDto>.Error(CodigosError.Users.NotFound);
+            return Respuesta<SesionRespuestaDto>.Error(CodigosError.Users.NotFound);
 
         if (!hashServicio.Verificar(solicitud.Password, usuario.Password))
-            return Resultado<SesionRespuestaDto>.Error(CodigosError.Users.ContrasennaErronea);
+            return Respuesta<SesionRespuestaDto>.Error(CodigosError.Users.ContrasennaErronea);
 
         if (usuario.Estatus != EstatusBasico.Activo)
-            return Resultado<SesionRespuestaDto>.Error(CodigosError.Users.Bloqueado);
+            return Respuesta<SesionRespuestaDto>.Error(CodigosError.Users.Bloqueado);
         
         usuario.RegistrarAcceso();
-        await unidadDeTrabajo.CompletarAsync();
+        await unidadDeTrabajo.GuardarCambiosAsync();
 
-        return Resultado<SesionRespuestaDto>.Exitoso(GenerarRespuestaAutenticacion(usuario));
+        return Respuesta<SesionRespuestaDto>.Exitoso(GenerarRespuestaAutenticacion(usuario));
     }
 
-    public Task<Resultado> CambiarContraseniaAsync(LoginSolicitudDto solicitud)
+    public Task<Respuesta> CambiarContraseniaAsync(LoginSolicitudDto solicitud)
     {
         throw new NotImplementedException();
     }
@@ -85,7 +85,7 @@ public class SesionServicio(
             usuario.Nombre,
             permisos,
             jwtString,
-            tokenDescriptor.Expires
+            (DateTime)tokenDescriptor.Expires
         );
     }
 }

@@ -1,70 +1,71 @@
 using Paqueteria.Application.Comun.Interfaces;
-using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Dtos;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Errors;
+using Paqueteria.Application.Modulos.Empresas.Dtos;
+using Paqueteria.Core.Comun;
+using Paqueteria.Core.Comun.Errors;
 
 namespace Paqueteria.Application.Modulos.Empresas;
 
 public sealed class EmpresaServicio(IUnitOfWork unit, IUsuarioContextoServicio contextoUsuario) : IEmpresaServicio
 {
-    public async Task<Resultado<IReadOnlyList<EmpresaResponseDto>>> ObtenerTodosAsync()
+    public async Task<Respuesta<IReadOnlyList<EmpresaResponseDto>>> ObtenerTodosAsync()
     {
 
         var empresas =  ( await unit.Empresas.ObtenerTodosAsync(false) )
             .Select( EmpresaResponseDto.FromEntity ).ToList();
 
-        return Resultado<IReadOnlyList<EmpresaResponseDto>>.Exitoso(empresas);
+        return Respuesta<IReadOnlyList<EmpresaResponseDto>>.Exitoso(empresas);
     }
 
-    public async Task<Resultado<EmpresaResponseDto>> ObtenerPorIdAsync()
+    public async Task<Respuesta<EmpresaResponseDto>> ObtenerPorIdAsync()
     {
         var empresa = await unit.Empresas.ObtenerPorIdAsync(contextoUsuario.EmpresaId);
 
         if (empresa is null)
-            return Resultado<EmpresaResponseDto>.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta<EmpresaResponseDto>.Error(CodigosError.Generic.NoEncontrado);
 
-        return Resultado<EmpresaResponseDto>.Exitoso(EmpresaResponseDto.FromEntity(empresa));
+        return Respuesta<EmpresaResponseDto>.Exitoso(EmpresaResponseDto.FromEntity(empresa));
     }
 
-    public async Task<Resultado<EmpresaResponseDto>> AgregarAsync(EmpresaCreateDto dto)
+    public async Task<Respuesta<EmpresaResponseDto>> AgregarAsync(EmpresaCreateDto dto)
     {
         var empresa = await unit.Empresas.AgregarAsync(dto.ToEntity());
 
-        var result = await unit.CompletarAsync();
+        var result = await unit.GuardarCambiosAsync();
 
         if (result <= 0)
-            return Resultado<EmpresaResponseDto>.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta<EmpresaResponseDto>.Error(CodigosError.Generic.NoEncontrado);
 
-        return Resultado<EmpresaResponseDto>.Exitoso(EmpresaResponseDto.FromEntity(empresa));
+        return Respuesta<EmpresaResponseDto>.Exitoso(EmpresaResponseDto.FromEntity(empresa));
     }
 
-    public async Task<Resultado> ActualizarAsync(EmpresaUpdateDto dto)
+    public async Task<Respuesta> ActualizarAsync(EmpresaUpdateDto dto)
     {
         var empresa = (await unit.Empresas.ObtenerPorIdAsync(dto.EmpresaId));
 
         if (empresa is null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         dto.UpdateEntity(empresa);
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
 
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 
-    public async Task<Resultado> EliminarAsync(Guid empresaId)
+    public async Task<Respuesta> EliminarAsync(Guid empresaId)
     {
         var empresa = (await unit.Empresas.ObtenerPorIdAsync(empresaId));
 
         if ( empresa is null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         unit.Empresas.Eliminar(empresa);
 
-        var result = await unit.CompletarAsync();
+        var result = await unit.GuardarCambiosAsync();
         if (result <= 0)
-            return Resultado.Error(CodigosError.Generic.NoEliminado);
+            return Respuesta.Error(CodigosError.Generic.NoEliminado);
 
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 }

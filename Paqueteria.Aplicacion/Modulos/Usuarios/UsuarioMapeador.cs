@@ -3,7 +3,7 @@ using Paqueteria.Application.Modulos.Permisos.Dtos;
 using Paqueteria.Application.Modulos.Roles;
 using Paqueteria.Application.Modulos.Roles.Dtos;
 using Paqueteria.Application.Modulos.Usuarios.Dtos;
-using Paqueteria.Core.Entities.Sistema;
+using Paqueteria.Core.Entidades.Sistema;
 
 namespace Paqueteria.Application.Modulos.Usuarios;
 
@@ -35,6 +35,7 @@ public static class UsuarioMapeador
     // Método de extensión para objetos en memoria
     public static UsuarioRespuestaDto ARespuestaDto(this Usuario entidad)
     {
+        
         var roles = entidad.UsuarioRoles?
             .Where(ur => ur.Rol != null)
             .Select(ur => ur.Rol!.ARespuestaDto())

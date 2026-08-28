@@ -1,15 +1,14 @@
-using Paqueteria.Application.DTOs;
 using Paqueteria.Application.Modulos.Usuarios.Dtos;
-using Paqueteria.Core.Common;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Usuarios;
 
 public interface IUsuarioServicio
 {
-    Task<Resultado<IReadOnlyList<UsuarioRespuestaDto>>> ObtenerTodosAsync();
-    Task<Resultado<UsuarioRespuestaDto>> ObtenerPorIdAsync(Guid usuarioId);
-    Task<Resultado<UsuarioRespuestaDto>> ObtenerPorUsername(string username);
-    Task<Resultado<UsuarioRespuestaDto>> AgregarAsync(UsuarioCrearDto dto);
-    Task<Resultado> ActualizarAsync(UsuarioActualizarDto dto);
-    Task<Resultado> EliminarAsync(Guid usuarioId);
+    Task<Respuesta<IReadOnlyList<UsuarioRespuestaDto>>> ObtenerTodosAsync();
+    Task<Respuesta<UsuarioRespuestaDto>> ObtenerPorIdAsync(Guid usuarioId);
+    Task<Respuesta<UsuarioRespuestaDto>> ObtenerPorUsername(string username);
+    Task<Respuesta<UsuarioRespuestaDto>> AgregarAsync(UsuarioCrearDto dto);
+    Task<Respuesta> ActualizarAsync(UsuarioActualizarDto dto);
+    Task<Respuesta> EliminarAsync(Guid usuarioId);
 }

@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Paqueteria.Application.Modulos.Permisos.Dtos;
-using Paqueteria.Core.Entities.Sistema;
+using Paqueteria.Core.Entidades.Sistema;
 
 namespace Paqueteria.Application.Modulos.Permisos;
 

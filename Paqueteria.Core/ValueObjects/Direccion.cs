@@ -1,4 +1,4 @@
-using Paqueteria.Core.Entities.Catalogos;
+using Paqueteria.Core.Entidades.Catalogos;
 
 namespace Paqueteria.Core.ValueObjects;
 

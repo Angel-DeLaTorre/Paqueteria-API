@@ -3,19 +3,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Paqueteria.Application.Comun.Interfaces;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Interfaces.Services.Reportes;
 using Paqueteria.Application.Modulos.Sesion.Configuracion;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Audit;
-using Paqueteria.Core.Interfaces.Reportes;
-using Paqueteria.Core.Interfaces.Repositories;
-using Paqueteria.Infrastructure.Data;
-using Paqueteria.Infrastructure.Persistence;
+using Paqueteria.Core.Interfaces.Repositorios;
+using Paqueteria.Infrastructure.Persistencia;
+using Paqueteria.Infrastructure.Persistencia.Repositorios;
 using Paqueteria.Infrastructure.Reportes;
 using Paqueteria.Infrastructure.Reportes.Estrategias;
-using Paqueteria.Infrastructure.Repositories;
 using Paqueteria.Infrastructure.Seguridad;
-using Paqueteria.Infrastructure.Services;
 
 namespace Paqueteria.Infrastructure;
 
@@ -39,28 +33,26 @@ public static class InyeccionDependencias
                 // Configuramos el ensamblado de migraciones
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-        services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
-        services.AddScoped<IUnitOfWorkBase, UnitOfWorkBaseBase>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IArticuloRepository, ArticuloRepository>();
-        services.AddScoped<IAsignacionRepository, AsignacionRepository>();
-        services.AddScoped<IBitacoraAccesoRepository, BitacoraAccesoRepository>();
-        services.AddScoped<IBitacoraSistemaRepository, BitacoraSistemaRepository>();
-        services.AddScoped<IChoferRepository, ChoferRepository>();
-        services.AddScoped<IClienteRepository, ClienteRepository>();
-        services.AddScoped<IFolioSucursalRepository, FolioSucursalRepository>();
-        services.AddScoped<IEmpresaRepository, EmpresaRepository>();
-        services.AddScoped<IEstadoRepository, EstadoRepository>();
-        services.AddScoped<IGuiaRepository, GuiaRepository>();
+        services.AddScoped(typeof(IEntityRepositorio<>), typeof(EntityRepositorio<>));
+        services.AddScoped<IUnitOfWork, UnidadDeTrabajo>();
+        services.AddScoped<IArticuloRepositorio, ArticuloRepositorio>();
+        services.AddScoped<IAsignacionRepositorio, AsignacionRepositorio>();
+        services.AddScoped<IBitacoraAccesoRepositorio, BitacoraAccesoRepositorio>();
+        services.AddScoped<IBitacoraSistemaRepositorio, BitacoraSistemaRepositorio>();
+        services.AddScoped<IChoferRepositorio, ChoferRepositorio>();
+        services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
+        services.AddScoped<IFolioSucursalRepositorio, FolioSucursalRepositorio>();
+        services.AddScoped<IEmpresaRepositorio, EmpresaRepositorio>();
+        services.AddScoped<IEstadoRepositorio, EstadoRepositorio>();
+        services.AddScoped<IGuiaRepositorio, GuiaRepositorio>();
         services.AddScoped<IGuiaTransbordoRepositorio, GuiaTransbordoRepositorio>();
-        services.AddScoped<IMunicipioRepository, MunicipioRepository>();
-        services.AddScoped<IRutaRepository, RutaRepository>();
-        services.AddScoped<ISeguroRepository, SeguroRepository>();
-        services.AddScoped<ISucursalRepository, SucursalRepository>();
-        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-        services.AddScoped<IRolRepository, RolRepository>();
-        services.AddScoped<IPermisoRepository, PermisoRepository>();
-        services.AddScoped<IAuditLogService, FakeAuditLogService>();
+        services.AddScoped<IMunicipioRepositorio, MunicipioRepositorio>();
+        services.AddScoped<IRutaRepositorio, RutaRepositorio>();
+        services.AddScoped<ISeguroRepositorio, SeguroRepositorio>();
+        services.AddScoped<ISucursalRepositorio, SucursalRepositorio>();
+        services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
+        services.AddScoped<IRolRepositorio, RolRepositorio>();
+        services.AddScoped<IPermisoRepositorio, PermisoRepositorio>();
         services.AddScoped<IHashServicio, BCryptHashServicio>();
         
         // Reporteria
@@ -69,6 +61,7 @@ public static class InyeccionDependencias
         //Estrategias
         services.AddScoped<IPdfEstrategia, GuiaPdfEstrategia>();
         services.AddScoped<IPdfEstrategia, ReporteSalidaOperador>();
+        services.AddScoped<IPdfEstrategia, RemisionPdfEstrategia>();
         
         return services;
     }

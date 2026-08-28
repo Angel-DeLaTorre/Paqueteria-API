@@ -1,13 +1,14 @@
-using Paqueteria.Application.DTOs;
-using Paqueteria.Core.Common;
+using Paqueteria.Application.Dtos;
+using Paqueteria.Application.Modulos.Sucursales.Dtos;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Sucursales;
 
 public interface ISucursalServicio
 {
-    Task<Resultado<IReadOnlyList<SucursalResponseDto>>> ObtenerTodosAsync();
-    Task<Resultado<SucursalResponseDto>> ObtenerPorIdAsync(Guid sucursalId);
-    Task<Resultado<SucursalResponseDto>> AgregarAsync(SucursalCreateDto dto);
-    Task<Resultado> ActualizarAsync(SucursaUpdateDto dto);
-    Task<Resultado> EliminarAsync(Guid sucursalId);
+    Task<Respuesta<IReadOnlyList<SucursalResponseDto>>> ObtenerTodosAsync();
+    Task<Respuesta<SucursalResponseDto>> ObtenerPorIdAsync(Guid sucursalId);
+    Task<Respuesta<SucursalResponseDto>> AgregarAsync(SucursalCreateDto dto);
+    Task<Respuesta> ActualizarAsync(SucursaUpdateDto dto);
+    Task<Respuesta> EliminarAsync(Guid sucursalId);
 }

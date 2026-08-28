@@ -2,14 +2,14 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Paqueteria.API.Configurations;
+using Paqueteria.API.Configuraciones;
 using Paqueteria.API.Middlewares;
 using Paqueteria.API.Servicios;
 using Paqueteria.Application;
 using Paqueteria.Application.Comun.Interfaces;
 using Paqueteria.Application.Modulos.Sesion.Configuracion;
 using Paqueteria.Infrastructure;
-using Paqueteria.Infrastructure.Data;
+using Paqueteria.Infrastructure.Persistencia;
 using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,13 +1,14 @@
-using Paqueteria.Application.DTOs;
-using Paqueteria.Core.Common;
+using Paqueteria.Application.Dtos;
+using Paqueteria.Application.Modulos.Articulos.Dtos;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Articulos;
 
 public interface IArticuloServicio
 {
-    Task<Resultado<IReadOnlyList<ArticuloResponseDto>>> ObtenerTodosAsync();
-    Task<Resultado<ArticuloResponseDto>> ObtenerPorIdAsync(Guid articuloId);
-    Task<Resultado<ArticuloResponseDto>> AgregarAsync(ArticuloCreateDto dto);
-    Task<Resultado> ActualizarAsync(ArticuloUpdateDto dto);
-    Task<Resultado> EliminarAsync(Guid articuloId);
+    Task<Respuesta<IReadOnlyList<ArticuloResponseDto>>> ObtenerTodosAsync();
+    Task<Respuesta<ArticuloResponseDto>> ObtenerPorIdAsync(Guid articuloId);
+    Task<Respuesta<ArticuloResponseDto>> AgregarAsync(ArticuloCreateDto dto);
+    Task<Respuesta> ActualizarAsync(ArticuloUpdateDto dto);
+    Task<Respuesta> EliminarAsync(Guid articuloId);
 }

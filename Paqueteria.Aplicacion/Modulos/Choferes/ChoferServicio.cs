@@ -1,35 +1,36 @@
 using Paqueteria.Application.Comun.Interfaces;
-using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Dtos;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Errors;
-using Paqueteria.Core.Entities.Remisiones;
+using Paqueteria.Application.Modulos.Choferes.Dtos;
+using Paqueteria.Core.Comun;
+using Paqueteria.Core.Comun.Errors;
+using Paqueteria.Core.Entidades.Remisiones;
 
 namespace Paqueteria.Application.Modulos.Choferes;
 
 public class ChoferServicio(IUnitOfWork unit, IUsuarioContextoServicio contextoUsuario) : IChoferServicio
 {
-    public async Task<Resultado<IReadOnlyList<ChoferResponseDto>>> ObtenerTodosAsync()
+    public async Task<Respuesta<IReadOnlyList<ChoferResponseDto>>> ObtenerTodosAsync()
     {
 
         var choferes = ( await unit.Choferes.ObtenerTodosAsync(contextoUsuario.EmpresaId) )
             .Select( ChoferResponseDto.FromEntity ).ToList();
-        return Resultado<IReadOnlyList<ChoferResponseDto>>.Exitoso(choferes);
+        return Respuesta<IReadOnlyList<ChoferResponseDto>>.Exitoso(choferes);
         
     }
 
-    public async Task<Resultado<ChoferResponseDto>> ObtenerPorIdAsync(Guid choferId)
+    public async Task<Respuesta<ChoferResponseDto>> ObtenerPorIdAsync(Guid choferId)
     {
 
         var chofer = await unit.Choferes.ObtenerPorIdAsync(choferId, contextoUsuario.EmpresaId);
 
         if (chofer is null)
-            return Resultado<ChoferResponseDto>.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta<ChoferResponseDto>.Error(CodigosError.Generic.NoEncontrado);
 
-        return Resultado<ChoferResponseDto>.Exitoso(ChoferResponseDto.FromEntity(chofer));
+        return Respuesta<ChoferResponseDto>.Exitoso(ChoferResponseDto.FromEntity(chofer));
     }
 
-    public async Task<Resultado<ChoferResponseDto>> AgregarAsync(ChoferCreateDto dto)
+    public async Task<Respuesta<ChoferResponseDto>> AgregarAsync(ChoferCreateDto dto)
     {
         var direccion = dto.Direccion.ToEntity();
         
@@ -47,18 +48,18 @@ public class ChoferServicio(IUnitOfWork unit, IUsuarioContextoServicio contextoU
         
         await unit.Choferes.AgregarAsync(chofer);
 
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
 
-        return Resultado<ChoferResponseDto>.Exitoso(ChoferResponseDto.FromEntity(chofer));
+        return Respuesta<ChoferResponseDto>.Exitoso(ChoferResponseDto.FromEntity(chofer));
     }
 
-    public async Task<Resultado> ActualizarAsync(ChoferUpdateDto dto)
+    public async Task<Respuesta> ActualizarAsync(ChoferUpdateDto dto)
     {
 
         var chofer = await unit.Choferes.ObtenerPorIdAsync(dto.ChoferId,  contextoUsuario.EmpresaId);
 
         if (chofer is null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         var direccion = dto.Direccion.ToEntity();
     
@@ -73,46 +74,46 @@ public class ChoferServicio(IUnitOfWork unit, IUsuarioContextoServicio contextoU
         
         chofer.AsignarCamion( dto.NumCamion, dto.NumContenedor, dto.NumContenedor2 );
         
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
 
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 
-    public async Task<Resultado> EliminarAsync(Guid choferId)
+    public async Task<Respuesta> EliminarAsync(Guid choferId)
     {
         var chofer = (await unit.Choferes.ObtenerPorIdAsync(choferId,  contextoUsuario.EmpresaId));
 
         if (chofer is null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
 
         unit.Choferes.Eliminar(chofer);
 
-        var result = await unit.CompletarAsync();
+        var result = await unit.GuardarCambiosAsync();
         if (result <= 0)
-            return Resultado.Error(CodigosError.Generic.NoEliminado);
+            return Respuesta.Error(CodigosError.Generic.NoEliminado);
 
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
     
-    public async Task<Resultado> DesactivarAsync(Guid choferId)
+    public async Task<Respuesta> DesactivarAsync(Guid choferId)
     {
         var chofer = await unit.Choferes.ObtenerPorIdAsync(choferId, contextoUsuario.EmpresaId);
-        if (chofer == null) return Resultado.Error(CodigosError.Generic.NoEncontrado);
+        if (chofer == null) return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         chofer.Desactivar();
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
     
-    public async Task<Resultado> ActivarAsync(Guid choferId)
+    public async Task<Respuesta> ActivarAsync(Guid choferId)
     {
         var chofer = await unit.Choferes.ObtenerPorIdAsync(choferId, contextoUsuario.EmpresaId);
-        if (chofer == null) return Resultado.Error(CodigosError.Generic.NoEncontrado);
+        if (chofer == null) return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         chofer.Activar();
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 }

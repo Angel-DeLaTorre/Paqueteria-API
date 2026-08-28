@@ -1,34 +1,35 @@
 using Paqueteria.Application.Comun.Interfaces;
-using Paqueteria.Application.DTOs;
+using Paqueteria.Application.Dtos;
 using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Core.Common;
-using Paqueteria.Core.Common.Errors;
+using Paqueteria.Application.Modulos.Roles.Dtos;
+using Paqueteria.Core.Comun;
+using Paqueteria.Core.Comun.Errors;
 
 namespace Paqueteria.Application.Modulos.Roles;
 
 public sealed class RolServicio( IUnitOfWork unit, IUsuarioContextoServicio contextoUsuario) : IRolServicio
 {
-    public async Task<Resultado<RolResponseDto>> ObtenerPorIdAsync(Guid id)
+    public async Task<Respuesta<RolResponseDto>> ObtenerPorIdAsync(Guid id)
     {
         var rol = await unit.Roles.ObtenerPorIdAsync(id, contextoUsuario.EmpresaId, includePermissions: true);
         if (rol == null)
-            return Resultado<RolResponseDto>.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta<RolResponseDto>.Error(CodigosError.Generic.NoEncontrado);
 
-        return Resultado<RolResponseDto>.Exitoso(RolResponseDto.FromEntity(rol));
+        return Respuesta<RolResponseDto>.Exitoso(RolResponseDto.FromEntity(rol));
     }
     
-    public async Task<Resultado<IEnumerable<RolResponseDto>>> ObtenerTodosAsync()
+    public async Task<Respuesta<IEnumerable<RolResponseDto>>> ObtenerTodosAsync()
     {
         var listaRoles = await unit.Roles.ObtenerTodosAsync(contextoUsuario.EmpresaId);
         var dtos = listaRoles.Select(RolResponseDto.FromEntity).ToList();
-        return Resultado<IEnumerable<RolResponseDto>>.Exitoso(dtos);
+        return Respuesta<IEnumerable<RolResponseDto>>.Exitoso(dtos);
     }
     
-    public async Task<Resultado<RolResponseDto>> AgregarAsync(RolCreateDto dto)
+    public async Task<Respuesta<RolResponseDto>> AgregarAsync(RolCreateDto dto)
     {
         var rolExistente = await unit.Roles.ObtenerPorNombreAsync(dto.Nombre, contextoUsuario.EmpresaId);
         if (rolExistente != null)
-            return Resultado<RolResponseDto>.Error(CodigosError.Generic.Conflicto);
+            return Respuesta<RolResponseDto>.Error(CodigosError.Generic.Conflicto);
         
         var rol = dto.ToEntity(contextoUsuario.EmpresaId);
         await unit.Roles.AgregarAsync(rol);
@@ -40,17 +41,17 @@ public sealed class RolServicio( IUnitOfWork unit, IUsuarioContextoServicio cont
                 await unit.Roles.AgregarPermisoAlRolAsync(rol.Id, permisoId, contextoUsuario.EmpresaId);
             }
         }
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
         var rolCompleto = await unit.Roles.ObtenerPorIdAsync(rol.Id, contextoUsuario.EmpresaId, includePermissions: true);
         
-        return Resultado<RolResponseDto>.Exitoso(RolResponseDto.FromEntity(rolCompleto !));
+        return Respuesta<RolResponseDto>.Exitoso(RolResponseDto.FromEntity(rolCompleto !));
     }
     
-    public async Task<Resultado> ActualizarAsync(RolUpdateDto dto)
+    public async Task<Respuesta> ActualizarAsync(RolUpdateDto dto)
     {
         var rol = await unit.Roles.ObtenerPorIdAsync(dto.RoleId, contextoUsuario.EmpresaId, includePermissions: true);
         if (rol == null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         dto.UpdateEntity(rol);
 
@@ -67,38 +68,38 @@ public sealed class RolServicio( IUnitOfWork unit, IUsuarioContextoServicio cont
             }
         }
         
-        await unit.CompletarAsync();
-        return Resultado.Exitoso();
+        await unit.GuardarCambiosAsync();
+        return Respuesta.Exitoso();
     }
-    public async Task<Resultado> ActivarAsync(Guid rolId)
+    public async Task<Respuesta> ActivarAsync(Guid rolId)
     {
         var rol = await unit.Roles.ObtenerPorIdAsync(rolId, contextoUsuario.EmpresaId);
-        if (rol == null) return Resultado.Error(CodigosError.Generic.NoEncontrado);
+        if (rol == null) return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         rol.Activar();
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
-    public async Task<Resultado> DesactivarAsync(Guid rolId)
+    public async Task<Respuesta> DesactivarAsync(Guid rolId)
     {
         var rol = await unit.Roles.ObtenerPorIdAsync(rolId, contextoUsuario.EmpresaId);
-        if (rol == null) return Resultado.Error(CodigosError.Generic.NoEncontrado);
+        if (rol == null) return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         rol.Desactivar();
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
         
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
-    public async Task<Resultado> EliminarAsync(Guid id)
+    public async Task<Respuesta> EliminarAsync(Guid id)
     {
         var rol = await unit.Roles.ObtenerPorIdAsync(id, contextoUsuario.EmpresaId);
         if (rol == null)
-            return Resultado.Error(CodigosError.Generic.NoEncontrado);
+            return Respuesta.Error(CodigosError.Generic.NoEncontrado);
         
         unit.Roles.Eliminar(rol);
-        await unit.CompletarAsync();
+        await unit.GuardarCambiosAsync();
 
-        return Resultado.Exitoso();
+        return Respuesta.Exitoso();
     }
 }

@@ -1,15 +1,16 @@
-using Paqueteria.Application.DTOs;
-using Paqueteria.Core.Common;
+using Paqueteria.Application.Dtos;
+using Paqueteria.Application.Modulos.Asignaciones.Dtos;
+using Paqueteria.Core.Comun;
 
 namespace Paqueteria.Application.Modulos.Asignaciones;
 
 public interface IAsignacionServicio
 {
-    Task<Resultado<IReadOnlyList<AsignacionResponseDto>>> ObtenerTodosAsync();
-    Task<Resultado<AsignacionResponseDto>> ObtenerPorIdAsync(Guid asignacionId);
-    Task<Resultado<AsignacionResponseDto>> AgregarAsync(AsignacionCreateDto dto);
-    Task<Resultado> ActualizarAsync(AsignacionUpdateDto dto);
-    Task<Resultado> EliminarAsync(Guid asignacionId);
+    Task<Respuesta<IReadOnlyList<AsignacionRespuestaDto>>> ObtenerTodosAsync();
+    Task<Respuesta<AsignacionRespuestaDto>> ObtenerPorIdAsync(Guid asignacionId);
+    Task<Respuesta<AsignacionRespuestaDto>> AgregarAsync(AsignacionCrearDto dto);
+    Task<Respuesta> ActualizarAsync(AsignacionActualizarDto dto);
+    Task<Respuesta> EliminarAsync(Guid asignacionId);
     
-    Task<Resultado<byte[]>> GenerarReporteSalidasPdfAsync(Guid? sucursalOrigenId, DateTime? fechaInicio, DateTime? fechaFin);
+    Task<Respuesta<byte[]>> GenerarReporteSalidasPdfAsync(Guid? sucursalOrigenId, DateTime? fechaInicio, DateTime? fechaFin);
 }
