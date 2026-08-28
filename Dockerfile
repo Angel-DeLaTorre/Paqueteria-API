@@ -6,26 +6,26 @@ WORKDIR /src
 
 # 1. Copiamos todos los archivos .csproj replicando su estructura exacta de carpetas
 # Esto permite aprovechar la caché de Docker para acelerar futuras compilaciones
-COPY ["Paqueteria.API/Paqueteria.API.csproj", "Paqueteria.API/"]
-COPY ["Paqueteria.Application/Paqueteria.Application.csproj", "Paqueteria.Application/"]
+COPY ["Paqueteria.API/Paqueteria.Api.csproj", "Paqueteria.Api/"]
+COPY ["Paqueteria.Applicacion/Paqueteria.Aplicacion.csproj", "Paqueteria.Aplicacion/"]
 COPY ["Paqueteria.Core/Paqueteria.Core.csproj", "Paqueteria.Core/"]
-COPY ["Paqueteria.Infrastructure/Paqueteria.Infrastructure.csproj", "Paqueteria.Infrastructure/"]
+COPY ["Paqueteria.Infraestructura/Paqueteria.Infraestructura.csproj", "Paqueteria.Infraestructura/"]
 
 # 2. Restauramos las dependencias NuGet basándonos en el proyecto ejecutable principal
-RUN dotnet restore "Paqueteria.API/Paqueteria.API.csproj"
+RUN dotnet restore "Paqueteria.Api/Paqueteria.Api.csproj"
 
 # 3. Copiamos absolutamente el resto del código fuente del repositorio
 COPY . .
 
 # 4. Nos movemos a la capa de la API y compilamos en modo Release sin generar el ejecutable nativo del Host
-WORKDIR "/src/Paqueteria.API"
-RUN dotnet build "Paqueteria.API.csproj" -c Release -o /app/build
+WORKDIR "/src/Paqueteria.Api"
+RUN dotnet build "Paqueteria.Api.csproj" -c Release -o /app/build
 
 # =========================================================
 # Etapa 2: Publicación de los binarios optimizados
 # =========================================================
 FROM build AS publish
-RUN dotnet publish "Paqueteria.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Paqueteria.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # =========================================================
 # Etapa 3: Imagen de ejecución final (Runtime ligero de .NET 10)
@@ -40,4 +40,4 @@ EXPOSE 8080
 COPY --from=publish /app/publish .
 
 # Comando de arranque del contenedor
-ENTRYPOINT ["dotnet", "Paqueteria.API.dll"]
+ENTRYPOINT ["dotnet", "Paqueteria.Api.dll"]
