@@ -5,11 +5,11 @@ using Paqueteria.Core.Entidades.Remisiones;
 namespace Paqueteria.Application.Modulos.Choferes.Dtos;
 
 public record ChoferCreateDto(
-    string Nombre,
-    string ApellidoPaterno,
-    string ApellidoMaterno,
-    DireccionDto Direccion,
-    string Telefono,
+    [property: Required] string Nombre,
+    [property: Required] string ApellidoPaterno,
+    [property: Required] string ApellidoMaterno,
+    [property: Required] DireccionDto Direccion,
+    [property: Required] string Telefono,
     string? NumCamion,
     string? NumContenedor,
     string? NumContenedor2
@@ -17,11 +17,11 @@ public record ChoferCreateDto(
 
 public record ChoferUpdateDto(
     [property: Required] Guid ChoferId,
-    string Nombre,
-    string ApellidoPaterno,
-    string ApellidoMaterno,
-    DireccionDto Direccion,
-    string Telefono,
+    [property: Required] string Nombre,
+    [property: Required] string ApellidoPaterno,
+    [property: Required] string ApellidoMaterno,
+    [property: Required] DireccionDto Direccion,
+    [property: Required] string Telefono,
     string? NumCamion,
     string? NumContenedor,
     string? NumContenedor2
@@ -29,10 +29,10 @@ public record ChoferUpdateDto(
 
 public record ChoferResponseDto(
     [property: Required] Guid ChoferId,
-    string Nombre,
-    string ApellidoPaterno,
+    [property: Required] string Nombre,
+    [property: Required] string ApellidoPaterno,
     string? ApellidoMaterno,
-    DireccionResponseDto Direccion,
+    [property: Required] DireccionResponseDto Direccion,
     string? Telefono,
     string? NumCamion,
     string? NumContenedor,
