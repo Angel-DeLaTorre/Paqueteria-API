@@ -4,9 +4,10 @@ public enum EstatusGuia
 {
     PendenteRecoleccion = 1,
     Recolectado = 2,
-    Transito = 3,
-    BodegaDestino = 5,
-    Reparticion = 6,
-    EsperaRecoleccion = 7,
-    Entregado = 8
+    EnBodegaOrigen = 3,
+    EnTransito = 4,
+    EnBodegaTransbordo = 5,
+    EnBodegaDestino = 6,
+    Entregada = 7,
+    Cancelada = 8
 }

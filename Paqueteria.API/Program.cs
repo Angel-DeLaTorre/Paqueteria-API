@@ -2,32 +2,42 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Paqueteria.API.Configurations;
+using Paqueteria.API.Configuraciones;
 using Paqueteria.API.Middlewares;
-using Paqueteria.Core.Settings;
+using Paqueteria.API.Servicios;
+using Paqueteria.Application;
+using Paqueteria.Application.Comun.Interfaces;
+using Paqueteria.Application.Modulos.Sesion.Configuracion;
 using Paqueteria.Infrastructure;
-using Paqueteria.Infrastructure.Data;
+using Paqueteria.Infrastructure.Persistencia;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
-if (jwtSettings == null || string.IsNullOrWhiteSpace(jwtSettings.Key))
+var jwtConf = builder.Configuration.GetSection(JwtOpciones.SectionName).Get<JwtOpciones>();
+if (jwtConf == null || string.IsNullOrWhiteSpace(jwtConf.Key))
 {
     throw new InvalidOperationException(
-        $"Error Crítico de Configuración: La clave para la sección '{JwtSettings.SectionName}' no se encuentra definida en el entorno.");
+        $"Error Crítico de Configuración: La clave para la sección '{JwtOpciones.SectionName}' no se encuentra definida en el entorno.");
 }
-var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
+var key = Encoding.ASCII.GetBytes(jwtConf.Key);
 
 builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.AddControllers()
+builder.Services
+    .AddControllers()
     .ConfigureCustomValidationErrorResponse();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddInfrastructureServices(builder.Configuration);
+
+builder.Services
+    .AgregarAplicacion()
+    .AgregarInfraestructura(builder.Configuration);
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails(); 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUsuarioContextoServicio, UsuarioContextoServicio>();
 
 builder.Services.AddCors(options =>
 {
@@ -50,31 +60,37 @@ builder.Services.AddAuthentication(x =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = true,
-        ValidIssuer = jwtSettings.Issuer,
+        ValidIssuer = jwtConf.Issuer,
         ValidateAudience = true,
-        ValidAudience = jwtSettings.Audience,
+        ValidAudience = jwtConf.Audience,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero // Elimina el margen de 5 min por defecto
     };
 });
 
+builder.Services.AddAuthorization();
+
+QuestPDF.Settings.License = LicenseType.Community;
+
 var app = builder.Build();
+
+app.UseExceptionHandler(); 
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseExceptionHandler(); 
 if (!app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
 
 app.UseCors("CorsPolicy");
-app.MapControllers();
+
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {

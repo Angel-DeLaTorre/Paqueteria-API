@@ -1,46 +1,22 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-using Paqueteria.Core.Entities.Catalogos;
+using Paqueteria.Core.Entidades.Catalogos;
 
 namespace Paqueteria.Core.ValueObjects;
 
-[Owned]
 public record Direccion
 {
     #region Columns
-    
-        [MaxLength(255)]
-        [Column("calle")]
-        public string Calle { get; set; } = string.Empty;
-
-        [MaxLength(50)]
-        [Column("numero_exterior")]
-        public string NumeroExterior { get; set; }  = string.Empty;
-
-        [MaxLength(50)]
-        [Column("numero_interior")]
-        public string? NumeroInterior { get; set; }
-
-        [MaxLength(100)]
-        [Column("colonia")]
-        public string Colonia { get; set; }  = string.Empty;
-
-        [MaxLength(6)]
-        [Column("codigo_postal")]
-        public string CodigoPostal { get; set; }  = string.Empty;
-
-        [MaxLength(100)]
-        [Column("localidad")]
-        public string? Localidad { get; set; }
-
-        [Column("municipio_id")]
-        public Guid MunicipioId { get; set; } = Guid.Empty;
+        public string Calle { get; init; } = string.Empty;
+        public string NumeroExterior { get; init; }  = string.Empty;
+        public string? NumeroInterior { get; init; }
+        public string Colonia { get; init; }  = string.Empty;
+        public string CodigoPostal { get; init; }  = string.Empty;
+        public string? Localidad { get; init; }
+        public Guid MunicipioId { get; init; } = Guid.Empty;
     
     #endregion
     
     #region Foreign Keys
-        public virtual Municipio Municipio { get; init; } = null!;
+        public Municipio Municipio { get; init; } = null!;
     #endregion
     
     #region Constructors
