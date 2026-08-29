@@ -55,7 +55,7 @@ jobs:
             
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            echo "POSTGRES_DB_CONN=Host=postgres-db;Database=paqueteria_db;Username=admin_paqueteria;Password=${{ secrets.DB_PASSWORD }};" > .env
+            echo "ConnectionStrings__DefaultConnection=Host=postgres-db;Database=paqueteria_db;Username=admin_paqueteria;Password=${{ secrets.DB_PASSWORD }};" > .env
             echo "Jwt__Key=${{ secrets.JWT_SETTINGS_KEY }}" >> .env
             echo "Jwt__Issuer=PaqueteriaAPI" >> .env
             echo "Jwt__Audience=PaqueteriaWeb" >> .env
