@@ -99,6 +99,8 @@ public class GuiaRepositorio(AppDbContext context) : IGuiaRepositorio
         
         return await query
             .Where(c => c.EmpresaId == empresaId)
+            .Include(g => g.ClienteOrigen)
+            .Include(g => g.ClienteDestino)
             .Include(d => d.DireccionOrigen)
             .ThenInclude(m => m.Direccion)
             .ThenInclude(d => d.Municipio)

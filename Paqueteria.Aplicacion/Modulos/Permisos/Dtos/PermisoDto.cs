@@ -12,7 +12,7 @@ public record PermisoCreateDto(
 };
 
 public record PermisoUpdateDto(
-    [property: Required] Guid PermisoId,
+    [param: Required] Guid PermisoId,
     string Nombre,
     string Descripcion
 )
@@ -25,7 +25,7 @@ public record PermisoUpdateDto(
 };
 
 public record PermisoResponseDto(
-    [property: Required] Guid PermisoId,
+    [param: Required] Guid PermisoId,
     string Nombre,
     string Descripcion
 )

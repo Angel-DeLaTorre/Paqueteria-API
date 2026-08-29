@@ -21,7 +21,7 @@ public record RutaCrearDto(
 };
 
 public record RutaActualizarDto(
-    [property: Required] Guid RutaId,
+    [param: Required] Guid RutaId,
     Guid SucursalOrigenId,
     Guid SucursalDestinoId,
     string? Descripcion
@@ -36,7 +36,7 @@ public record RutaActualizarDto(
 }
 
 public record RutaRespuestaDto(
-    [property: Required] Guid RutaId,
+    [param: Required] Guid RutaId,
     Guid SucursalOrigenId,
     SucursalResponseDto SucursalOrigen,
     Guid SucursalDestinoId,

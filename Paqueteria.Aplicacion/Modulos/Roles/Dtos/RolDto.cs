@@ -14,7 +14,7 @@ public record RolCreateDto(
 };
 
 public record RolUpdateDto(
-    [property: Required] Guid RoleId,
+    [param: Required] Guid RoleId,
     string Nombre,
     string Descripcion,
     List<Guid>? PermisosIds
@@ -28,7 +28,7 @@ public record RolUpdateDto(
 };
 
 public record RolResponseDto(
-    [property: Required]
+    [param: Required]
     Guid RolId,
     string Nombre,
     string Descripcion,

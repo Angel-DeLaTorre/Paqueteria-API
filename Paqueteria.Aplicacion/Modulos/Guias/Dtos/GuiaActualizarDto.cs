@@ -5,7 +5,7 @@ namespace Paqueteria.Application.Modulos.Guias.Dtos;
 
 public record GuiaActualizarDto
 (
-    [property: Required] Guid GuiaId,
+    [param: Required] Guid GuiaId,
     FormaPago FormaPago,
     DateTime? FechaEnvio,
     DateTime? FechaPago,

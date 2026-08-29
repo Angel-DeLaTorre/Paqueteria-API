@@ -29,12 +29,12 @@ public record SucursalCreateDto(
 };
 
 public record SucursaUpdateDto(
-    [property: Required] Guid SucursalId,
-    [property: Required] string Nombre,
-    [property: Required] string Codigo,
-    [property: Required] bool EsMatriz,
-    [property: Required] DireccionDto Direccion,
-    [property: Required] string Telefono
+    [param: Required] Guid SucursalId,
+    [param: Required] string Nombre,
+    [param: Required] string Codigo,
+    [param: Required] bool EsMatriz,
+    [param: Required] DireccionDto Direccion,
+    [param: Required] string Telefono
 )
 {
     public void UpdateEntity(Sucursal entity)
@@ -48,13 +48,13 @@ public record SucursaUpdateDto(
 };
 
 public record SucursalResponseDto(
-    [property: Required] Guid SucursalId,
-    [property: Required] string Nombre,
-    [property: Required] string Codigo,
-    [property: Required] bool EsMatriz,
-    [property: Required] DireccionResponseDto Direccion,
+    [param: Required] Guid SucursalId,
+    [param: Required] string Nombre,
+    [param: Required] string Codigo,
+    [param: Required] bool EsMatriz,
+    [param: Required] DireccionResponseDto Direccion,
     string? Telefono,
-    [property: Required] EstatusBasico Estatus
+    [param: Required] EstatusBasico Estatus
 )
 {
     public static SucursalResponseDto FromEntity(Sucursal entity)

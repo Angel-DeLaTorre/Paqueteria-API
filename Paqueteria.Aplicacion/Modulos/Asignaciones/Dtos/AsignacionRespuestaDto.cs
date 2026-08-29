@@ -4,8 +4,8 @@ using Paqueteria.Core.Entidades.Remisiones;
 namespace Paqueteria.Application.Modulos.Asignaciones.Dtos;
 
 public record AsignacionRespuestaDto(
-    [property: Required] Guid Id,
-    [property: Required] string Clave,
+    [param: Required] Guid Id,
+    [param: Required] string Clave,
     Sucursal? SucursalOrigen,
     Sucursal? SucursalDestino,
     Guid? ChoferId,

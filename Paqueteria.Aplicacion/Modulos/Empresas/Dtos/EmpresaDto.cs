@@ -19,7 +19,7 @@ public record EmpresaCreateDto(
 }
 
 public record EmpresaUpdateDto(
-    [property: Required] Guid EmpresaId,
+    [param: Required] Guid EmpresaId,
     string Nombre,
     string? NombreCorto,
     string Rfc,
@@ -36,7 +36,7 @@ public record EmpresaUpdateDto(
 }
 
 public record EmpresaResponseDto(
-    [property: Required] Guid EmpresaId,
+    [param: Required] Guid EmpresaId,
     string Nombre,
     string? NombreCorto,
     string Rfc,

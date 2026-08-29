@@ -4,7 +4,7 @@ using Paqueteria.Core.Entidades.Catalogos;
 namespace Paqueteria.Application.Modulos.Estados.Dtos;
 
 public record EstadoResponseDto(
-    [property: Required] string EstadoId,
+    [param: Required] string EstadoId,
     string Nombre,
     string Acronimo
 )

@@ -5,9 +5,9 @@ namespace Paqueteria.Application.Modulos.Usuarios.Dtos;
 
 public record UsuarioRespuestaDto
 (
-    [property: Required] Guid Id,
-    [property: Required] string Nombre,
-    [property: Required] string Username,
+    [param: Required] Guid Id,
+    [param: Required] string Nombre,
+    [param: Required] string Username,
     List<RolRespuestaDto> Roles,
     DateTime? FechaUltimoAcesso
 );

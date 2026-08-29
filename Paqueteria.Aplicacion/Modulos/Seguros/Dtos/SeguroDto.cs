@@ -12,7 +12,7 @@ public record SeguroCreateDto(
 };
 
 public record SeguroUpdateDto(
-    [property: Required] Guid SeguroId,
+    [param: Required] Guid SeguroId,
     string Nombre
 )
 {
@@ -23,7 +23,7 @@ public record SeguroUpdateDto(
 };
 
 public record SeguroResponseDto(
-    [property: Required] Guid SeguroId,
+    [param: Required] Guid SeguroId,
     string Nombre
 )
 {

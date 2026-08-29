@@ -4,8 +4,8 @@ using Paqueteria.Core.Entidades.Sistema;
 namespace Paqueteria.Application.Modulos.Sesion.Dtos;
 
 public record LoginRequestDto(
-    [property: Required] string Username, 
-    [property: Required] string Password
+    [param: Required] string Username, 
+    [param: Required] string Password
     );
 
 public record SesionResponseDto(
