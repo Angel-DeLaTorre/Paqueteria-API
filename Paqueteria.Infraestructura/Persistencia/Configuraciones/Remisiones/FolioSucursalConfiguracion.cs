@@ -26,8 +26,8 @@ public class FolioSucursalConfiguracion : IEntityTypeConfiguration<FolioSucursal
             .IsRequired();
 
         builder.HasOne(f => f.Sucursal)
-            .WithOne()
-            .HasForeignKey<FolioSucursal>(f => f.SucursalId)
+            .WithMany()
+            .HasForeignKey(f => f.SucursalId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

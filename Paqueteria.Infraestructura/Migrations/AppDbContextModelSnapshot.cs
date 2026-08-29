@@ -479,9 +479,6 @@ namespace Paqueteria.Infrastructure.Migrations
 
                     b.HasKey("SucursalId", "Tipo");
 
-                    b.HasIndex("SucursalId")
-                        .IsUnique();
-
                     b.ToTable("folios_sucursales", (string)null);
                 });
 
@@ -1494,8 +1491,8 @@ namespace Paqueteria.Infrastructure.Migrations
             modelBuilder.Entity("Paqueteria.Core.Entidades.Remisiones.FolioSucursal", b =>
                 {
                     b.HasOne("Paqueteria.Core.Entidades.Remisiones.Sucursal", "Sucursal")
-                        .WithOne()
-                        .HasForeignKey("Paqueteria.Core.Entidades.Remisiones.FolioSucursal", "SucursalId")
+                        .WithMany()
+                        .HasForeignKey("SucursalId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
