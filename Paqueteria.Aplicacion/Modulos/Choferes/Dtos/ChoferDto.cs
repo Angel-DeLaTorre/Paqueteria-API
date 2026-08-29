@@ -5,34 +5,34 @@ using Paqueteria.Core.Entidades.Remisiones;
 namespace Paqueteria.Application.Modulos.Choferes.Dtos;
 
 public record ChoferCreateDto(
-    [property: Required] string Nombre,
-    [property: Required] string ApellidoPaterno,
-    [property: Required] string ApellidoMaterno,
-    [property: Required] DireccionDto Direccion,
-    [property: Required] string Telefono,
+    [param: Required] string Nombre,
+    [param: Required] string ApellidoPaterno,
+    [param: Required] string ApellidoMaterno,
+    [param: Required] DireccionDto Direccion,
+    [param: Required] string Telefono,
     string? NumCamion,
     string? NumContenedor,
     string? NumContenedor2
 );
 
 public record ChoferUpdateDto(
-    [property: Required] Guid ChoferId,
-    [property: Required] string Nombre,
-    [property: Required] string ApellidoPaterno,
-    [property: Required] string ApellidoMaterno,
-    [property: Required] DireccionDto Direccion,
-    [property: Required] string Telefono,
+    [param: Required] Guid ChoferId,
+    [param: Required] string Nombre,
+    [param: Required] string ApellidoPaterno,
+    [param: Required] string ApellidoMaterno,
+    [param: Required] DireccionDto Direccion,
+    [param: Required] string Telefono,
     string? NumCamion,
     string? NumContenedor,
     string? NumContenedor2
 );
 
 public record ChoferResponseDto(
-    [property: Required] Guid ChoferId,
-    [property: Required] string Nombre,
-    [property: Required] string ApellidoPaterno,
+    [param: Required] Guid ChoferId,
+    [param: Required] string Nombre,
+    [param: Required] string ApellidoPaterno,
     string? ApellidoMaterno,
-    [property: Required] DireccionResponseDto Direccion,
+    [param: Required] DireccionResponseDto Direccion,
     string? Telefono,
     string? NumCamion,
     string? NumContenedor,

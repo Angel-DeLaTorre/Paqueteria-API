@@ -5,10 +5,10 @@ namespace Paqueteria.Application.Modulos.Asignaciones.Dtos;
 
 public record AsignacionActualizarDto
 (
-    [property: Required] Guid AsignacionId,
-    [property: Required] Guid SucursalOrigenId,
-    [property: Required] Guid SucursalDestinoId,
-    [property: Required] DateTime FechaPartida,
+    [param: Required] Guid AsignacionId,
+    [param: Required] Guid SucursalOrigenId,
+    [param: Required] Guid SucursalDestinoId,
+    [param: Required] DateTime FechaPartida,
     string? St1,
     string? St2,
     string? St3,

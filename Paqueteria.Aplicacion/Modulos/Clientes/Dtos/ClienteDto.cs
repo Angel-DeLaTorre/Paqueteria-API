@@ -51,7 +51,7 @@ public record ClienteCreateDto(
 };
 
 public record ClienteUpdateDto(
-    [property: Required] Guid ClienteId,
+    [param: Required] Guid ClienteId,
     string Nombre,
     string Rfc,
     string Telefono,
@@ -76,7 +76,7 @@ public record ClienteUpdateDto(
 };
 
 public record ClienteResponseDto(
-    [property: Required] Guid ClienteId,
+    [param: Required] Guid ClienteId,
     string Nombre,
     string? Rfc,
     EstatusBasico Estatus,

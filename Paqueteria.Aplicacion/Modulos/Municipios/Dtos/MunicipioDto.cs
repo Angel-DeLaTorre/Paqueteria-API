@@ -4,7 +4,7 @@ using Paqueteria.Core.Entidades.Catalogos;
 namespace Paqueteria.Application.Modulos.Municipios.Dtos;
 
 public record MunicipioResponseDto(
-    [property: Required] Guid MunicipioId,
+    [param: Required] Guid MunicipioId,
     string Nombre,
     string EstadoId,
     string? EstadoNombre

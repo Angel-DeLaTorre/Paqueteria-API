@@ -5,10 +5,10 @@ namespace Paqueteria.Application.Modulos.Clientes.Dtos;
 
 public record ClienteRespuestaDto
 (
-    [property: Required] Guid ClienteId,
-    [property: Required] string Nombre,
+    [param: Required] Guid ClienteId,
+    [param: Required] string Nombre,
     string? Rfc,
-    [property: Required] EstatusBasico Estatus,
+    [param: Required] EstatusBasico Estatus,
     string? Telefono,
     string? Telefono2,
     string? Correo,
