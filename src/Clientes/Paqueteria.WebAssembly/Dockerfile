@@ -1,5 +1,5 @@
 ﻿# Etapa de compilación
-FROM cr.microsoft.com/dotnet/aspnet:10.0 AS build-env
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS build-env
 WORKDIR /src
 
 # Copiar proyectos necesarios para el cliente
