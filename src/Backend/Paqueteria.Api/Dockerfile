@@ -1,7 +1,7 @@
 ﻿# =========================================================
 # Etapa 1: Compilación de la solución (SDK de .NET 10)
 # =========================================================
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS build-env
 WORKDIR /src
 
 # Copiamos todos los archivos .csproj con la nueva estructura de carpetas
