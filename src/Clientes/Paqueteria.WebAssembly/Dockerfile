@@ -24,6 +24,10 @@ RUN echo 'server { \
     location / { \
         root /usr/share/nginx/html; \
         include /etc/nginx/mime.types; \
-        try_files $uri $uri/ /index.html =404; \
+        try_files $uri $uri/ /index.html; \
+    } \
+    location ~* \.(wasm|clr)$ { \
+        types { application/wasm wasm; } \
+        add_header Cache-Control "no-cache"; \
     } \
 }' > /etc/nginx/conf.d/default.conf
