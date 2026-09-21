@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/angel-delatorre/paqueteria-web
+  IMAGE_NAME: ghcr.io/angel-delatorre/paqueteria-wasm
 
 jobs:
   build-and-push-wasm:
