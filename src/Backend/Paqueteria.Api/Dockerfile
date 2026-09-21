@@ -1,5 +1,5 @@
 ﻿# Etapa 1: Compilación de la solución (SDK de .NET 10)
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
 # 1. Copiamos ÚNICAMENTE la carpeta Comun y la carpeta Backend completa
@@ -18,7 +18,7 @@ FROM build AS publish
 RUN dotnet publish "Paqueteria.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Etapa 3: Imagen de producción ligera (Runtime de ASP.NET Core 10)
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS final
 WORKDIR /app
 EXPOSE 8080
 
