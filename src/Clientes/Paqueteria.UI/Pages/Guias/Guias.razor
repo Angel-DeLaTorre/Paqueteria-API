@@ -1,0 +1,130 @@
+@page "/catalogos/guias"
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Guias
+@inject IGuiaServicio GuiaServicio
+@inject NavigationManager Navigation
+@inject NotificationService NotificationService
+
+<PageTitle>Guías de Embarque - Paquetería</PageTitle>
+
+<RadzenCard Class="rz-my-4 rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+        <div>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-m-0" Style="font-weight: bold;">
+                Consulta de Guías de Embarque
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-color-secondary rz-m-0">
+                Histórico y gestión de embarques emitidos
+            </RadzenText>
+        </div>
+        <RadzenButton Icon="add" Text="Nueva Guía" ButtonStyle="ButtonStyle.Primary" Click='() => Navigation.NavigateTo("/catalogos/guias/alta")' />
+    </RadzenStack>
+
+    @if (_cargando)
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 250px;">
+            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenDataGrid Data="@_guias" TItem="GuiaRespuestaDto" AllowPaging="true" PageSize="10" PagerHorizontalAlign="HorizontalAlign.Right" ShowPagingSummary="true">
+            <Columns>
+                <RadzenDataGridColumn TItem="GuiaRespuestaDto" Title="Folio / Clave" Width="150px">
+                    <Template Context="g">
+                        <RadzenText TextStyle="TextStyle.Body1" Style="font-weight: bold;" Class="rz-m-0">@g.Clave</RadzenText>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="GuiaRespuestaDto" Title="Fecha Envío">
+                    <Template Context="g">
+                        @(g.FechaEnvio?.ToString("dd/MM/yyyy") ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="GuiaRespuestaDto" Title="Origen">
+                    <Template Context="g">
+                        <span>@g.DireccionOrigen?.Direccion?.Calle, @g.DireccionOrigen?.Direccion?.Colonia</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="GuiaRespuestaDto" Title="Destino">
+                    <Template Context="g">
+                        <span>@g.DireccionDestino?.Direccion?.Calle, @g.DireccionDestino?.Direccion?.Colonia</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="GuiaRespuestaDto" Title="Total" Width="130px">
+                    <Template Context="g">
+                        <RadzenText TextStyle="TextStyle.Body1" Class="rz-color-success rz-m-0" Style="font-weight: bold;">
+                            @g.Total.ToString("C2")
+                        </RadzenText>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="GuiaRespuestaDto" Title="Seguro" Width="120px">
+                    <Template Context="g">
+                        @if (g.CobroSeguro > 0 || g.EstaAsegurado)
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="Asegurado" />
+                        }
+                        else
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="N/A" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="GuiaRespuestaDto" Title="Acciones" Width="120px" Sortable="false" Filterable="false">
+                    <Template Context="g">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                            <RadzenButton Icon="visibility" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click='() => Navigation.NavigateTo($"/catalogos/guias/{g.GuiaId}")' />
+                            <RadzenButton Icon="print" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" IsBusy="@(_idImprimiendo == g.GuiaId)" Disabled="@(_idImprimiendo != null)" Click="() => HandleImprimir(g.GuiaId)" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    }
+</RadzenCard>
+
+@code {
+    private List<GuiaRespuestaDto> _guias = new();
+    private bool _cargando = true;
+    private Guid? _idImprimiendo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarDatos();
+    }
+
+    private async Task CargarDatos()
+    {
+        _cargando = true;
+        var res = await GuiaServicio.ObtenerTodosAsync();
+        if (res.EsExitoso && res.Datos != null)
+        {
+            _guias = res.Datos.ToList();
+        }
+        else if (res.DetalleError != null)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al consultar guías", res.DetalleError.Description);
+        }
+        _cargando = false;
+    }
+
+    private async Task HandleImprimir(Guid guiaId)
+    {
+        _idImprimiendo = guiaId;
+        var res = await GuiaServicio.GenerarEtiquetaAsync(guiaId);
+        if (res.EsExitoso && res.Datos != null)
+        {
+            // Lógica de impresión PDF (JSInterop / pdfImprimirUtil)
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al generar el reporte", res.DetalleError?.Description ?? "No se pudo generar el reporte.");
+        }
+        _idImprimiendo = null;
+    }
+}

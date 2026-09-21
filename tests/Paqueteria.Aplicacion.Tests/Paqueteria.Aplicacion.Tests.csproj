@@ -20,10 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Paqueteria.Aplicacion\Paqueteria.Aplicacion.csproj" />
-    <ProjectReference Include="..\..\Paqueteria.Core\Paqueteria.Core.csproj" />
-    <ProjectReference Include="..\..\src\Paqueteria.Aplicacion\Paqueteria.Aplicacion.csproj" />
-    <ProjectReference Include="..\..\src\Paqueteria.Dominio\Paqueteria.Dominio.csproj" />
+    <ProjectReference Include="..\..\src\Backend\Paqueteria.Aplicacion\Paqueteria.Aplicacion.csproj" />
+    <ProjectReference Include="..\..\src\Backend\Paqueteria.Dominio\Paqueteria.Dominio.csproj" />
   </ItemGroup>
 
   <ItemGroup>

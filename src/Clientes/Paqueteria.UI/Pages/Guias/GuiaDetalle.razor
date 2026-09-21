@@ -1,0 +1,219 @@
+@page "/catalogos/guias/{id:guid}"
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Guias
+@using Paqueteria.Comun.Dtos.Seguros
+@inject IGuiaServicio GuiaServicio
+@inject ISeguroServicio SeguroServicio
+@inject NavigationManager Navigation
+@inject NotificationService NotificationService
+
+<PageTitle>Detalle de Guía - Paquetería</PageTitle>
+
+@if (_cargando)
+{
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 60vh;">
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+    </RadzenStack>
+}
+else if (_guia != null)
+{
+    <RadzenStack Gap="1.5rem">
+        <!-- ENCABEZADO Y ACCIONES -->
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                <RadzenButton Icon="arrow_back" ButtonStyle="ButtonStyle.Light" Click='() => Navigation.NavigateTo("/catalogos/guias")' />
+                <RadzenText TextStyle="TextStyle.H4" Class="rz-m-0" Style="font-weight: bold;">Guía: @_guia.Clave</RadzenText>
+                <RadzenBadge BadgeStyle="@(_guia.EstaAsegurado ? BadgeStyle.Info : BadgeStyle.Light)" Text="@(_guia.EstaAsegurado ? "Asegurado" : "Sin Seguro")" />
+            </RadzenStack>
+
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                @if (!_isEditing)
+                {
+                    <RadzenButton Text="Imprimir Etiqueta" Icon="print" ButtonStyle="ButtonStyle.Secondary" Click="HandleImprimirEtiqueta" />
+                    <RadzenButton Text="Editar / Modificar" Icon="edit" ButtonStyle="ButtonStyle.Primary" Click="() => _isEditing = true" />
+                }
+                else
+                {
+                    <RadzenButton Text="Cancelar" Icon="close" ButtonStyle="ButtonStyle.Light" Click="() => _isEditing = false" Disabled="@_guardando" />
+                    <RadzenButton Text="Guardar Cambios" Icon="save" ButtonStyle="ButtonStyle.Primary" IsBusy="@_guardando" Click="HandleSave" />
+                }
+            </RadzenStack>
+        </RadzenStack>
+
+        <!-- REMITENTE Y DESTINATARIO -->
+        <RadzenRow Gutter="1rem">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenCard Class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-primary rz-mb-2" Style="font-weight: bold;">Origen (Remitente)</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0"><strong>Cliente:</strong> @_guia.ClienteOrigen?.Nombre</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0"><strong>Dirección:</strong> @_guia.DireccionOrigen?.Direccion?.Calle #@_guia.DireccionOrigen?.Direccion?.NumeroExterior, Col. @_guia.DireccionOrigen?.Direccion?.Colonia</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0"><strong>Sucursal Admisión:</strong> @_guia.SucursalOrigenNombre</RadzenText>
+                </RadzenCard>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenCard Class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-primary rz-mb-2" Style="font-weight: bold;">Destino (Destinatario)</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0"><strong>Cliente:</strong> @_guia.ClienteDestino?.Nombre</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0"><strong>Dirección:</strong> @_guia.DireccionDestino?.Direccion?.Calle #@_guia.DireccionDestino?.Direccion?.NumeroExterior, Col. @_guia.DireccionDestino?.Direccion?.Colonia</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0"><strong>Sucursal Entrega:</strong> @_guia.SucursalDestinoNombre</RadzenText>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <!-- PAGO Y SEGURO -->
+        <RadzenCard Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-4">Condiciones de Pago y Seguro</RadzenText>
+            @if (_isEditing)
+            {
+                <RadzenRow Gutter="1rem">
+                    <RadzenColumn Size="12" SizeMD="4" Class="rz-d-flex rz-align-items-center">
+                        <RadzenSwitch @bind-Value="_editEstaAsegurado" Name="chkEditSeguro" />
+                        <RadzenLabel Text="¿Mercancía Asegurada?" Component="chkEditSeguro" Class="rz-ml-2" />
+                    </RadzenColumn>
+                    @if (_editEstaAsegurado)
+                    {
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Aseguradora" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenDropDown @bind-Value="_editSeguroId" Data="@_seguros" TextProperty="Nombre" ValueProperty="SeguroId" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Póliza" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="_editPolizaSeguro" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    }
+                </RadzenRow>
+            }
+            else
+            {
+                <RadzenRow Gutter="1rem">
+                    <RadzenColumn Size="12" SizeMD="4"><RadzenText TextStyle="TextStyle.Body2"><strong>Forma de Pago:</strong> @_guia.FormaPago</RadzenText></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="4"><RadzenText TextStyle="TextStyle.Body2"><strong>¿Asegurado?:</strong> @(_guia.EstaAsegurado ? "Sí" : "No")</RadzenText></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="4"><RadzenText TextStyle="TextStyle.Body2"><strong>Póliza:</strong> @(_guia.PolizaSeguro ?? "N/A")</RadzenText></RadzenColumn>
+                </RadzenRow>
+            }
+        </RadzenCard>
+
+        <!-- DESGLOSE FINANCIERO -->
+        <RadzenCard Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-4">Desglose de Costos</RadzenText>
+            <RadzenRow Gutter="1rem">
+                <RadzenColumn Size="6" SizeMD="3"><RadzenText TextStyle="TextStyle.Caption">Flete</RadzenText><RadzenText TextStyle="TextStyle.Body1">@_guia.Flete.ToString("C2")</RadzenText></RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3"><RadzenText TextStyle="TextStyle.Caption">Recolección</RadzenText><RadzenText TextStyle="TextStyle.Body1">@_guia.Recoleccion.ToString("C2")</RadzenText></RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3"><RadzenText TextStyle="TextStyle.Caption">Subtotal</RadzenText><RadzenText TextStyle="TextStyle.Body1">@_guia.Subtotal.ToString("C2")</RadzenText></RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3"><RadzenText TextStyle="TextStyle.Caption">Total</RadzenText><RadzenText TextStyle="TextStyle.H6" Class="rz-color-success">@_guia.Total.ToString("C2")</RadzenText></RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+
+        <!-- TABLA ARTÍCULOS -->
+        <RadzenCard Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-4">Artículos Contenidos</RadzenText>
+            <RadzenDataGrid Data="@_guia.ArticulosGuia" TItem="ArticulosGuiaDto">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ArticulosGuiaDto" Title="Clave SAT" Property="ClaveProdServSat" />
+                    <RadzenDataGridColumn TItem="ArticulosGuiaDto" Title="Descripción" Property="Descripcion" />
+                    <RadzenDataGridColumn TItem="ArticulosGuiaDto" Title="Cantidad" Property="Cantidad" />
+                    <RadzenDataGridColumn TItem="ArticulosGuiaDto" Title="Peso (kg)" Property="PesoUnitarioKg" />
+                    <RadzenDataGridColumn TItem="ArticulosGuiaDto" Title="Valor Unitario">
+                        <Template Context="a">@a.ValorUnidad.ToString("C2")</Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ArticulosGuiaDto" Title="Peligroso">
+                        <Template Context="a">
+                            <RadzenBadge BadgeStyle="@(a.EsMaterialPeligroso ? BadgeStyle.Danger : BadgeStyle.Success)" Text="@(a.EsMaterialPeligroso ? "Sí" : "No")" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </RadzenStack>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private GuiaRespuestaDto? _guia;
+    private List<SeguroRespuestaDto> _seguros = new();
+    private bool _cargando = true;
+    private bool _isEditing;
+    private bool _guardando;
+
+    private bool _editEstaAsegurado;
+    private Guid? _editSeguroId;
+    private string? _editPolizaSeguro;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarGuia();
+        var resSeguros = await SeguroServicio.ObtenerTodosAsync();
+        if (resSeguros.EsExitoso) _seguros = resSeguros.Datos ?? new();
+    }
+
+    private async Task CargarGuia()
+    {
+        _cargando = true;
+        var res = await GuiaServicio.ObtenerPorIdAsync(Id);
+        if (res.EsExitoso && res.Datos != null)
+        {
+            _guia = res.Datos;
+            _editEstaAsegurado = _guia.EstaAsegurado;
+            _editSeguroId = _guia.SeguroId;
+            _editPolizaSeguro = _guia.PolizaSeguro;
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError?.Description ?? "No se encontró la guía.");
+            Navigation.NavigateTo("/catalogos/guias");
+        }
+        _cargando = false;
+    }
+
+    private async Task HandleSave()
+    {
+        if (_guia == null) return;
+        _guardando = true;
+
+        var dto = new GuiaActualizarDto(
+            _guia.GuiaId,
+            _guia.FormaPago,
+            _guia.FechaEnvio,
+            _guia.FechaPago,
+            _guia.ClienteOrigenId,
+            _guia.ClienteDestinoId,
+            _guia.SucursalOrigenId,
+            _guia.SucursalDestinoId,
+            _guia.Flete,
+            _guia.Iva,
+            _guia.IvaRetenido,
+            _guia.Subtotal,
+            _guia.Total,
+            _guia.CobroSeguro,
+            _guia.ImporteTexto,
+            _guia.Observaciones,
+            _editEstaAsegurado ? _editPolizaSeguro : null
+        );
+
+        var res = await GuiaServicio.ActualizarAsync(dto);
+        if (res.EsExitoso)
+        {
+            NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Guía actualizada correctamente.");
+            _isEditing = false;
+            await CargarGuia();
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError?.Description ?? "No se pudo guardar la guía.");
+        }
+        _guardando = false;
+    }
+
+    private async Task HandleImprimirEtiqueta()
+    {
+        var res = await GuiaServicio.GenerarEtiquetaAsync(Id);
+        if (res.EsExitoso)
+        {
+            // Lógica de impresión
+        }
+    }
+}

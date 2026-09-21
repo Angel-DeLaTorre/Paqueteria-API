@@ -1,0 +1,351 @@
+@page "/catalogos/guias/alta"
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Clientes
+@using Paqueteria.Comun.Dtos.Guias
+@using Paqueteria.Comun.Dtos.Seguros
+@using Paqueteria.Comun.Dtos.Sucursales
+@using Paqueteria.Comun.Enums
+@inject IGuiaServicio GuiaServicio
+@inject IClienteServicio ClienteServicio
+@inject ISucursalServicio SucursalServicio
+@inject ISeguroServicio SeguroServicio
+@inject NavigationManager Navigation
+@inject NotificationService NotificationService
+
+<PageTitle>Nueva Guía - Paquetería</PageTitle>
+
+<EditForm Model="@_model" OnValidSubmit="OnFinish">
+    <DataAnnotationsValidator />
+
+    <RadzenStack Gap="1.5rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenText TextStyle="TextStyle.H4" Class="rz-m-0" Style="font-weight: bold;">Generar Nueva Guía</RadzenText>
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Guardar Guía" Icon="save" ButtonStyle="ButtonStyle.Primary" IsBusy="@_cargando" />
+        </RadzenStack>
+
+        <!-- REMITENTE Y DESTINATARIO -->
+        <RadzenRow Gutter="1rem">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenCard Class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-success rz-mb-4" Style="font-weight: bold;">Remitente</RadzenText>
+                    <RadzenStack Gap="1rem">
+                        <RadzenFormField Text="Cliente Origen *" Variant="Variant.Outlined">
+                            <RadzenDropDown @bind-Value="_model.ClienteOrigenId" Data="@_clientes" 
+                                            TextProperty="Nombre" 
+                                            ValueProperty="ClienteId" 
+                                            AllowFiltering="true"
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                            FilterAsYouType="true"
+                                            Change="@(arg => OnClienteChange((Guid)arg, true))"
+                                            Placeholder="Buscar Cliente..." />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Seleccionar Bodega / Domicilio *" Variant="Variant.Outlined">
+                            <RadzenDropDown @bind-Value="_model.DireccionOrigenId" Data="@_direccionesOrigen" 
+                                            TextProperty="Label"
+                                            ValueProperty="Value"
+                                            AllowFiltering="true"
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                            FilterAsYouType="true"
+                                            Disabled="@(!_direccionesOrigen.Any())"
+                                            Placeholder="Seleccione dirección..." />
+                        </RadzenFormField>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenCard Class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-info rz-mb-4" Style="font-weight: bold;">Destinatario</RadzenText>
+                    <RadzenStack Gap="1rem">
+                        <RadzenFormField Text="Cliente Destino *" Variant="Variant.Outlined">
+                            <RadzenDropDown @bind-Value="_model.ClienteDestinoId" Data="@_clientes" 
+                                            TextProperty="Nombre"
+                                            ValueProperty="ClienteId" 
+                                            AllowFiltering="true"
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                            FilterAsYouType="true"
+                                            Change="@(arg => OnClienteChange((Guid)arg, false))" 
+                                            Placeholder="Buscar Cliente..." />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Seleccionar Punto de Entrega *" Variant="Variant.Outlined">
+                            <RadzenDropDown @bind-Value="_model.DireccionDestinoId" Data="@_direccionesDestino" 
+                                            TextProperty="Label"
+                                            ValueProperty="Value"
+                                            AllowFiltering="true"
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                            FilterAsYouType="true"
+                                            Disabled="@(!_direccionesDestino.Any())"
+                                            Placeholder="Seleccione dirección..." />
+                        </RadzenFormField>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <!-- LOGÍSTICA DE SUCURSALES -->
+        <RadzenCard Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-4">Logística de Sucursales</RadzenText>
+            <RadzenRow Gutter="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Sucursal de Admisión (Origen) *" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenDropDown @bind-Value="_model.SucursalOrigenId" Data="@_sucursales" 
+                                        TextProperty="Nombre"
+                                        AllowFiltering="true"
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        FilterAsYouType="true"
+                                        ValueProperty="SucursalId"
+                                        Placeholder="Seleccione sucursal salida" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Sucursal de Llegada (Destino) *" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenDropDown @bind-Value="_model.SucursalDestinoId" Data="@_sucursales" 
+                                        TextProperty="Nombre"
+                                        AllowFiltering="true"
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        FilterAsYouType="true"
+                                        ValueProperty="SucursalId"
+                                        Placeholder="Seleccione sucursal destino" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+
+        <!-- CONDICIONES DE PAGO Y SEGURO -->
+        <RadzenCard Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-4">Condiciones de Pago y Seguro</RadzenText>
+            <RadzenRow Gutter="1rem">
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenFormField Text="Forma de pago *" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenDropDown @bind-Value="_model.FormaPago" Data="@(Enum.GetValues<FormaPago>())" />
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                <RadzenColumn Size="12" SizeMD="4" Class="rz-d-flex rz-align-items-center">
+                    <RadzenSwitch @bind-Value="_model.EstaAsegurado" Name="chkAsegurado" />
+                    <RadzenLabel Text="¿Mercancía Asegurada?" Component="chkAsegurado" Class="rz-ml-2" />
+                </RadzenColumn>
+
+                @if (_model.EstaAsegurado)
+                {
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenFormField Text="Aseguradora *" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenDropDown @bind-Value="_model.SeguroId" Data="@_seguros" TextProperty="Nombre" ValueProperty="SeguroId" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenFormField Text="Número de Póliza *" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="_model.PolizaSeguro" Placeholder="Ej. POL-2026-99482" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+                }
+            </RadzenRow>
+        </RadzenCard>
+
+        <!-- COSTOS -->
+        <RadzenCard Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-4">Desglose de Costos</RadzenText>
+            <RadzenRow Gutter="1rem">
+                <RadzenColumn Size="6" SizeMD="3">
+                    <RadzenFormField Text="Flete" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="_model.Flete" Format="$#,##0.00" 
+                                       Change="@((decimal _) => RecalcularCostos())" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    <RadzenFormField Text="Seguro" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="_model.CobroSeguro" Format="$#,##0.00"
+                                       Change="@((decimal _) => RecalcularCostos())" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    <RadzenFormField Text="Recolección" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="_model.Recoleccion" Format="$#,##0.00"
+                                       Change="@((decimal _) => RecalcularCostos())" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    <RadzenFormField Text="Entrega a Domicilio" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="_model.EntregaA" 
+                                       Format="c" 
+                                       Change="@((decimal _) => RecalcularCostos())" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    <RadzenFormField Text="Maniobras" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="_model.Maniobras" Format="c" 
+                                       Change="@((decimal _) => RecalcularCostos())" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    <RadzenFormField Text="Peaje / Casetas" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="_model.Peaje" Format="c" 
+                                       Change="@((decimal _) => RecalcularCostos())" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    <RadzenFormField Text="Líneas / Transbordo" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="_model.Lineas" Format="c" 
+                                       Change="@((decimal _) => RecalcularCostos())" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="3" Class="rz-d-flex rz-align-items-center">
+                    <RadzenSwitch @bind-Value="_model.CondonaIva" Name="chkIva" Change="RecalcularCostos" />
+                    <RadzenLabel Text="Exentar IVA" Component="chkIva" Class="rz-ml-2" />
+                </RadzenColumn>
+            </RadzenRow>
+
+            <!-- RESUMEN -->
+            <RadzenCard Class="rz-mt-4 rz-background-color-neutral-100">
+                <RadzenRow Gutter="1rem">
+                    <RadzenColumn Size="6" SizeMD="3">
+                        <RadzenText TextStyle="TextStyle.Caption">Subtotal</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6">@_model.Subtotal.ToString("C2")</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="6" SizeMD="3">
+                        <RadzenText TextStyle="TextStyle.Caption">IVA (@(_model.CondonaIva ? "0%" : "16%"))</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6">@_model.Iva.ToString("C2")</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="6" SizeMD="3">
+                        <RadzenText TextStyle="TextStyle.Caption">Retención IVA (4%)</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6">@_model.IvaRetenido.ToString("C2")</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="6" SizeMD="3">
+                        <RadzenText TextStyle="TextStyle.Caption" Class="rz-color-primary" Style="font-weight: bold;">Total Final</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H5" Class="rz-color-primary" Style="font-weight: bold;">@_model.Total.ToString("C2")</RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenCard>
+        </RadzenCard>
+
+        <!-- ARTÍCULOS -->
+        <RadzenCard Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-4">Artículos del Envío</RadzenText>
+            <ArticulosFormList Articulos="@_model.Articulos" />
+        </RadzenCard>
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Guardar Guía" Icon="save" ButtonStyle="ButtonStyle.Primary" IsBusy="@_cargando" />
+        </RadzenStack>
+    </RadzenStack>
+</EditForm>
+
+@code {
+    private GuiaFormModel _model = new();
+    private List<ClienteRespuestaDto> _clientes = new();
+    private List<SucursalRespuestaDto> _sucursales = new();
+    private List<SeguroRespuestaDto> _seguros = new();
+    private List<OpcionCombo> _direccionesOrigen = new();
+    private List<OpcionCombo> _direccionesDestino = new();
+    private bool _cargando;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var resClientes = await ClienteServicio.ObtenerTodosAsync();
+        if (resClientes.EsExitoso) _clientes = resClientes.Datos ?? new();
+
+        var resSucursales = await SucursalServicio.ObtenerTodosAsync();
+        if (resSucursales.EsExitoso) _sucursales = resSucursales.Datos ?? new();
+
+        var resSeguros = await SeguroServicio.ObtenerTodosAsync();
+        if (resSeguros.EsExitoso) _seguros = resSeguros.Datos ?? new();
+    }
+
+    private void OnClienteChange(Guid clienteId, bool esOrigen)
+    {
+        var cliente = _clientes.FirstOrDefault(c => c.ClienteId == clienteId);
+        var lista = cliente?.Direcciones?.Select(d => new OpcionCombo 
+        { 
+            Value = d.DireccionId, 
+            Label = $"{d.Direccion?.Calle} #{d.Direccion?.NumeroExterior}, Col. {d.Direccion?.Colonia}" 
+        }).ToList() ?? new();
+
+        if (esOrigen) _direccionesOrigen = lista;
+        else _direccionesDestino = lista;
+    }
+
+    private void RecalcularCostos()
+    {
+        _model.Subtotal = _model.Flete + _model.CobroSeguro + _model.Recoleccion + _model.EntregaA + _model.Maniobras + _model.Peaje + _model.Lineas;
+        _model.Iva = _model.CondonaIva ? 0 : (_model.Subtotal * 0.16m);
+        _model.IvaRetenido = _model.Subtotal * 0.04m;
+        _model.Total = (_model.Subtotal + _model.Iva) - _model.IvaRetenido;
+    }
+
+    private async Task OnFinish()
+    {
+        _cargando = true;
+        var dto = new GuiaCrearDto(
+            _model.FormaPago,
+            _model.ClienteOrigenId,
+            _model.DireccionOrigenId,
+            _model.ClienteDestinoId,
+            _model.DireccionDestinoId,
+            _model.SucursalOrigenId,
+            _model.SucursalDestinoId,
+            Guid.Empty,
+            _model.Flete,
+            _model.CobroSeguro,
+            _model.Recoleccion,
+            _model.EntregaA,
+            _model.Maniobras,
+            _model.Peaje,
+            _model.Lineas,
+            _model.CondonaIva,
+            _model.Iva,
+            _model.IvaRetenido,
+            _model.Subtotal,
+            _model.Total,
+            _model.Observaciones,
+            _model.EstaAsegurado,
+            _model.PolizaSeguro,
+            _model.SeguroId,
+            _model.Articulos.Select(a => new ArticulosGuiaCrearDto(a.ClaveProdServSat, a.Descripcion, a.Cantidad, a.ClaveUnidadSat, a.PesoUnitarioKg, a.ClaveTipoEmbalajeSat, a.ValorUnidad, a.Largo, a.Ancho, a.Alto, a.EsMaterialPeligroso, a.ClaveProdServSat)).ToList()
+        );
+
+        var res = await GuiaServicio.CrearAsync(dto);
+        if (res.EsExitoso)
+        {
+            NotificationService.Notify(NotificationSeverity.Success, "Éxito", "La guía de embarque se ha generado correctamente.");
+            Navigation.NavigateTo("/catalogos/guias");
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError?.Description ?? "Ocurrió un problema.");
+        }
+        _cargando = false;
+    }
+
+    private class OpcionCombo { public Guid Value { get; set; } public string Label { get; set; } = string.Empty; }
+
+    private class GuiaFormModel
+    {
+        public FormaPago FormaPago { get; set; }
+        public Guid ClienteOrigenId { get; set; }
+        public Guid DireccionOrigenId { get; set; }
+        public Guid ClienteDestinoId { get; set; }
+        public Guid DireccionDestinoId { get; set; }
+        public Guid SucursalOrigenId { get; set; }
+        public Guid SucursalDestinoId { get; set; }
+        public decimal Flete { get; set; }
+        public decimal CobroSeguro { get; set; }
+        public decimal Recoleccion { get; set; }
+        public decimal EntregaA { get; set; }
+        public decimal Maniobras { get; set; }
+        public decimal Peaje { get; set; }
+        public decimal Lineas { get; set; }
+        public bool CondonaIva { get; set; }
+        public decimal Iva { get; set; }
+        public decimal IvaRetenido { get; set; }
+        public decimal Subtotal { get; set; }
+        public decimal Total { get; set; }
+        public string? Observaciones { get; set; }
+        public bool EstaAsegurado { get; set; }
+        public string? PolizaSeguro { get; set; }
+        public Guid? SeguroId { get; set; }
+        public List<ArticulosFormList.ArticuloFormModel> Articulos { get; set; } = new();
+    }
+}

@@ -1,8 +1,8 @@
 using Moq;
-using Paqueteria.Application.Comun.Interfaces;
-using Paqueteria.Application.Interfaces.Persistence;
-using Paqueteria.Application.Modulos.Usuarios;
-using Paqueteria.Application.Modulos.Usuarios.Dtos;
+using Paqueteria.Aplicacion.Comun.Interfaces;
+using Paqueteria.Aplicacion.Interfaces.Persistence;
+using Paqueteria.Aplicacion.Modulos.Usuarios;
+using Paqueteria.Comun.Dtos.Usuarios;
 using Paqueteria.Dominio.Entidades.Sistema;
 using Paqueteria.Dominio.Interfaces.Repositorios;
 

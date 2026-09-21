@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Paqueteria.WebAssembly</title>
+    <base href="/"/>
+
+    <!-- 1. Tema de Radzen CSS -->
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+
+    <!-- 2. Hojas de estilos locales y de la librería UI -->
+    <link href="Paqueteria.WebAssembly.styles.css" rel="stylesheet"/>
+    <link href="_content/Paqueteria.UI/Paqueteria.UI.bundle.scp.css" rel="stylesheet"/>
+
+    <!-- 3. Fuente de Iconos -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+
+<body>
+<div id="app">
+    <!-- Spinner centrado sin depender de clases CSS externas -->
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; font-family: sans-serif;">
+        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 10px auto;"></div>
+        <span style="color: #666; font-size: 14px;">Cargando...</span>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</div>
+
+<script src="_framework/blazor.webassembly.js"></script>
+<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+</body>
+
+</html>

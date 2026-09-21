@@ -1,0 +1,336 @@
+@page "/catalogos/choferes"
+@using Microsoft.AspNetCore.Authorization
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Choferes
+@using Paqueteria.Comun.Dtos.Comun
+@attribute [Authorize]
+@inject IChoferServicio ChoferServicio
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+<PageTitle>Choferes - Paquetería</PageTitle>
+
+<RadzenCard Class="rz-my-4 rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+        <div>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-m-0" Style="font-weight: bold;">
+                Catálogo de Choferes
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-color-secondary rz-m-0">
+                Gestión de operadores de transporte
+            </RadzenText>
+        </div>
+        <RadzenButton Icon="add" Text="Agregar Chofer" ButtonStyle="ButtonStyle.Primary" Click="NuevoChofer" />
+    </RadzenStack>
+
+    @if (cargando)
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 250px;">
+            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-mt-2">Cargando información...</RadzenText>
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenDataGrid Data="@choferes"
+                        TItem="ChoferRespuestaDto"
+                        IsLoading="@cargando"
+                        AllowPaging="true"
+                        PageSize="10"
+                        PagerHorizontalAlign="HorizontalAlign.Right"
+                        ShowPagingSummary="true">
+            <Columns>
+                <RadzenDataGridColumn TItem="ChoferRespuestaDto" Title="Nombre Completo">
+                    <Template Context="c">
+                        <RadzenText TextStyle="TextStyle.Body1" Style="font-weight: bold;" Class="rz-m-0">
+                            @c.Nombre @c.ApellidoPaterno @c.ApellidoMaterno
+                        </RadzenText>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ChoferRespuestaDto" Property="Telefono" Title="Teléfono" />
+
+                <RadzenDataGridColumn TItem="ChoferRespuestaDto" Title="Camión">
+                    <Template Context="c">
+                        @(c.NumCamion ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ChoferRespuestaDto" Title="Contenedor 1">
+                    <Template Context="c">
+                        @(c.NumContenedor ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ChoferRespuestaDto" Title="Contenedor 2">
+                    <Template Context="c">
+                        @(c.NumContenedor2 ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ChoferRespuestaDto" Title="Acciones" Width="160px" Sortable="false" Filterable="false">
+                    <Template Context="c">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Small" Click="() => PrepararEdicion(c)" />
+                            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Small" Click="() => Eliminar(c.ChoferId)" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    }
+</RadzenCard>
+
+@code {
+    private List<ChoferRespuestaDto> choferes = new();
+    private ChoferFormModel formModel = new();
+    private Guid? choferIdEdicion;
+    private bool cargando = true;
+    private bool esEdicion;
+    private bool guardando;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarChoferes();
+    }
+
+    private async Task CargarChoferes()
+    {
+        cargando = true;
+        var res = await ChoferServicio.ObtenerTodosAsync();
+        if (res.EsExitoso && res.Datos != null)
+        {
+            choferes = res.Datos;
+        }
+        else if (res.DetalleError != null)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError.Description);
+        }
+        cargando = false;
+    }
+
+    private async Task NuevoChofer()
+    {
+        choferIdEdicion = null;
+        formModel = new ChoferFormModel();
+        esEdicion = false;
+        await AbrirDialogoFormulario("Nuevo Chofer");
+    }
+
+    private async Task PrepararEdicion(ChoferRespuestaDto chofer)
+    {
+        choferIdEdicion = chofer.ChoferId;
+        formModel = new ChoferFormModel
+        {
+            Nombre = chofer.Nombre,
+            ApellidoPaterno = chofer.ApellidoPaterno,
+            ApellidoMaterno = chofer.ApellidoMaterno ?? "",
+            Telefono = chofer.Telefono ?? "",
+            NumCamion = chofer.NumCamion,
+            NumContenedor = chofer.NumContenedor,
+            NumContenedor2 = chofer.NumContenedor2,
+            Calle = chofer.Direccion?.Calle ?? "",
+            NumeroExterior = chofer.Direccion?.NumeroExterior ?? "",
+            NumeroInterior = chofer.Direccion?.NumeroInterior ?? "",
+            Colonia = chofer.Direccion?.Colonia ?? "",
+            CodigoPostal = chofer.Direccion?.CodigoPostal ?? "",
+            MunicipioId = chofer.Direccion?.MunicipioId ?? Guid.Empty
+        };
+        esEdicion = true;
+        await AbrirDialogoFormulario("Editar Chofer");
+    }
+
+    private async Task AbrirDialogoFormulario(string titulo)
+    {
+        await DialogService.OpenAsync(titulo, ds =>
+            @<EditForm Model="@formModel" OnValidSubmit="() => Guardar(ds)">
+                <DataAnnotationsValidator />
+                <RadzenStack Gap="1rem">
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-primary rz-mb-0" Style="font-weight: bold;">
+                        Datos Personales
+                    </RadzenText>
+                    <RadzenRow Gutter="1rem">
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Nombre" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Nombre" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Apellido Paterno" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.ApellidoPaterno" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Apellido Materno" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.ApellidoMaterno" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Teléfono" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Telefono" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-primary rz-mb-0" Style="font-weight: bold;">
+                        Asignación de Unidades
+                    </RadzenText>
+                    <RadzenRow Gutter="1rem">
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Num. Camión" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.NumCamion" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Contenedor 1" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.NumContenedor" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Contenedor 2" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.NumContenedor2" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-primary rz-mb-0" Style="font-weight: bold;">
+                        Dirección Base
+                    </RadzenText>
+                    <RadzenRow Gutter="1rem">
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenFormField Text="Calle" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Calle" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Número Exterior" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.NumeroExterior" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Colonia" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Colonia" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Código Postal" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.CodigoPostal" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mt-4">
+                        <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="() => ds.Close(false)" />
+                        <RadzenButton Text="Guardar" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" IsBusy="@guardando" />
+                    </RadzenStack>
+                </RadzenStack>
+            </EditForm>,
+            new DialogOptions { Width = "700px", Resizable = true, Draggable = true }
+        );
+    }
+
+    private async Task Guardar(DialogService ds)
+    {
+        guardando = true;
+
+        var direccionDto = new DireccionDto(
+            formModel.Calle,
+            formModel.NumeroExterior,
+            formModel.NumeroInterior,
+            formModel.Colonia,
+            formModel.CodigoPostal,
+            string.Empty,
+            formModel.MunicipioId
+        );
+
+        bool esExitoso;
+        string? mensajeError = null;
+
+        if (esEdicion && choferIdEdicion.HasValue)
+        {
+            var dto = new ChoferActualizarDto(
+                choferIdEdicion.Value,
+                formModel.Nombre,
+                formModel.ApellidoPaterno,
+                formModel.ApellidoMaterno,
+                direccionDto,
+                formModel.Telefono,
+                formModel.NumCamion,
+                formModel.NumContenedor,
+                formModel.NumContenedor2
+            );
+            var res = await ChoferServicio.ActualizarAsync(choferIdEdicion.Value, dto);
+            esExitoso = res.EsExitoso;
+            mensajeError = res.DetalleError?.Description ?? "Error al actualizar chofer.";
+        }
+        else
+        {
+            var dto = new ChoferCrearDto(
+                formModel.Nombre,
+                formModel.ApellidoPaterno,
+                formModel.ApellidoMaterno,
+                direccionDto,
+                formModel.Telefono,
+                formModel.NumCamion,
+                formModel.NumContenedor,
+                formModel.NumContenedor2
+            );
+            var res = await ChoferServicio.CrearAsync(dto);
+            esExitoso = res.EsExitoso;
+            mensajeError = res.DetalleError?.Description ?? "Error al crear chofer.";
+        }
+
+        if (esExitoso)
+        {
+            ds.Close(true);
+            NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Registro guardado correctamente");
+            await CargarChoferes();
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", mensajeError);
+        }
+
+        guardando = false;
+    }
+
+    private async Task Eliminar(Guid id)
+    {
+        var confirmacion = await DialogService.Confirm(
+            "¿Está seguro de que desea eliminar este chofer?",
+            "Eliminar Chofer",
+            new ConfirmOptions { OkButtonText = "Eliminar", CancelButtonText = "Cancelar" }
+        );
+
+        if (confirmacion == true)
+        {
+            var res = await ChoferServicio.EliminarAsync(id);
+            if (res.EsExitoso)
+            {
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Chofer eliminado correctamente");
+                await CargarChoferes();
+            }
+            else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError?.Description ?? "Error al eliminar chofer.");
+            }
+        }
+    }
+
+    private class ChoferFormModel
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string ApellidoPaterno { get; set; } = string.Empty;
+        public string ApellidoMaterno { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public string? NumCamion { get; set; }
+        public string? NumContenedor { get; set; }
+        public string? NumContenedor2 { get; set; }
+        public string Calle { get; set; } = string.Empty;
+        public string NumeroExterior { get; set; } = string.Empty;
+        public string NumeroInterior { get; set; } = string.Empty;
+        public string Colonia { get; set; } = string.Empty;
+        public string CodigoPostal { get; set; } = string.Empty;
+        public Guid MunicipioId { get; init; } = Guid.Empty;
+    }
+}

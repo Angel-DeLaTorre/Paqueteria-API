@@ -1,0 +1,149 @@
+@page "/catalogos/asignaciones"
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Asignaciones
+@inject IAsignacionServicio AsignacionServicio
+@inject NavigationManager Navigation
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+<PageTitle>Asignaciones - Paquetería</PageTitle>
+
+<RadzenCard Class="rz-my-4 rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+        <div>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-m-0" Style="font-weight: bold;">
+                Consulta de Asignaciones
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-color-secondary rz-m-0">
+                Gestión de viajes y despachos de transporte
+            </RadzenText>
+        </div>
+        <RadzenButton Icon="add" Text="Nueva Asignación" ButtonStyle="ButtonStyle.Primary" Click='() => Navigation.NavigateTo("/catalogos/asignaciones/alta")' />
+    </RadzenStack>
+
+    @if (_cargando)
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 250px;">
+            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenDataGrid Data="@_asignaciones" TItem="AsignacionRespuestaDto" AllowPaging="true" PageSize="10" PagerHorizontalAlign="HorizontalAlign.Right" ShowPagingSummary="true">
+            <Columns>
+                <RadzenDataGridColumn TItem="AsignacionRespuestaDto" Title="ID Asignación" Width="180px">
+                    <Template Context="a">
+                        <RadzenText TextStyle="TextStyle.Body1" Style="font-weight: bold;" Class="rz-m-0">@a.Clave</RadzenText>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="AsignacionRespuestaDto" Title="Fecha Partida" Width="140px">
+                    <Template Context="a">
+                        @(a.FechaPartida?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="AsignacionRespuestaDto" Title="Sucursal Origen">
+                    <Template Context="a">
+                        @(a.SucursalOrigen?.Nombre ?? "N/A")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="AsignacionRespuestaDto" Title="Sucursal Destino">
+                    <Template Context="a">
+                        @(a.SucursalDestino?.Nombre ?? "N/A")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="AsignacionRespuestaDto" Title="Chofer ID">
+                    <Template Context="a">
+                        @if (a.ChoferId.HasValue)
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@a.ChoferId.Value.ToString().Substring(0, 8)" />
+                        }
+                        else
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="Sin Asignar" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="AsignacionRespuestaDto" Title="Estatus (ST1 - ST4)">
+                    <Template Context="a">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.25rem" Wrap="FlexWrap.Wrap">
+                            @if (!string.IsNullOrEmpty(a.St1)) { <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="@a.St1" /> }
+                            @if (!string.IsNullOrEmpty(a.St2)) { <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@a.St2" /> }
+                            @if (!string.IsNullOrEmpty(a.St3)) { <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="@a.St3" /> }
+                            @if (!string.IsNullOrEmpty(a.St4)) { <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="@a.St4" /> }
+                            @if (string.IsNullOrEmpty(a.St1) && string.IsNullOrEmpty(a.St2) && string.IsNullOrEmpty(a.St3) && string.IsNullOrEmpty(a.St4))
+                            {
+                                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="Sin Estado" />
+                            }
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="AsignacionRespuestaDto" Title="Acciones" Width="120px" Sortable="false" Filterable="false">
+                    <Template Context="a">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+                            <RadzenButton Icon="visibility" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="() => VerDetalle(a)" />
+                            <RadzenButton Icon="print" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" Click="() => HandleImprimir(a.AsignacionId)" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    }
+</RadzenCard>
+
+@code {
+    private List<AsignacionRespuestaDto> _asignaciones = new();
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarDatos();
+    }
+
+    private async Task CargarDatos()
+    {
+        _cargando = true;
+        var respuesta = await AsignacionServicio.ObtenerTodosAsync();
+        if (respuesta.EsExitoso && respuesta.Datos != null)
+        {
+            _asignaciones = respuesta.Datos.ToList();
+        }
+        else if (respuesta.DetalleError != null)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al obtener asignaciones", respuesta.DetalleError.Description);
+        }
+        _cargando = false;
+    }
+    
+    private async Task VerDetalle(AsignacionRespuestaDto asignacion)
+    {
+        var detalle = await AsignacionServicio.ObtenerPorIdAsync(asignacion.AsignacionId);
+
+        if (detalle is { EsExitoso: true, Datos: not null })
+        {
+            await DialogService.OpenAsync<AsignacionDetalle>(
+                $"Detalle de Asignación #{asignacion.Clave}",
+                new Dictionary<string, object?> { { "Asignacion", detalle.Datos } },
+                new DialogOptions { Width = "750px", Resizable = true, Draggable = true }
+            );
+        }
+    }
+
+    private async Task HandleImprimir(Guid id)
+    {
+        var respuesta = await AsignacionServicio.GenerarReporteSalidaAsync(id);
+        if (respuesta.EsExitoso)
+        {
+            NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Reporte generado.");
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", respuesta.DetalleError?.Description ?? "No se pudo generar el reporte.");
+        }
+    }
+}

@@ -1,0 +1,192 @@
+@page "/catalogos/seguros"
+@using System.ComponentModel.DataAnnotations
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Seguros
+@inject ISeguroServicio SeguroService
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+<RadzenCard Class="rz-my-4 rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-m-0">Gestión de Seguros</RadzenText>
+        <RadzenButton Icon="add" Text="Nuevo seguro" ButtonStyle="ButtonStyle.Primary" Click="OpenCreateModal" />
+    </RadzenStack>
+
+    <RadzenDataGrid Data="@_seguros"
+                    TItem="SeguroRespuestaDto"
+                    IsLoading="@_loading"
+                    AllowPaging="true"
+                    PageSize="10"
+                    PagerHorizontalAlign="HorizontalAlign.Right"
+                    ShowPagingSummary="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="SeguroRespuestaDto" Property="Nombre" Title="Nombre" Width="85%" />
+            <RadzenDataGridColumn TItem="SeguroRespuestaDto" Title="Acciones" Width="15%" Sortable="false" Filterable="false">
+                <Template Context="seguro">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="() => OpenEditModal(seguro)" />
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="() => OnDesactivarSeguro(seguro.SeguroId)" />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    private List<SeguroRespuestaDto>? _seguros = [];
+    private SeguroFormModel _formModel = new();
+    private bool _loading = false;
+    private bool _saving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSegurosAsync();
+    }
+
+    private async Task LoadSegurosAsync()
+    {
+        _loading = true;
+        try
+        {
+            var respuesta = await SeguroService.ObtenerTodosAsync();
+            if (respuesta.EsExitoso)
+            {
+                _seguros = respuesta.Datos ?? [];
+            }
+            else if (respuesta.DetalleError != null)
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", respuesta.DetalleError.Description);
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", "Error al cargar los registros");
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task OpenCreateModal()
+    {
+        _formModel = new SeguroFormModel();
+        await OpenFormDialog("Registro de Seguro");
+    }
+
+    private async Task OpenEditModal(SeguroRespuestaDto seguro)
+    {
+        _formModel = new SeguroFormModel
+        {
+            SeguroId = seguro.SeguroId,
+            Nombre = seguro.Nombre
+        };
+        await OpenFormDialog("Editar Seguro");
+    }
+
+    private async Task OpenFormDialog(string title)
+    {
+        var result = await DialogService.OpenAsync(title, ds =>
+            @<EditForm Model="@_formModel" OnValidSubmit="() => SaveFromDialog(ds)">
+                <DataAnnotationsValidator />
+                <RadzenStack Gap="1.5rem">
+                    <RadzenFormField Text="Nombre de seguro" Variant="Variant.Outlined">
+                        <RadzenTextBox @bind-Value="@_formModel.Nombre" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _formModel.Nombre)" />
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                        <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="() => ds.Close(false)" />
+                        <RadzenButton Text="Guardar" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" IsBusy="@_saving" />
+                    </RadzenStack>
+                </RadzenStack>
+            </EditForm>
+        );
+    }
+
+    private async Task SaveFromDialog(DialogService ds)
+    {
+        _saving = true;
+        try
+        {
+            bool success;
+            string? mensajeError = null;
+
+            if (!_formModel.SeguroId.HasValue)
+            {
+                var seguroCrear = new SeguroCrearDto(_formModel.Nombre);
+                var respuesta = await SeguroService.CrearAsync(seguroCrear);
+                success = respuesta.EsExitoso;
+                mensajeError = respuesta.DetalleError?.Description;
+            }
+            else
+            {
+                var seguroActualizar = new SeguroActualizarDto(_formModel.SeguroId.Value, _formModel.Nombre);
+                var respuesta = await SeguroService.ActualizarAsync(_formModel.SeguroId.Value, seguroActualizar);
+                success = respuesta.EsExitoso;
+                mensajeError = respuesta.DetalleError?.Description;
+            }
+
+            if (success)
+            {
+                ds.Close(true);
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Registro guardado correctamente");
+                await LoadSegurosAsync();
+            }
+            else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", mensajeError ?? "Ocurrió un error al guardar el registro");
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", "Ocurrió un error inesperado");
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private async Task OnDesactivarSeguro(Guid id)
+    {
+        var confirmResult = await DialogService.Confirm(
+            "Esta acción cambiará el estatus del registro y podría afectar operaciones relacionadas.",
+            "¿Está seguro de desactivar este registro?",
+            new ConfirmOptions { OkButtonText = "Aceptar", CancelButtonText = "Cancelar" }
+        );
+
+        if (confirmResult == true)
+        {
+            try
+            {
+                var respuesta = await SeguroService.DesactivarAsync(id);
+                if (respuesta.EsExitoso)
+                {
+                    NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Registro desactivado correctamente");
+                    await LoadSegurosAsync();
+                }
+                else
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Error", respuesta.DetalleError?.Description ?? "No se pudo desactivar el registro");
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", "Ocurrió un error al intentar desactivar el registro");
+                Console.WriteLine(ex.Message);
+            }
+        }
+    }
+
+    private class SeguroFormModel
+    {
+        public Guid? SeguroId { get; set; }
+
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; } = string.Empty;
+    }
+}

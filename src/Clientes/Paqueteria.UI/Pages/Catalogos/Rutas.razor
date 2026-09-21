@@ -1,0 +1,245 @@
+@page "/catalogos/rutas"
+@using Microsoft.AspNetCore.Authorization
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Rutas
+@using Paqueteria.Comun.Dtos.Sucursales
+@attribute [Authorize]
+@inject IRutaServicio RutaServicio
+@inject ISucursalServicio SucursalServicio
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+<PageTitle>Rutas - Paquetería</PageTitle>
+
+<RadzenCard Class="rz-my-4 rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+        <div>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-m-0" Style="font-weight: bold;">
+                Catálogo de Rutas
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-color-secondary rz-m-0">
+                Rutas de traslado entre sucursales
+            </RadzenText>
+        </div>
+        <RadzenButton Icon="add" Text="Agregar Ruta" ButtonStyle="ButtonStyle.Primary" Click="NuevaRuta" />
+    </RadzenStack>
+    
+    @if (cargando)
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 250px;">
+            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-mt-2">Cargando información...</RadzenText>
+        </RadzenStack>
+    }
+    else
+    {
+
+        <RadzenDataGrid Data="@rutas"
+                        TItem="RutaRespuestaDto"
+                        IsLoading="@cargando"
+                        AllowPaging="true"
+                        PageSize="10"
+                        PagerHorizontalAlign="HorizontalAlign.Right"
+                        ShowPagingSummary="true">
+            <Columns>
+                <RadzenDataGridColumn TItem="RutaRespuestaDto" Title="Descripción">
+                    <Template Context="r">
+                        <RadzenText TextStyle="TextStyle.Body1" Style="font-weight: bold;" Class="rz-m-0">
+                            @(r.Descripcion ?? "Sin Descripción")
+                        </RadzenText>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="RutaRespuestaDto" Title="Sucursal Origen">
+                    <Template Context="r">
+                        <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill="true" Text="@r.SucursalOrigen?.Nombre"/>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="RutaRespuestaDto" Title="Sucursal Destino">
+                    <Template Context="r">
+                        <RadzenBadge BadgeStyle="BadgeStyle.Success" IsPill="true" Text="@r.SucursalDestino?.Nombre"/>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="RutaRespuestaDto" Title="Acciones" Width="160px" Sortable="false" Filterable="false">
+                    <Template Context="r">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Small" Click="() => PrepararEdicion(r)"/>
+                            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Small" Click="() => Eliminar(r.RutaId)"/>
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    }
+</RadzenCard>
+
+@code {
+    private List<RutaRespuestaDto> rutas = new();
+    private List<SucursalRespuestaDto> sucursales = new();
+    private RutaFormModel formModel = new();
+    private Guid? rutaIdEdicion;
+    private bool cargando = true;
+    private bool esEdicion;
+    private bool guardando;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarRutas();
+        var resSuc = await SucursalServicio.ObtenerTodosAsync();
+        if (resSuc.EsExitoso && resSuc.Datos != null)
+        {
+            sucursales = resSuc.Datos;
+        }
+        else if (resSuc.DetalleError != null)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", resSuc.DetalleError.Description);
+        }
+    }
+
+    private async Task CargarRutas()
+    {
+        cargando = true;
+        var res = await RutaServicio.ObtenerTodosAsync();
+        if (res.EsExitoso && res.Datos != null)
+        {
+            rutas = res.Datos;
+        }
+        else if (res.DetalleError != null)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError.Description);
+        }
+        cargando = false;
+    }
+
+    private async Task NuevaRuta()
+    {
+        rutaIdEdicion = null;
+        formModel = new RutaFormModel();
+        esEdicion = false;
+        await AbrirDialogoFormulario("Nueva Ruta");
+    }
+
+    private async Task PrepararEdicion(RutaRespuestaDto ruta)
+    {
+        rutaIdEdicion = ruta.RutaId;
+        formModel = new RutaFormModel
+        {
+            Descripcion = ruta.Descripcion ?? "",
+            SucursalOrigenId = ruta.SucursalOrigenId,
+            SucursalDestinoId = ruta.SucursalDestinoId
+        };
+        esEdicion = true;
+        await AbrirDialogoFormulario("Editar Ruta");
+    }
+
+    private async Task AbrirDialogoFormulario(string titulo)
+    {
+        await DialogService.OpenAsync(titulo, ds =>
+            @<EditForm Model="@formModel" OnValidSubmit="() => Guardar(ds)">
+                <DataAnnotationsValidator />
+                <RadzenStack Gap="1.5rem">
+                    <RadzenFormField Text="Descripción de la Ruta" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenTextBox @bind-Value="formModel.Descripcion" Placeholder="Ej: León -> Ciudad de México" />
+                    </RadzenFormField>
+
+                    <RadzenFormField Text="Sucursal Origen" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenDropDown Data="@sucursales"
+                                        @bind-Value="formModel.SucursalOrigenId"
+                                        TextProperty="Nombre"
+                                        ValueProperty="SucursalId"
+                                        Placeholder="-- Seleccione Origen --"
+                                        Style="width: 100%;" />
+                    </RadzenFormField>
+
+                    <RadzenFormField Text="Sucursal Destino" Variant="Variant.Outlined" Style="width: 100%;">
+                        <RadzenDropDown Data="@sucursales"
+                                        @bind-Value="formModel.SucursalDestinoId"
+                                        TextProperty="Nombre"
+                                        ValueProperty="SucursalId"
+                                        Placeholder="-- Seleccione Destino --"
+                                        Style="width: 100%;" />
+                    </RadzenFormField>
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mt-4">
+                        <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="() => ds.Close(false)" />
+                        <RadzenButton Text="Guardar" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" IsBusy="@guardando" />
+                    </RadzenStack>
+                </RadzenStack>
+            </EditForm>,
+            new DialogOptions { Width = "500px", Resizable = true, Draggable = true }
+        );
+    }
+
+    private async Task Guardar(DialogService ds)
+    {
+        if (formModel.SucursalOrigenId == Guid.Empty || formModel.SucursalDestinoId == Guid.Empty)
+        {
+            NotificationService.Notify(NotificationSeverity.Warning, "Advertencia", "Debes seleccionar una sucursal de origen y de destino.");
+            return;
+        }
+
+        guardando = true;
+        bool esExitoso;
+        string? mensajeError = null;
+
+        if (esEdicion && rutaIdEdicion.HasValue)
+        {
+            var dto = new RutaActualizarDto(rutaIdEdicion.Value, formModel.SucursalOrigenId, formModel.SucursalDestinoId, formModel.Descripcion);
+            var res = await RutaServicio.ActualizarAsync(rutaIdEdicion.Value, dto);
+            esExitoso = res.EsExitoso;
+            mensajeError = res.DetalleError?.Description ?? "Error al actualizar ruta.";
+        }
+        else
+        {
+            var dto = new RutaCrearDto(formModel.Descripcion, formModel.SucursalOrigenId, formModel.SucursalDestinoId);
+            var res = await RutaServicio.CrearAsync(dto);
+            esExitoso = res.EsExitoso;
+            mensajeError = res.DetalleError?.Description ?? "Error al crear ruta.";
+        }
+
+        if (esExitoso)
+        {
+            ds.Close(true);
+            NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Ruta guardada correctamente");
+            await CargarRutas();
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", mensajeError);
+        }
+
+        guardando = false;
+    }
+
+    private async Task Eliminar(Guid id)
+    {
+        var confirmacion = await DialogService.Confirm(
+            "¿Está seguro de que desea eliminar esta ruta?",
+            "Eliminar Ruta",
+            new ConfirmOptions { OkButtonText = "Eliminar", CancelButtonText = "Cancelar" }
+        );
+
+        if (confirmacion == true)
+        {
+            var res = await RutaServicio.EliminarAsync(id);
+            if (res.EsExitoso)
+            {
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Ruta eliminada correctamente");
+                await CargarRutas();
+            }
+            else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError?.Description ?? "Error al eliminar ruta.");
+            }
+        }
+    }
+
+    private class RutaFormModel
+    {
+        public string Descripcion { get; set; } = string.Empty;
+        public Guid SucursalOrigenId { get; set; } = Guid.Empty;
+        public Guid SucursalDestinoId { get; set; } = Guid.Empty;
+    }
+}

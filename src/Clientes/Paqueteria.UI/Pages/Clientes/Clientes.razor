@@ -1,0 +1,434 @@
+@page "/catalogos/clientes"
+@using Microsoft.AspNetCore.Authorization
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Clientes
+@using Paqueteria.Comun.Dtos.Comun
+@using Paqueteria.Comun.Enums
+@attribute [Authorize]
+@inject IClienteServicio ClienteServicio
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+<PageTitle>Clientes - Paquetería</PageTitle>
+
+<RadzenCard Class="rz-my-4 rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+        <div>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-m-0" Style="font-weight: bold;">
+                Catálogo de Clientes
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-color-secondary rz-m-0">
+                Gestión de remitentes y destinatarios
+            </RadzenText>
+        </div>
+        <RadzenButton Icon="add" Text="Agregar Cliente" ButtonStyle="ButtonStyle.Primary" Click="NuevoCliente" />
+    </RadzenStack>
+    
+    @if (cargando)
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 250px;">
+            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-mt-2">Cargando información...</RadzenText>
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenDataGrid Data="@clientes"
+                        TItem="ClienteRespuestaDto"
+                        IsLoading="@cargando"
+                        AllowPaging="true"
+                        PageSize="10"
+                        PagerHorizontalAlign="HorizontalAlign.Right"
+                        ShowPagingSummary="true">
+            <Template Context="c">
+                <RadzenCard Class="rz-m-2 rz-p-3" Style="background-color: var(--rz-base-200);">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-3">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0" Style="font-weight: bold;">
+                            Direcciones del Cliente
+                        </RadzenText>
+                        <RadzenButton Icon="add_location" 
+                                      Text="Agregar Dirección" 
+                                      ButtonStyle="ButtonStyle.Secondary" 
+                                      Size="ButtonSize.Small" 
+                                      Click="() => NuevaDireccion(c.ClienteId)" />
+                    </RadzenStack>
+                    
+                    @if (c.Direcciones != null && c.Direcciones.Any())
+                    {
+                        <RadzenDataGrid Data="@c.Direcciones" TItem="ClienteDireccionRespuestaDto" AllowPaging="false" AllowSorting="false">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="ClienteDireccionRespuestaDto" Title="Calle y Número">
+                                    <Template Context="d">
+                                        @($"{d.Direccion.Calle ?? "-"} Ext: {d.Direccion.NumeroExterior ?? "S/N"}{(string.IsNullOrWhiteSpace(d.Direccion.NumeroInterior) ? "" : $" Int: {d.Direccion.NumeroInterior}")}")
+                                    </Template>
+                                </RadzenDataGridColumn>
+
+                                <RadzenDataGridColumn TItem="ClienteDireccionRespuestaDto" Title="Colonia">
+                                    <Template Context="d">
+                                        @(d.Direccion.Colonia ?? "-")
+                                    </Template>
+                                </RadzenDataGridColumn>
+
+                                <RadzenDataGridColumn TItem="ClienteDireccionRespuestaDto" Title="C.P." Width="100px">
+                                    <Template Context="d">
+                                        @(d.Direccion.CodigoPostal ?? "-")
+                                    </Template>
+                                </RadzenDataGridColumn>
+
+                                <RadzenDataGridColumn TItem="ClienteDireccionRespuestaDto" Title="Municipio / Estado">
+                                    <Template Context="d">
+                                        @($"{d.Direccion.MunicipioNombre ?? "-"}, {d.Direccion.Estado ?? "-"}")
+                                    </Template>
+                                </RadzenDataGridColumn>
+
+                                <RadzenDataGridColumn TItem="ClienteDireccionRespuestaDto" Title="Estatus" Width="110px">
+                                    <Template Context="d">
+                                        <RadzenBadge BadgeStyle="@(d.Estatus == EstatusBasico.Activo ? BadgeStyle.Success : BadgeStyle.Danger)" 
+                                                     Text="@d.Estatus.ToString()" IsPill="true" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    }
+                    else
+                    {
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-color-secondary rz-m-0">
+                            No hay direcciones registradas para este cliente.
+                        </RadzenText>
+                    }
+                </RadzenCard>
+            </Template>
+
+            <Columns>
+                <RadzenDataGridColumn TItem="ClienteRespuestaDto" Title="Nombre / Razón Social">
+                    <Template Context="c">
+                        <RadzenText TextStyle="TextStyle.Body1" Style="font-weight: bold;" Class="rz-m-0">
+                            @c.Nombre
+                        </RadzenText>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ClienteRespuestaDto" Title="RFC">
+                    <Template Context="c">
+                        @(c.Rfc ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ClienteRespuestaDto" Title="Contacto">
+                    <Template Context="c">
+                        @(c.Contacto ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ClienteRespuestaDto" Title="Teléfono">
+                    <Template Context="c">
+                        @(c.Telefono ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ClienteRespuestaDto" Title="Correo">
+                    <Template Context="c">
+                        @(c.Correo ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ClienteRespuestaDto" Title="Convenio">
+                    <Template Context="c">
+                        @(c.NumConvenio ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="ClienteRespuestaDto" Title="Acciones" Width="160px" Sortable="false" Filterable="false">
+                    <Template Context="c">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Small" Click="() => PrepararEdicion(c)"/>
+                            <RadzenButton Icon="add_location" 
+                                          ButtonStyle="ButtonStyle.Secondary" 
+                                          Size="ButtonSize.Small" 
+                                          Click="() => NuevaDireccion(c.ClienteId)" />
+                            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Small" Click="() => Eliminar(c.ClienteId)"/>
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    }
+</RadzenCard>
+
+@code {
+    private List<ClienteRespuestaDto> clientes = new();
+    private ClienteFormModel formModel = new();
+    private DireccionFormModel direccionFormModel = new();
+    private Guid? clienteIdEdicion;
+    private bool cargando = true;
+    private bool esEdicion;
+    private bool guardando;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarClientes();
+    }
+
+    private async Task CargarClientes()
+    {
+        cargando = true;
+        var res = await ClienteServicio.ObtenerTodosAsync();
+        if (res.EsExitoso && res.Datos != null)
+        {
+            clientes = res.Datos;
+        }
+        else if (res.DetalleError != null)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError.Description);
+        }
+        cargando = false;
+    }
+
+    private async Task NuevaDireccion(Guid clienteId)
+    {
+        // Inyectar IEstadoServicio e IMunicipioServicio en Clientes.razor no es necesario si se manejan dentro del modal
+        var resultado = await DialogService.OpenAsync<ModalAgregarDireccion>(
+            "Agregar Dirección",
+            new Dictionary<string, object?> { { "Pais", "MEX" } },
+            new DialogOptions { Width = "650px", Resizable = true, Draggable = true }
+        );
+
+        if (resultado is DireccionDto dto)
+        {
+            guardando = true;
+        
+            var res = await ClienteServicio.AgregarDireccion(clienteId, dto);
+
+            if (res.EsExitoso)
+            {
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Dirección agregada correctamente");
+            }else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError?.Description);
+            }
+            
+            await CargarClientes();
+        
+            guardando = false;
+        }
+    }
+
+
+    private async Task GuardarDireccion(DialogService ds, Guid clienteId)
+    {
+        guardando = true;
+
+        var dto = new DireccionDto(
+            direccionFormModel.Calle,
+            direccionFormModel.NumeroExterior,
+            direccionFormModel.NumeroInterior,
+            direccionFormModel.Colonia,
+            direccionFormModel.CodigoPostal,
+            direccionFormModel.Localidad,
+            direccionFormModel.MunicipioId
+        );
+
+        
+        // AQUÍ: Invocar el método correspondiente de ClienteServicio (ej. ClienteServicio.AgregarDireccionAsync(clienteId, dto))
+        // Simulando el guardado exitoso:
+        ds.Close(true);
+        NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Dirección agregada correctamente");
+        await CargarClientes();
+
+        guardando = false;
+    }
+
+    private async Task NuevoCliente()
+    {
+        clienteIdEdicion = null;
+        formModel = new ClienteFormModel();
+        esEdicion = false;
+        await AbrirDialogoFormulario("Nuevo Cliente");
+    }
+
+    private async Task PrepararEdicion(ClienteRespuestaDto cliente)
+    {
+        clienteIdEdicion = cliente.ClienteId;
+        formModel = new ClienteFormModel
+        {
+            Nombre = cliente.Nombre,
+            Rfc = cliente.Rfc ?? "",
+            Telefono = cliente.Telefono ?? "",
+            Telefono2 = cliente.Telefono2,
+            Correo = cliente.Correo ?? "",
+            Contacto = cliente.Contacto ?? "",
+            NumConvenio = cliente.NumConvenio,
+            PolizaSeguro = cliente.PolizaSeguro
+        };
+        esEdicion = true;
+        await AbrirDialogoFormulario("Editar Cliente");
+    }
+
+    private async Task AbrirDialogoFormulario(string titulo)
+    {
+        await DialogService.OpenAsync(titulo, ds =>
+            @<EditForm Model="@formModel" OnValidSubmit="() => Guardar(ds)">
+                <DataAnnotationsValidator />
+                <RadzenStack Gap="1rem">
+                    <RadzenRow Gutter="1rem">
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Nombre / Razón Social" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Nombre" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="RFC" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Rfc" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Teléfono Principal" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Telefono" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Teléfono Secundario" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Telefono2" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Correo Electrónico" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Correo" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Nombre de Contacto" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.Contacto" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Num. Convenio" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.NumConvenio" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Póliza de Seguro" Variant="Variant.Outlined" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="formModel.PolizaSeguro" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mt-4">
+                        <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="() => ds.Close(false)" />
+                        <RadzenButton Text="Guardar" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" IsBusy="@guardando" />
+                    </RadzenStack>
+                </RadzenStack>
+            </EditForm>,
+            new DialogOptions { Width = "700px", Resizable = true, Draggable = true }
+        );
+    }
+
+    private async Task Guardar(DialogService ds)
+    {
+        guardando = true;
+        bool esExitoso;
+        string? mensajeError = null;
+
+        if (esEdicion && clienteIdEdicion.HasValue)
+        {
+            var dto = new ClienteActualizarDto(
+                clienteIdEdicion.Value,
+                formModel.Nombre,
+                formModel.Rfc,
+                formModel.Telefono,
+                formModel.Telefono2,
+                formModel.Correo,
+                formModel.Contacto,
+                formModel.NumConvenio,
+                formModel.PolizaSeguro
+            );
+            var res = await ClienteServicio.ActualizarAsync(clienteIdEdicion.Value, dto);
+            esExitoso = res.EsExitoso;
+            mensajeError = res.DetalleError?.Description ?? "Error al actualizar cliente.";
+        }
+        else
+        {
+            var dto = new ClienteCrearDto(
+                formModel.Nombre,
+                formModel.Rfc,
+                TipoPersona.Fisica,
+                formModel.Telefono,
+                formModel.Telefono2,
+                formModel.Correo,
+                formModel.Contacto,
+                formModel.NumConvenio,
+                formModel.PolizaSeguro,
+                null
+            );
+            var res = await ClienteServicio.CrearAsync(dto);
+            esExitoso = res.EsExitoso;
+            mensajeError = res.DetalleError?.Description ?? "Error al crear cliente.";
+        }
+
+        if (esExitoso)
+        {
+            ds.Close(true);
+            NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Cliente guardado correctamente");
+            await CargarClientes();
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", mensajeError);
+        }
+
+        guardando = false;
+    }
+
+    private async Task Eliminar(Guid id)
+    {
+        var confirmacion = await DialogService.Confirm(
+            "¿Está seguro de que desea eliminar este cliente?",
+            "Eliminar Cliente",
+            new ConfirmOptions { OkButtonText = "Eliminar", CancelButtonText = "Cancelar" }
+        );
+
+        if (confirmacion == true)
+        {
+            var res = await ClienteServicio.DesactivarAsync(id);
+            if (res.EsExitoso)
+            {
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Cliente eliminado correctamente");
+                await CargarClientes();
+            }
+            else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", res.DetalleError?.Description ?? "Error al eliminar cliente.");
+            }
+        }
+    }
+
+    private class ClienteFormModel
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Rfc { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public string? Telefono2 { get; set; }
+        public string Correo { get; set; } = string.Empty;
+        public string Contacto { get; set; } = string.Empty;
+        public string? NumConvenio { get; set; }
+        public string? PolizaSeguro { get; set; }
+    }
+
+    private class DireccionFormModel
+    {
+        public string Calle { get; set; } = string.Empty;
+        public string NumeroExterior { get; set; } = string.Empty;
+        public string? NumeroInterior { get; set; }
+        public string Colonia { get; set; } = string.Empty;
+        public string CodigoPostal { get; set; } = string.Empty;
+        public string? Localidad { get; set; }
+        public Guid MunicipioId { get; set; }
+    }
+}
