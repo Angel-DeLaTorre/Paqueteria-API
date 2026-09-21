@@ -15,6 +15,7 @@ env:
 jobs:
   build-and-push-wasm:
     runs-on: ubuntu-latest
+    environment: PROD
     permissions:
       contents: read
       packages: write
