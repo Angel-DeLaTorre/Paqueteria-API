@@ -13,25 +13,19 @@ RUN dotnet publish "Paqueteria.WebAssembly.csproj" -c Release -o /out
 FROM nginx:alpine
 EXPOSE 80
 
-# Copiamos absolutamente todo_ el contenido publicado (/out incluye wwwroot y _content)
+# Copiamos el contenido publicado (/out contiene wwwroot con todos los _content y assets)
 COPY --from=build-env /out /usr/share/nginx/html
 
-# Configuramos Nginx apuntando al subdirectorio wwwroot dentro del volumen copiado
+# Configuración limpia de Nginx apuntando al subdirectorio wwwroot y soportando SPA
 RUN echo 'server { \
     listen 80; \
     server_name localhost; \
-    root /usr/share/nginx/html; \
-    index wwwroot/index.html index.html; \
+    root /usr/share/nginx/html/wwwroot; \
+    index index.html; \
     location / { \
-        root /usr/share/nginx/html/wwwroot; \
         try_files $uri $uri/ /index.html; \
     } \
-    location /_content/ { \
-        alias /usr/share/nginx/html/wwwroot/_content/; \
-        try_files $uri =404; \
-    } \
     location ~* \.(wasm|clr)$ { \
-        root /usr/share/nginx/html/wwwroot; \
         types { application/wasm wasm; } \
         add_header Cache-Control "no-cache"; \
     } \
