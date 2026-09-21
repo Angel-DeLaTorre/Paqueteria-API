@@ -23,13 +23,7 @@ RUN echo 'server { \
     server_name localhost; \
     location / { \
         root /usr/share/nginx/html; \
+        include /etc/nginx/mime.types; \
         try_files $uri $uri/ /index.html =404; \
-    } \
-    # Configuración crucial para que el navegador acepte los binarios de .NET 10 \
-    types { \
-        application/wasm wasm; \
-        application/json json; \
-        application/octet-stream clr; \
-        application/octet-stream dll; \
     } \
 }' > /etc/nginx/conf.d/default.conf
