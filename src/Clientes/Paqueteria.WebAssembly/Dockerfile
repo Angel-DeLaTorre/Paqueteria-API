@@ -17,5 +17,19 @@ EXPOSE 80
 
 COPY --from=build-env /out/wwwroot /usr/share/nginx/html
 
-# Configuración básica para soportar el ruteo de Blazor SPA (evita errores 404 al recargar páginas)
-RUN echo 'server { listen 80; location / { root /usr/share/nginx/html; try_files $uri $uri/ /index.html =404; } }' > /etc/nginx/conf.d/default.conf
+#  Inyectamos una configuración completa de Nginx para soportar tipos de archivos .wasm y SPA Routing
+RUN echo 'server { \
+    listen 80; \
+    server_name localhost; \
+    location / { \
+        root /usr/share/nginx/html; \
+        try_files $uri $uri/ /index.html =404; \
+    } \
+    # Configuración crucial para que el navegador acepte los binarios de .NET 10 \
+    types { \
+        application/wasm wasm; \
+        application/json json; \
+        application/octet-stream clr; \
+        application/octet-stream dll; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
