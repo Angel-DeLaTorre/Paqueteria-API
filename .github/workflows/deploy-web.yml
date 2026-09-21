@@ -32,7 +32,7 @@ jobs:
           
       - name: Inyectar la URL de la API en producción
         run: |
-          sed -i 's|API_URL_PLACEHOLDER|http://${{ vars.SSH_HOST }}:8080/api/|g' src/Clientes/Paqueteria.WebAssembly/wwwroot/appsettings.json
+          sed -i 's|PAQUETERIA_API_URL|http://${{ vars.SSH_HOST }}:8080/api/|g' src/Clientes/Paqueteria.WebAssembly/wwwroot/appsettings.json
 
       - name: Construir y subir imagen de WebAssembly
         uses: docker/build-push-action@v5
