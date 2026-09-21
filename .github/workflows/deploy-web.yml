@@ -3,10 +3,10 @@ name: Deploy WebAssembly Client
 on:
   push:
     branches: [ "main", "master", "test-web" ]
-    #paths:
-    #  - 'src/Clientes/**'
-    #  - 'src/Paqueteria.Comun/**'
-    #  - '.github/workflows/deploy-web.yml'
+    paths:
+      - 'src/Clientes/**'
+      - 'src/Paqueteria.Comun/**'
+      - '.github/workflows/deploy-web.yml'
 
 env:
   REGISTRY: ghcr.io
