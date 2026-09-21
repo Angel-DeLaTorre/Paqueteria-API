@@ -2,7 +2,7 @@ name: Deploy Backend API
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master", "test-web" ]
     paths:
       - 'src/Backend/**'
       - 'src/Paqueteria.Comun/**'
