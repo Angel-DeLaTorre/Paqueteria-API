@@ -1,0 +1,79 @@
+@page "/login"
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Sesion
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@layout AuthLayout
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ITokenStorage TokenStorage
+@inject NotificationService NotificationService
+
+<PageTitle>Iniciar Sesión - Paquetería</PageTitle>
+
+<RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 100vh;" Class="rz-p-4">
+    <RadzenCard Class="rz-p-6 rz-shadow-8" Style="width: 100%; max-width: 420px; border-radius: 8px;">
+        <RadzenStack AlignItems="AlignItems.Center" Class="rz-mb-4">
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1" Class="rz-color-primary rz-m-0" Style="font-weight: bold;">
+                Paquetería
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-color-secondary rz-m-0">
+                Ingrese sus credenciales para acceder
+            </RadzenText>
+        </RadzenStack>
+
+        @if (!string.IsNullOrEmpty(_mensajeError))
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Class="rz-mb-4" AllowClose="false">
+                @_mensajeError
+            </RadzenAlert>
+        }
+
+        <RadzenLogin UserText="Usuario / Correo"
+                     PasswordText="Contraseña"
+                     LoginText="Iniciar Sesión"
+                     RememberMeText="Recordarme"
+                     AllowRememberMe="false"
+                     AllowResetPassword="false"
+                     AllowRegister="false"
+                     Login="@(args => EjecutarLogin(args))" />
+                     
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    private string? _mensajeError;
+
+    private async Task EjecutarLogin(LoginArgs args)
+    {
+        _mensajeError = null;
+
+        var dtoRequest = new LoginSolicitudDto(
+            args.Username,
+            args.Password
+        );
+
+        var respuesta = await AuthService.LoginAsync(dtoRequest);
+
+        if (respuesta.EsExitoso && respuesta.Datos != null && !string.IsNullOrEmpty(respuesta.Datos.Token))
+        {
+            var token = respuesta.Datos.Token;
+
+            // 1. Guardar token en el almacenamiento específico del cliente
+            await TokenStorage.SetTokenAsync(token);
+
+            // 2. Notificar al proveedor de autenticación
+            if (AuthStateProvider is CustomAuthenticationStateProvider customAuthStateProvider)
+            {
+                customAuthStateProvider.NotifyUserAuthentication(token);
+            }
+
+            // 3. Redireccionar al inicio
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            _mensajeError = respuesta.DetalleError?.Description ?? "Credenciales inválidas o error de conexión.";
+        }
+    }
+}

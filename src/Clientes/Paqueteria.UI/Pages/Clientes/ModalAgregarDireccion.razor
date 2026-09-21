@@ -1,0 +1,151 @@
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Comun
+@using Paqueteria.Comun.Dtos.Estados
+@using Paqueteria.Comun.Dtos.Municipios
+@inject IEstadoServicio EstadoServicio
+@inject IMunicipioServicio MunicipioServicio
+@inject DialogService DialogService
+
+<EditForm Model="@modelo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <RadzenStack Gap="1rem">
+        <RadzenRow Gutter="1rem">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenFormField Text="Estado" Variant="Variant.Outlined" Style="width: 100%;">
+                    <RadzenDropDown TValue="string"
+                                    Data="@estados"
+                                    TextProperty="Nombre"
+                                    ValueProperty="EstadoId"
+                                    @bind-Value="estadoSeleccionado"
+                                    Change="@OnEstadoChanged"
+                                    Placeholder="Seleccione un estado..."
+                                    IsLoading="@cargandoEstados"
+                                    AllowFiltering="true"
+                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenFormField Text="Municipio / Ciudad" Variant="Variant.Outlined" Style="width: 100%;">
+                    <RadzenDropDown TValue="Guid"
+                                    Data="@municipios"
+                                    TextProperty="Nombre"
+                                    ValueProperty="MunicipioId"
+                                    @bind-Value="modelo.MunicipioId"
+                                    Disabled="@(!municipios.Any() || cargandoMunicipios)"
+                                    Placeholder="Seleccione un municipio..."
+                                    IsLoading="@cargandoMunicipios"
+                                    AllowFiltering="true"
+                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenFormField Text="Calle" Variant="Variant.Outlined" Style="width: 100%;">
+                    <RadzenTextBox @bind-Value="modelo.Calle" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="4">
+                <RadzenFormField Text="Num. Exterior" Variant="Variant.Outlined" Style="width: 100%;">
+                    <RadzenTextBox @bind-Value="modelo.NumeroExterior" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="4">
+                <RadzenFormField Text="Num. Interior" Variant="Variant.Outlined" Style="width: 100%;">
+                    <RadzenTextBox @bind-Value="modelo.NumeroInterior" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenFormField Text="Colonia" Variant="Variant.Outlined" Style="width: 100%;">
+                    <RadzenTextBox @bind-Value="modelo.Colonia" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="4">
+                <RadzenFormField Text="Código Postal" Variant="Variant.Outlined" Style="width: 100%;">
+                    <RadzenTextBox @bind-Value="modelo.CodigoPostal" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenFormField Text="Localidad" Variant="Variant.Outlined" Style="width: 100%;">
+                    <RadzenTextBox @bind-Value="modelo.Localidad" />
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mt-4">
+            <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="() => DialogService.Close(null)" />
+            <RadzenButton Text="Guardar Dirección" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Disabled="@(modelo.MunicipioId == Guid.Empty)" />
+        </RadzenStack>
+    </RadzenStack>
+</EditForm>
+
+@code {
+    [Parameter] public string Pais { get; set; } = "MEX";
+
+    private DireccionFormModel modelo = new();
+    private List<EstadoRespuestaDto> estados = new();
+    private List<MunicipioRespuestaDto> municipios = new();
+    private string? estadoSeleccionado;
+
+    private bool cargandoEstados;
+    private bool cargandoMunicipios;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cargandoEstados = true;
+        var res = await EstadoServicio.ObtenerTodosAsync(Pais);
+        if (res.EsExitoso && res.Datos != null)
+        {
+            estados = res.Datos;
+        }
+        cargandoEstados = false;
+    }
+
+    private async Task OnEstadoChanged(object args)
+    {
+        modelo.MunicipioId = Guid.Empty;
+        municipios.Clear();
+
+        if (args is string estado && !string.IsNullOrWhiteSpace(estado))
+        {
+            cargandoMunicipios = true;
+            var res = await MunicipioServicio.ObtenerTodosAsync(estado);
+            if (res.EsExitoso && res.Datos != null)
+            {
+                municipios = res.Datos;
+            }
+            cargandoMunicipios = false;
+        }
+    }
+
+    private void Guardar()
+    {
+        var dto = new DireccionDto(
+            modelo.Calle,
+            modelo.NumeroExterior,
+            modelo.NumeroInterior,
+            modelo.Colonia,
+            modelo.CodigoPostal,
+            modelo.Localidad,
+            modelo.MunicipioId
+        );
+
+        DialogService.Close(dto);
+    }
+
+    private class DireccionFormModel
+    {
+        public string Calle { get; set; } = string.Empty;
+        public string NumeroExterior { get; set; } = string.Empty;
+        public string? NumeroInterior { get; set; }
+        public string Colonia { get; set; } = string.Empty;
+        public string CodigoPostal { get; set; } = string.Empty;
+        public string? Localidad { get; set; }
+        public Guid MunicipioId { get; set; }
+    }
+}

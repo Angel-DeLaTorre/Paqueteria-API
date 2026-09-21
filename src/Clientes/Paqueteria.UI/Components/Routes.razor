@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+@using Paqueteria.UI.Components.Layout
+@using Paqueteria.UI.Pages
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(MainLayout).Assembly"
+            AdditionalAssemblies="[typeof(App).Assembly]">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 60vh;">
+                        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+                    </RadzenStack>
+                </Authorizing>
+                <NotAuthorized>
+                    @if (context.User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="container text-center py-5">
+                            <h3 class="text-danger">Acceso no autorizado</h3>
+                            <p>No tienes permisos suficientes para acceder a este recurso.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <RedirectToLogin />
+                    }
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>No encontrado</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <div class="container text-center py-5">
+                    <h3 class="text-secondary">Página no encontrada</h3>
+                    <p>La ruta especificada no existe en la aplicación.</p>
+                </div>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+<RadzenTheme Theme="standard" />
+<RadzenComponents />

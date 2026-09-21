@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# 1. Copiamos todos los archivos .csproj replicando su estructura exacta de carpetas
+# 1. Copiamos todos los archivos .csproj
 # Esto permite aprovechar la caché de Docker para acelerar futuras compilaciones
 COPY ["Paqueteria.Api/Paqueteria.Api.csproj", "Paqueteria.Api/"]
 COPY ["Paqueteria.Aplicacion/Paqueteria.Aplicacion.csproj", "Paqueteria.Aplicacion/"]

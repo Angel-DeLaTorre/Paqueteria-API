@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://microsoft.com"
+             xmlns:x="http://microsoft.com"
+             xmlns:local="clr-namespace:Paqueteria.Desktop"
+             xmlns:ui="clr-namespace:Paqueteria.UI.Components;assembly=Paqueteria.UI"
+             x:Class="Paqueteria.Desktop.MainPage">
+
+    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+        <BlazorWebView.RootComponents>
+            <!-- Ahora mapea el Routes de la librería compartida de UI -->
+            <RootComponent Selector="#app" ComponentType="{x:Type ui:Routes}" />
+        </BlazorWebView.RootComponents>
+    </BlazorWebView>
+
+</ContentPage>

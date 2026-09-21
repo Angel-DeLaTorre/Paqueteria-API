@@ -1,0 +1,164 @@
+@using Paqueteria.Cliente.Core.Interfaces
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+<RadzenStack Gap="1.5rem" Class="rz-p-2">
+
+    <!-- ENCABEZADO Y ESTATUS -->
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+        <div>
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-m-0" Style="font-weight: bold;">
+                Asignación #@Asignacion?.Folio
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Caption" Class="rz-text-color-secondary rz-m-0">
+                Registrado el @Asignacion?.FechaRegistro.ToString("dd/MM/yyyy HH:mm")
+            </RadzenText>
+        </div>
+        <div>
+            @if (Asignacion?.Activo == true)
+            {
+                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="En Ruta / Activa" Class="rz-px-3 rz-py-2" />
+            }
+            else
+            {
+                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="Finalizada / Inactiva" Class="rz-px-3 rz-py-2" />
+            }
+        </div>
+    </RadzenStack>
+
+    <!-- DETALLES DEL CHOFER Y LA UNIDAD -->
+    <RadzenRow Gutter="1rem">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Class="rz-p-4 rz-background-color-neutral-100">
+                <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-primary rz-mb-2" Style="font-weight: bold;">
+                    Información del Operador
+                </RadzenText>
+                <RadzenStack Gap="0.5rem">
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">
+                        <strong>Chofer:</strong> @Asignacion?.ChoferNombreCompleto
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">
+                        <strong>Teléfono:</strong> @(Asignacion?.ChoferTelefono ?? "-")
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Class="rz-p-4 rz-background-color-neutral-100">
+                <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-primary rz-mb-2" Style="font-weight: bold;">
+                    Unidad y Transporte
+                </RadzenText>
+                <RadzenStack Gap="0.5rem">
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">
+                        <strong>Número de Camión:</strong> @(Asignacion?.NumCamion ?? "-")
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">
+                        <strong>Contenedores:</strong> @(Asignacion?.NumContenedor ?? "-") / @(Asignacion?.NumContenedor2 ?? "-")
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <!-- INFORMACIÓN DE LA RUTA -->
+    <RadzenCard Class="rz-p-4">
+        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-color-primary rz-mb-2" Style="font-weight: bold;">
+            Ruta Asignada
+        </RadzenText>
+        <RadzenRow Gutter="1rem">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">
+                    <strong>Nombre Ruta:</strong> @Asignacion?.RutaNombre
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">
+                    <strong>Origen - Destino:</strong> @Asignacion?.SucursalOrigenNombre ➔ @Asignacion?.SucursalDestinoNombre
+                </RadzenText>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenCard>
+
+    <!-- OBSERVACIONES SI EXISTEN -->
+    @if (!string.IsNullOrEmpty(Asignacion?.Observaciones))
+    {
+        <RadzenCard Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.Subtitle2" Style="font-weight: bold;" Class="rz-mb-1">Observaciones</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">@Asignacion.Observaciones</RadzenText>
+        </RadzenCard>
+    }
+
+    <!-- GUÍAS ASOCIADAS A LA ASIGNACIÓN -->
+    <RadzenCard Class="rz-p-4">
+        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-mb-3" Style="font-weight: bold;">
+            Guías Embarcadas (@(Asignacion?.Guias?.Count() ?? 0))
+        </RadzenText>
+
+        @if (Asignacion?.Guias != null && Asignacion.Guias.Any())
+        {
+            <RadzenDataGrid Data="@Asignacion.Guias" TItem="GuiaAsignadaItemDto" AllowPaging="true" PageSize="5" Size="DataGridSize.Small">
+                <Columns>
+                    <RadzenDataGridColumn TItem="GuiaAsignadaItemDto" Property="Clave" Title="Clave / Folio" Width="140px">
+                        <Template Context="g">
+                            <RadzenText TextStyle="TextStyle.Body2" Style="font-weight: bold;" Class="rz-m-0">@g.Clave</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="GuiaAsignadaItemDto" Property="ClienteDestino" Title="Destinatario" />
+                    <RadzenDataGridColumn TItem="GuiaAsignadaItemDto" Property="Total" Title="Monto" Width="120px">
+                        <Template Context="g">
+                            @g.Total.ToString("C2")
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        }
+        else
+        {
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-color-secondary rz-m-0">
+                No hay guías asociadas a esta asignación.
+            </RadzenText>
+        }
+    </RadzenCard>
+
+    <!-- ACCIONES DEL MODAL -->
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mt-2">
+        <RadzenButton Text="Cerrar" ButtonStyle="ButtonStyle.Light" Click="() => DialogService.Close(false)" />
+    </RadzenStack>
+
+</RadzenStack>
+
+@code {
+    [Parameter] public AsignacionDetalleDto? Asignacion { get; set; }
+
+    // DTOs auxiliares en caso de no tenerlos importados globalmente
+    public class AsignacionDetalleDto
+    {
+        public Guid AsignacionId { get; set; }
+        public string Folio { get; set; } = string.Empty;
+        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public bool Activo { get; set; } = true;
+
+        public string ChoferNombreCompleto { get; set; } = string.Empty;
+        public string? ChoferTelefono { get; set; }
+
+        public string NumCamion { get; set; } = string.Empty;
+        public string? NumContenedor { get; set; }
+        public string? NumContenedor2 { get; set; }
+
+        public string RutaNombre { get; set; } = string.Empty;
+        public string SucursalOrigenNombre { get; set; } = string.Empty;
+        public string SucursalDestinoNombre { get; set; } = string.Empty;
+
+        public string? Observaciones { get; set; }
+        public IEnumerable<GuiaAsignadaItemDto>? Guias { get; set; }
+    }
+
+    public class GuiaAsignadaItemDto
+    {
+        public Guid GuiaId { get; set; }
+        public string Clave { get; set; } = string.Empty;
+        public string ClienteDestino { get; set; } = string.Empty;
+        public decimal Total { get; set; }
+    }
+}

@@ -1,0 +1,54 @@
+﻿@page "/Error"
+@using System.Diagnostics
+@inject NavigationManager Navigation
+
+<PageTitle>Error - Paquetería</PageTitle>
+
+<div class="container mt-5">
+    <div class="card border-danger shadow-sm p-4">
+        <h1 class="text-danger fw-bold">Error en la Aplicación</h1>
+        <h2 class="fs-5 text-muted mb-4">Ocurrió un problema inesperado al procesar tu solicitud.</h2>
+
+        @if (ShowRequestId)
+        {
+            <p>
+                <strong>Request ID:</strong> <code>@RequestId</code>
+            </p>
+        }
+
+        <p>
+            <strong>Ruta afectada:</strong> <code>@Navigation.Uri</code>
+        </p>
+
+        <hr/>
+
+        <h3 class="fs-6 fw-bold">Modo de Desarrollo</h3>
+        <p class="text-secondary small">
+            Si estás en un entorno local, revisa la consola de desarrollador del navegador (F12) o los registros de
+            depuración para ver el stack trace completo de la excepción.
+        </p>
+
+        <div class="mt-3">
+            <button class="btn btn-outline-primary" @onclick="VolverAlInicio">
+                Volver al Inicio
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    protected override void OnInitialized()
+    {
+        // En el cliente, se obtiene el ID del rastreo de Activity actual
+        RequestId = Activity.Current?.Id;
+    }
+
+    private void VolverAlInicio()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+}

@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <!-- Configuración para Windows (Genera el ejecutable de escritorio real) -->
+    <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
+        <TargetFrameworks>net10.0-windows10.0.19041.0</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+        <UseMaui>true</UseMaui>
+    </PropertyGroup>
+
+    <!-- Configuración para macOS (Librería neutra: valida sintaxis en tu Mac sin pedir Xcode ni MAUI) -->
+    <PropertyGroup Condition="!$([MSBuild]::IsOSPlatform('windows'))">
+        <TargetFrameworks>net10.0</TargetFrameworks>
+        <OutputType>Library</OutputType>
+        <!-- Desactivamos temporalmente el compilador de MAUI en Mac para saltarnos la dependencia de Xcode -->
+        <UseMaui>false</UseMaui>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    </PropertyGroup>
+
+    <!-- Propiedades Generales del Proyecto -->
+    <PropertyGroup>
+        <RootNamespace>Paqueteria.Desktop</RootNamespace>
+        <SingleProject>true</SingleProject>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <EnableDefaultCssItems>false</EnableDefaultCssItems>
+        <Nullable>enable</Nullable>
+
+        <ApplicationTitle>Paqueteria.Desktop</ApplicationTitle>
+        <ApplicationId>com.companyname.paqueteria.desktop</ApplicationId>
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+    </PropertyGroup>
+
+    <!-- Paquetes NuGet condicionales (Solo se activan en Windows o entornos con soporte) -->
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('windows')) or '$(BuildingInsideVisualStudio)' == 'true'">
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0"/>
+        <ProjectReference Include="..\Paqueteria.UI\Paqueteria.UI.csproj"/>
+        <ProjectReference Include="..\Paqueteria.Cliente.Core\Paqueteria.Cliente.Core.csproj"/>
+    </ItemGroup>
+
+    <!-- Excluir archivos de MAUI en macOS para evitar errores en el editor -->
+    <ItemGroup Condition="!$([MSBuild]::IsOSPlatform('windows'))">
+        <!-- Archivos raíz -->
+        <Compile Remove="MauiProgram.cs" />
+        <Compile Remove="App.xaml.cs" />
+        <Compile Remove="MainPage.xaml.cs" />
+
+        <!-- Carpeta completa de Windows (Evita líneas rojas de WinUI en Mac) -->
+        <Compile Remove="Platforms/Windows/**/*.cs" />
+        <Manifest Remove="Platforms/Windows/**/*.manifest" />
+        <AppxManifest Remove="Platforms/Windows/**/*.appxmanifest" />
+
+        <MauiXaml Remove="App.xaml" />
+        <MauiXaml Remove="MainPage.xaml" />
+        <MauiXaml Remove="Platforms/Windows/**/*.xaml" />
+
+        <!-- Los mantiene visibles en el panel de Rider pero sin analizarlos como código activo -->
+        <None Include="MauiProgram.cs" />
+        <None Include="App.xaml" />
+        <None Include="MainPage.xaml" />
+        <None Include="Platforms/Windows/**/*" />
+    </ItemGroup>
+
+
+</Project>

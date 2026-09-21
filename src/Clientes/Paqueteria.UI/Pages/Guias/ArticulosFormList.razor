@@ -1,0 +1,144 @@
+@using System.ComponentModel.DataAnnotations
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem">
+    @if (Articulos != null)
+    {
+        @for (int i = 0; i < Articulos.Count; i++)
+        {
+            var index = i;
+            var articulo = Articulos[index];
+
+            <RadzenCard Class="rz-background-color-neutral-100 rz-border-radius-2 rz-p-4">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-2">
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0" Style="font-weight: bold;">
+                        Artículo #@(index + 1)
+                    </RadzenText>
+                    <RadzenButton Icon="delete" Text="Eliminar" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Small" Click="() => ConfirmarEliminar(index)" />
+                </RadzenStack>
+
+                <RadzenRow Gutter="1rem">
+                    <!-- SECCIÓN 1: DATOS SAT -->
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenFormField Text="Clave Prod/Serv SAT *" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenDropDown @bind-Value="articulo.ClaveProdServSat" Data="@CatSatProdServ" TextProperty="Label" ValueProperty="Value" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Seleccione clave" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenFormField Text="Clave Unidad SAT *" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenDropDown @bind-Value="articulo.ClaveUnidadSat" Data="@CatSatUnidad" TextProperty="Label" ValueProperty="Value" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Seleccione unidad" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenFormField Text="Tipo Embalaje SAT" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenDropDown @bind-Value="articulo.ClaveTipoEmbalajeSat" Data="@CatSatEmbalaje" TextProperty="Label" ValueProperty="Value" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" Placeholder="Seleccione embalaje" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <!-- SECCIÓN 2: DESCRIPCIÓN Y CANTIDADES -->
+                    <RadzenColumn Size="12" SizeMD="6">
+                        <RadzenFormField Text="Descripción *" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="articulo.Descripcion" Placeholder="Descripción detallada de la mercancía" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="6" SizeMD="3">
+                        <RadzenFormField Text="Cantidad *" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenNumeric @bind-Value="articulo.Cantidad" Min="1" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="6" SizeMD="3">
+                        <RadzenFormField Text="Valor Unidad *" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenNumeric @bind-Value="articulo.ValorUnidad" Min="0" Format="c" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <!-- SECCIÓN 3: PESO Y DIMENSIONES -->
+                    <RadzenColumn Size="6" SizeMD="2">
+                        <RadzenFormField Text="Peso (kg) *" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenNumeric @bind-Value="articulo.PesoUnitarioKg" Min="0.001m" Step="0.1" Format="0.000" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="6" SizeMD="2">
+                        <RadzenFormField Text="Largo (cm)" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenNumeric @bind-Value="articulo.Largo" Min="0" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="6" SizeMD="2">
+                        <RadzenFormField Text="Ancho (cm)" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenNumeric @bind-Value="articulo.Ancho" Min="0" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="6" SizeMD="2">
+                        <RadzenFormField Text="Alto (cm)" Variant="Variant.Outlined" Style="width: 100%;">
+                            <RadzenNumeric @bind-Value="articulo.Alto" Min="0" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+
+                    <!-- SECCIÓN 4: BANDERAS -->
+                    <RadzenColumn Size="12" SizeMD="4" Class="rz-d-flex rz-align-items-center">
+                        <RadzenCheckBox @bind-Value="articulo.EsMaterialPeligroso" Name="@($"chkPeligroso_{index}")" />
+                        <RadzenLabel Text="¿Es Material Peligroso?" Component="@($"chkPeligroso_{index}")" Class="rz-ml-2" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenCard>
+        }
+    }
+
+    <RadzenButton Icon="add" Text="Agregar Artículo" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Outlined" Style="width: 100%; border-style: dashed;" Click="AgregarArticulo" />
+</RadzenStack>
+
+@code {
+    [Parameter] public List<ArticuloFormModel> Articulos { get; set; } = new();
+    [Parameter] public IEnumerable<OpcionSelectDto> CatSatProdServ { get; set; } = Enumerable.Empty<OpcionSelectDto>();
+    [Parameter] public IEnumerable<OpcionSelectDto> CatSatUnidad { get; set; } = Enumerable.Empty<OpcionSelectDto>();
+    [Parameter] public IEnumerable<OpcionSelectDto> CatSatEmbalaje { get; set; } = Enumerable.Empty<OpcionSelectDto>();
+
+    private void AgregarArticulo()
+    {
+        Articulos.Add(new ArticuloFormModel());
+    }
+
+    private async Task ConfirmarEliminar(int index)
+    {
+        var confirm = await DialogService.Confirm("¿Está seguro de eliminar este artículo?", "Eliminar Artículo", new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+        if (confirm == true)
+        {
+            Articulos.RemoveAt(index);
+        }
+    }
+
+    public class OpcionSelectDto
+    {
+        public string Label { get; set; } = string.Empty;
+        public string Value { get; set; } = string.Empty;
+    }
+
+    public class ArticuloFormModel
+    {
+        [Required(ErrorMessage = "Requerido")]
+        public string ClaveProdServSat { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Requerido")]
+        public string ClaveUnidadSat { get; set; } = string.Empty;
+
+        public string? ClaveTipoEmbalajeSat { get; set; }
+
+        [Required(ErrorMessage = "Requerido")]
+        public string Descripcion { get; set; } = string.Empty;
+
+        public int Cantidad { get; set; } = 1;
+        public decimal ValorUnidad { get; set; } = 0;
+        public decimal PesoUnitarioKg { get; set; } = 0.1m;
+        public decimal Largo { get; set; } = 0;
+        public decimal Ancho { get; set; } = 0;
+        public decimal Alto { get; set; } = 0;
+        public bool EsMaterialPeligroso { get; set; } = false;
+    }
+}

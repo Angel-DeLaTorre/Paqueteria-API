@@ -1,0 +1,75 @@
+name: Deploy Backend API
+
+on:
+  push:
+    branches: [ "main", "master", "test-web" ]
+    paths:
+      - 'src/Backend/**'
+      - 'src/Paqueteria.Comun/**'
+      - '.github/workflows/deploy-backend.yml' # Se ejecuta si modificas este propio flujo
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-api:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Iniciar sesión en GitHub Packages (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Convertir nombre de imagen a minúsculas
+        run: |
+          echo "IMAGE_NAME_LOWER=$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      # Compila y sube exclusivamente la API
+      - name: Construir y subir imagen de la API
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./src/Backend/Paqueteria.Api/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}-api:latest
+
+  deploy-api:
+    needs: build-and-push-api
+    runs-on: ubuntu-latest
+    environment: PROD
+    
+    steps:
+      - name: Actualizar API en el VPS de Hetzner vía SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/paqueteria
+            
+            echo "${{ secrets.CR_PAT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Re-escribir variables de entorno del backend
+            echo "ConnectionStrings__DefaultConnection=Host=postgres-db;Database=paqueteria_db;Username=admin_paqueteria;Password=${{ secrets.DB_PASSWORD }};" > .env
+            echo "Jwt__Key=${{ secrets.JWT_SETTINGS_KEY }}" >> .env
+            echo "Jwt__Issuer=PaqueteriaAPI" >> .env
+            echo "Jwt__Audience=PaqueteriaWeb" >> .env
+            echo "Jwt__DurationInMinutes=15" >> .env
+            echo "ASPNETCORE_HTTPS_PORT=0" >> .env
+            
+            # Descargar e iniciar solo los contenedores de base de datos y API
+            docker compose pull paqueteria-api
+            docker compose up -d postgres-db paqueteria-api
+            
+            docker image prune -f

@@ -1,0 +1,368 @@
+@page "/usuarios"
+@using System.ComponentModel.DataAnnotations
+@using Paqueteria.Cliente.Core.Interfaces
+@using Paqueteria.Comun.Dtos.Usuarios
+@using Paqueteria.Comun.Dtos.Roles
+@inject IUsuarioServicio UsuarioService
+@inject IRolServicio RolService
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+<RadzenCard Class="rz-my-4 rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-m-0">Gestión de Usuarios</RadzenText>
+        <RadzenButton Icon="add" Text="Nuevo usuario" ButtonStyle="ButtonStyle.Primary" Click="OpenCreateModal" />
+    </RadzenStack>
+
+    <RadzenDataGrid Data="@_usuarios"
+                    TItem="UsuarioRespuestaDto"
+                    IsLoading="@_loading"
+                    AllowPaging="true"
+                    PageSize="10"
+                    PagerHorizontalAlign="HorizontalAlign.Right"
+                    ShowPagingSummary="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="UsuarioRespuestaDto" Property="Nombre" Title="Nombre" Width="25%">
+                <Template Context="usuario">
+                    <RadzenButton ButtonStyle="ButtonStyle.Info" Text="@usuario.Nombre" Click="() => OpenDetailModal(usuario)" Class="rz-p-0" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="UsuarioRespuestaDto" Property="Username" Title="Username" Width="20%" />
+            <RadzenDataGridColumn TItem="UsuarioRespuestaDto" Title="Último Acceso" Width="25%">
+                <Template Context="usuario">
+                    @(usuario.FechaUltimoAcesso.HasValue 
+                        ? usuario.FechaUltimoAcesso.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") 
+                        : "Sin acceso registrado")
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="UsuarioRespuestaDto" Title="Roles" Width="20%" Sortable="false" Filterable="false">
+                <Template Context="usuario">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.25rem" Wrap="FlexWrap.Wrap">
+                        @if (usuario.Roles != null && usuario.Roles.Any())
+                        {
+                            @foreach (var rol in usuario.Roles)
+                            {
+                                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@(string.IsNullOrEmpty(rol.Descripcion) ? rol.Nombre : rol.Descripcion)" />
+                            }
+                        }
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="UsuarioRespuestaDto" Title="Acciones" Width="10%" Sortable="false" Filterable="false">
+                <Template Context="usuario">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenButton Icon="visibility" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="() => OpenDetailModal(usuario)" />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    private List<UsuarioRespuestaDto>? _usuarios = [];
+    private List<RolRespuestaDto> _rolesDisponibles = [];
+    private UsuarioCrearFormModel _crearModel = new();
+    private UsuarioEditarFormModel _editarModel = new();
+    private bool _loading = false;
+    private bool _saving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.WhenAll(LoadUsuariosAsync(), LoadRolesAsync());
+    }
+
+    private async Task LoadUsuariosAsync()
+    {
+        _loading = true;
+        try
+        {
+            var respuesta = await UsuarioService.ObtenerTodosAsync();
+            if (respuesta.EsExitoso)
+            {
+                _usuarios = respuesta.Datos ?? [];
+            }
+            else if (respuesta.DetalleError != null)
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", respuesta.DetalleError.Description);
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", "Error al cargar los usuarios");
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task LoadRolesAsync()
+    {
+        try
+        {
+            var respuesta = await RolService.ObtenerTodosAsync();
+            if (respuesta.EsExitoso)
+            {
+                _rolesDisponibles = respuesta.Datos ?? [];
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar roles: {ex.Message}");
+        }
+    }
+
+    private async Task OpenCreateModal()
+    {
+        _crearModel = new UsuarioCrearFormModel();
+        await DialogService.OpenAsync("Nuevo Usuario", ds =>
+            @<EditForm Model="@_crearModel" OnValidSubmit="() => SaveCreateDialog(ds)">
+                <DataAnnotationsValidator />
+                <RadzenStack Gap="1rem">
+                    <RadzenFormField Text="Nombre" Variant="Variant.Outlined">
+                        <RadzenTextBox @bind-Value="@_crearModel.Nombre" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _crearModel.Nombre)" />
+
+                    <RadzenFormField Text="Usuario" Variant="Variant.Outlined">
+                        <RadzenTextBox @bind-Value="@_crearModel.Username" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _crearModel.Username)" />
+
+                    <RadzenFormField Text="Contraseña" Variant="Variant.Outlined">
+                        <RadzenPassword @bind-Value="@_crearModel.Password" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _crearModel.Password)" />
+
+                    <RadzenFormField Text="Roles" Variant="Variant.Outlined">
+                        <RadzenDropDown @bind-Value="@_crearModel.Roles"
+                                        Data="@_rolesDisponibles"
+                                        TextProperty="Nombre"
+                                        ValueProperty="RolId"
+                                        Multiple="true"
+                                        AllowClear="true"
+                                        Placeholder="Selecciona un rol"
+                                        Style="width: 100%;" />
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _crearModel.Roles)" />
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mt-2">
+                        <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="() => ds.Close(false)" />
+                        <RadzenButton Text="Guardar" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" IsBusy="@_saving" />
+                    </RadzenStack>
+                </RadzenStack>
+            </EditForm>
+        );
+    }
+
+    private async Task SaveCreateDialog(DialogService ds)
+    {
+        _saving = true;
+        try
+        {
+            var dto = new UsuarioCrearDto(_crearModel.Nombre, _crearModel.Username, _crearModel.Password, _crearModel.Roles);
+            var respuesta = await UsuarioService.CrearAsync(dto);
+
+            if (respuesta.EsExitoso)
+            {
+                ds.Close(true);
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Usuario creado correctamente");
+                await LoadUsuariosAsync();
+            }
+            else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error al crear usuario", respuesta.DetalleError?.Description ?? "Ocurrió un error inesperado");
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", "Ocurrió un error inesperado");
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private async Task OpenDetailModal(UsuarioRespuestaDto usuario)
+    {
+        _editarModel = new UsuarioEditarFormModel
+        {
+            UsuarioId = usuario.Id,
+            Nombre = usuario.Nombre,
+            Username = usuario.Username,
+            Roles = usuario.Roles?.Select(r => r.RolId).ToList() ?? []
+        };
+
+        bool isEditing = false;
+
+        await DialogService.OpenAsync($"Detalle de Usuario", ds =>
+            @<RadzenStack Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@usuario.Username" Class="rz-px-3 rz-py-2" />
+                    @if (!isEditing)
+                    {
+                        <RadzenButton Icon="edit" Text="Editar" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click="() => { isEditing = true; StateHasChanged(); }" />
+                    }
+                </RadzenStack>
+
+                <RadzenCard Class="rz-background-color-neutral-2" Style="border: none;">
+                    @if (isEditing)
+                    {
+                        <EditForm Model="@_editarModel" OnValidSubmit="() => SaveEditDialog(ds)">
+                            <DataAnnotationsValidator />
+                            <RadzenStack Gap="1rem">
+                                <RadzenFormField Text="Nombre" Variant="Variant.Outlined">
+                                    <RadzenTextBox @bind-Value="@_editarModel.Nombre" Style="width: 100%;" />
+                                </RadzenFormField>
+                                <ValidationMessage For="@(() => _editarModel.Nombre)" />
+
+                                <RadzenFormField Text="Usuario (No modificable)" Variant="Variant.Outlined">
+                                    <RadzenTextBox Value="@_editarModel.Username" Disabled="true" Style="width: 100%;" />
+                                </RadzenFormField>
+
+                                <RadzenFormField Text="Roles" Variant="Variant.Outlined">
+                                    <RadzenDropDown @bind-Value="@_editarModel.Roles"
+                                                    Data="@_rolesDisponibles"
+                                                    TextProperty="Nombre"
+                                                    ValueProperty="RolId"
+                                                    Multiple="true"
+                                                    AllowClear="true"
+                                                    Style="width: 100%;" />
+                                </RadzenFormField>
+
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mt-2">
+                                    <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="() => { isEditing = false; StateHasChanged(); }" />
+                                    <RadzenButton Text="Guardar Cambios" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" IsBusy="@_saving" />
+                                </RadzenStack>
+                            </RadzenStack>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        <RadzenStack Gap="0.75rem">
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Caption" Class="rz-color-text-secondary rz-m-0">Nombre</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1" Class="rz-m-0">@usuario.Nombre</RadzenText>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Caption" Class="rz-color-text-secondary rz-m-0">Username</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1" Class="rz-m-0">@usuario.Username</RadzenText>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Caption" Class="rz-color-text-secondary rz-m-0">Último Acceso</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1" Class="rz-m-0">
+                                    @(usuario.FechaUltimoAcesso.HasValue 
+                                        ? usuario.FechaUltimoAcesso.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") 
+                                        : "Sin acceso registrado")
+                                </RadzenText>
+                            </div>
+                        </RadzenStack>
+                    }
+                </RadzenCard>
+
+                @if (!isEditing)
+                {
+                    <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-mt-2">Roles y Permisos Asignados</RadzenText>
+                    <RadzenStack Gap="0.5rem">
+                        @if (usuario.Roles != null && usuario.Roles.Any())
+                        {
+                            @foreach (var rol in usuario.Roles)
+                            {
+                                <RadzenCard Variant="Variant.Outlined" Class="rz-p-3">
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-mb-1">@(string.IsNullOrEmpty(rol.Descripcion) ? rol.Nombre : rol.Descripcion)</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Caption" Class="rz-color-text-secondary rz-mb-1">Permisos:</RadzenText>
+                                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.25rem" Wrap="FlexWrap.Wrap">
+                                        @if (rol.Permisos != null && rol.Permisos.Any())
+                                        {
+                                            @foreach (var permiso in rol.Permisos)
+                                            {
+                                                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="@(string.IsNullOrEmpty(permiso.Descripcion) ? permiso.Nombre : permiso.Descripcion)" />
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text="Sin permisos específicos" />
+                                        }
+                                    </RadzenStack>
+                                </RadzenCard>
+                            }
+                        }
+                        else
+                        {
+                            <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-text-secondary">Sin roles asignados</RadzenText>
+                        }
+                    </RadzenStack>
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Class="rz-mt-2">
+                        <RadzenButton Text="Cerrar" ButtonStyle="ButtonStyle.Light" Click="() => ds.Close(false)" />
+                    </RadzenStack>
+                }
+            </RadzenStack>,
+            new DialogOptions { Width = "650px" }
+        );
+    }
+
+    private async Task SaveEditDialog(DialogService ds)
+    {
+        _saving = true;
+        try
+        {
+            var dto = new UsuarioActualizarDto(_editarModel.UsuarioId, _editarModel.Nombre);
+            var respuesta = await UsuarioService.ActualizarAsync(_editarModel.UsuarioId, dto);
+
+            if (respuesta.EsExitoso)
+            {
+                ds.Close(true);
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Usuario actualizado correctamente");
+                await LoadUsuariosAsync();
+            }
+            else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error al actualizar", respuesta.DetalleError?.Description ?? "Ocurrió un problema al procesar la solicitud");
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", "Ocurrió un problema al procesar la solicitud");
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private class UsuarioCrearFormModel
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El usuario es obligatorio")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        public string Password { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Selecciona al menos un rol")]
+        [MinLength(1, ErrorMessage = "Selecciona al menos un rol")]
+        public List<Guid> Roles { get; set; } = [];
+    }
+
+    private class UsuarioEditarFormModel
+    {
+        public Guid UsuarioId { get; set; }
+
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; } = string.Empty;
+
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Selecciona al menos un rol")]
+        [MinLength(1, ErrorMessage = "Selecciona al menos un rol")]
+        public List<Guid> Roles { get; set; } = [];
+    }
+}

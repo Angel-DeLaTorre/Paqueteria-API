@@ -1,0 +1,61 @@
+name: Deploy WebAssembly Client
+
+on:
+  push:
+    branches: [ "main", "master", "test-web" ]
+    paths:
+      - 'src/Clientes/**'
+      - 'src/Paqueteria.Comun/**'
+      - '.github/workflows/deploy-web.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/angel-delatorre/paqueteria-web
+
+jobs:
+  build-and-push-wasm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Iniciar sesión en GitHub Packages (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construir y subir imagen de WebAssembly
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./src/Clientes/Paqueteria.WebAssembly/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:latest
+
+  deploy-wasm:
+    needs: build-and-push-wasm
+    runs-on: ubuntu-latest
+    environment: PROD
+    
+    steps:
+      - name: Actualizar WebAssembly en el VPS de Hetzner vía SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ vars.SSH_HOST }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/paqueteria
+            
+            echo "${{ secrets.CR_PAT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            docker compose pull paqueteria-web
+            docker compose up -d paqueteria-web
+            
+            docker image prune -f

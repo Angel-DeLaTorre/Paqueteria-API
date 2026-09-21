@@ -1,0 +1,86 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject ITokenStorage TokenStorage
+@inject AuthenticationStateProvider AuthStateProvider
+
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => _sidebarExpanded = !_sidebarExpanded)" />
+            <RadzenLabel Text="Header" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar Responsive="false" Style="width: max-content">
+        <RadzenPanelMenu DisplayStyle="@(_sidebarExpanded ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon)" ShowArrow="true">
+            <RadzenPanelMenuItem Text="Inicio" Path="/" Icon="dashboard" />
+            <RadzenPanelMenuItem Text="Clientes" Path="/catalogos/clientes" Icon="group" />
+            <RadzenPanelMenuItem Text="Asignaciones" Path="/catalogos/asignaciones" Icon="emoji_events" />
+
+            <RadzenPanelMenuItem Text="Guías" Icon="folder_open">
+                <RadzenPanelMenuItem Text="Guías" Path="/catalogos/guias" Icon="assignment" />
+                <RadzenPanelMenuItem Text="Nueva Guía" Path="/catalogos/guias/alta" Icon="note_add" />
+            </RadzenPanelMenuItem>
+
+            <RadzenPanelMenuItem Text="Catálogos" Icon="folder">
+                <RadzenPanelMenuItem Text="Artículos" Path="/catalogos/articulos" Icon="qr_code" Match="NavLinkMatch.All"  />
+                <RadzenPanelMenuItem Text="Choferes" Path="/catalogos/choferes" Icon="badge" Match="NavLinkMatch.All"  />
+                <RadzenPanelMenuItem Text="Rutas" Path="/catalogos/rutas" Icon="alt_route" Match="NavLinkMatch.All"  />
+                <RadzenPanelMenuItem Text="Sucursales" Path="/catalogos/sucursales" Icon="store" Match="NavLinkMatch.All"  />
+                <RadzenPanelMenuItem Text="Seguros" Path="/catalogos/seguros" Icon="verified_user" Match="NavLinkMatch.All"  />
+            </RadzenPanelMenuItem>
+
+            <RadzenPanelMenuItem Text="Usuarios" Path="/usuarios" Icon="person" />
+            <RadzenPanelMenuItem Text="Configuración" Path="/configuracion" Icon="settings" />
+            <RadzenPanelMenuItem Text="Salir" Icon="logout" Click="LogoutAsync" Style="color: var(--rz-danger);" />
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="rz-p-4">
+            @if (_cargandoNavegacion)
+            {
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="min-height: 60vh;">
+                    <RadzenProgressBar Circular="true" Value="100" Mode="ProgressBarMode.Indeterminate" ProgressBarStyle="ProgressBarStyle.Primary" />
+                </RadzenStack>
+            }
+            else
+            {
+                @Body
+            }
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+    private bool _sidebarExpanded = true;
+    private bool _cargandoNavegacion;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // Al cambiar la URL, desactivamos brevemente el estado de carga
+        _cargandoNavegacion = false;
+        StateHasChanged();
+    }
+
+    private async Task LogoutAsync()
+    {
+        await TokenStorage.RemoveTokenAsync();
+
+        if (AuthStateProvider is CustomAuthenticationStateProvider customAuthStateProvider)
+        {
+            customAuthStateProvider.NotifyUserLogout();
+        }
+
+        Navigation.NavigateTo("/login", replace: true);
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+}
