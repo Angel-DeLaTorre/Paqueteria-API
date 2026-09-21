@@ -27,8 +27,9 @@ builder.Services.AddScoped<ITokenStorage, WebAssemblyTokenStorage>();
 builder.Services.AddTransient<AuthorizationHandler>();
 
 // 3. Cliente HTTP
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5005/api/";
 builder.Services.AddHttpClient("PaqueteriaApi",
-        client => { client.BaseAddress = new Uri("http://localhost:5005/api/"); })
+        client => { client.BaseAddress = new Uri(apiBaseUrl); })
     .AddHttpMessageHandler<AuthorizationHandler>();
 
 builder.Services.AddScoped(sp =>
