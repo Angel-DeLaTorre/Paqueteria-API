@@ -2,7 +2,7 @@ name: Deploy WebAssembly Client
 
 on:
   push:
-    branches: [ "main", "master", "test-web" ]
+    branches: [ "main", "master"]
     paths:
       - 'src/Clientes/**'
       - 'src/Paqueteria.Comun/**'
