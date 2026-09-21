@@ -2,7 +2,7 @@ name: Deploy Backend API
 
 on:
   push:
-    branches: [ "main", "master", "test-web" ]
+    branches: [ "main", "master"]
     paths:
       - 'src/Backend/**'
       - 'src/Paqueteria.Comun/**'
@@ -70,6 +70,6 @@ jobs:
             
             # Descargar e iniciar solo los contenedores de base de datos y API
             docker compose pull paqueteria-api
-            docker compose up -d --force-recreate postgres-db paqueteria-api
+            docker compose up -d --force-recreate paqueteria-api
             
             docker image prune -f
