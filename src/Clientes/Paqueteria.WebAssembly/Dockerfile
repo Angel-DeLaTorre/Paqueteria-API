@@ -21,12 +21,12 @@ COPY --from=build-env /out /usr/share/nginx/html
 RUN echo 'server { \
     listen 80; \
     server_name localhost; \
-    root /usr/share/nginx/html; \
+    root /usr/share/nginx/html/wwwroot; \
     index index.html; \
     location / { \
         try_files $uri $uri/ /index.html; \
     } \
-    location ~* \.(wasm|clr)$ { \
+    location ~* \.wasm$ { \
         types { application/wasm wasm; } \
         add_header Cache-Control "no-cache"; \
     } \
