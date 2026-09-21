@@ -70,6 +70,6 @@ jobs:
             
             # Descargar e iniciar solo los contenedores de base de datos y API
             docker compose pull paqueteria-api
-            docker compose up -d postgres-db paqueteria-api
+            docker compose up -d --force-recreate postgres-db paqueteria-api
             
             docker image prune -f
