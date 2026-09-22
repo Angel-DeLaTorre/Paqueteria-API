@@ -17,6 +17,7 @@ RUN dotnet publish -c Release -o /app/publish
 FROM nginx:alpine
 
 COPY --from=build-env /app/publish/wwwroot /usr/share/nginx/html
+COPY --from=build-env /app/publish/wwwroot/_framework /usr/share/nginx/html/_framework
 
 COPY src/Clientes/Paqueteria.WebAssembly/nginx.conf /etc/nginx/conf.d/default.conf
 
