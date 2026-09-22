@@ -2,6 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
 WORKDIR /src
 
+RUN dotnet workload install wasm-tools
+
 COPY ["src/Clientes/Paqueteria.WebAssembly/Paqueteria.WebAssembly.csproj", "src/Clientes/Paqueteria.WebAssembly/"]
 COPY ["src/Clientes/Paqueteria.UI/Paqueteria.UI.csproj", "src/Clientes/Paqueteria.UI/"]
 COPY ["src/Clientes/Paqueteria.Cliente.Core/Paqueteria.Cliente.Core.csproj", "src/Clientes/Paqueteria.Cliente.Core/"]
