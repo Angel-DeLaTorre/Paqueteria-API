@@ -41,6 +41,7 @@ jobs:
           context: .
           file: ./src/Clientes/Paqueteria.WebAssembly/Dockerfile
           push: true
+          no-cache: true
           tags: ${{ env.IMAGE_NAME }}:latest
 
   deploy-wasm:

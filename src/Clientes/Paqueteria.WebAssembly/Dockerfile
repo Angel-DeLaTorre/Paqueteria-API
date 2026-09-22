@@ -14,19 +14,29 @@ FROM nginx:alpine
 EXPOSE 80
 
 # Copiamos el contenido publicado (/out contiene wwwroot con todos los _content y assets)
-COPY --from=build-env /out /usr/share/nginx/html
+COPY --from=build-env /out/wwwroot /usr/share/nginx/html
 
 # Configuración limpia de Nginx apuntando al subdirectorio wwwroot y soportando SPA
 RUN echo 'server { \
     listen 80; \
     server_name localhost; \
-    root /usr/share/nginx/html/wwwroot; \
+    root /usr/share/nginx/html; \
     index index.html; \
+    \
     location / { \
         try_files $uri $uri/ /index.html; \
     } \
+    \
     location ~* \.(wasm|clr)$ { \
         types { application/wasm wasm; } \
         add_header Cache-Control "no-cache"; \
+    } \
+    \
+    location ~* \.css$ { \
+        add_header Content-Type text/css; \
+    } \
+    \
+    location ~* \.js$ { \
+        add_header Content-Type application/javascript; \
     } \
 }' > /etc/nginx/conf.d/default.conf
