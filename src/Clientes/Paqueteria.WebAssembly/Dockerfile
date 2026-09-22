@@ -2,6 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
 WORKDIR /src
 
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 RUN dotnet workload install wasm-tools
 
 COPY ["src/Clientes/Paqueteria.WebAssembly/Paqueteria.WebAssembly.csproj", "src/Clientes/Paqueteria.WebAssembly/"]
@@ -19,7 +20,7 @@ RUN dotnet publish -c Release -o /app/publish
 FROM nginx:alpine
 
 COPY --from=build-env /app/publish/wwwroot /usr/share/nginx/html
-COPY --from=build-env /app/publish/wwwroot/_framework /usr/share/nginx/html/_framework
+#COPY --from=build-env /app/publish/wwwroot/_framework /usr/share/nginx/html/_framework
 
 COPY src/Clientes/Paqueteria.WebAssembly/nginx.conf /etc/nginx/conf.d/default.conf
 
