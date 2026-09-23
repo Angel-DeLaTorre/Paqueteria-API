@@ -21,9 +21,10 @@ RUN dotnet publish -c Release -o /app/publish
 # Etapa 2: Producción usando Nginx
 FROM nginx:alpine
 
+# Copiar los archivos publicados de wwwroot al directorio por defecto de Nginx
 COPY --from=build-env /app/publish/wwwroot /usr/share/nginx/html
-#COPY --from=build-env /app/publish/wwwroot/_framework /usr/share/nginx/html/_framework
 
+# Copiar la configuración personalizada de Nginx
 COPY src/Clientes/Paqueteria.WebAssembly/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80 443
