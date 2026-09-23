@@ -1,5 +1,5 @@
 ﻿# Etapa 1: Compilación
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build-env
 WORKDIR /src
 
 RUN apt-get update && apt-get install -y python3 python3-pip && rm -rf /var/lib/apt/lists/*
